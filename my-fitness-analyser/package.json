@@ -10,10 +10,15 @@
     "tokens": "node scripts/tokens.mjs",
     "check": "node scripts/check-foundation.mjs",
     "prototype": "node --watch prototypes/server.mjs",
-    "test:prototypes": "node --test tests/prototypes.test.mjs"
+    "test:prototypes": "node --test tests/prototypes.test.mjs",
+    "dev": "node --watch prototypes/server.mjs",
+    "vendor:motion": "node scripts/vendor-motion.mjs"
   },
   "displayName": "My Fitness Analyser",
   "devDependencies": {
     "@garmin/fitsdk": "21.221.0"
+  },
+  "dependencies": {
+    "gsap": "3.15.1"
   }
 }

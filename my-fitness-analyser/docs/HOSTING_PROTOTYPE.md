@@ -5,6 +5,11 @@ synthetic demonstration activity: Garmin captures, API keys, screenshot imports,
 and personal records are excluded. The online version has no sign-in, durable
 check-in storage, Garmin connection, or private activity history.
 
+Current UI: root opens Field Notes, the owner's selected B direction. `/studio`
+contains the review tools. Future work is on `master` by owner instruction. The
+branch import steps below document the initial prototype deployment; when deploying
+the latest selected UI, choose `master` and retain the same application root.
+
 ## Deploy from GitHub
 
 1. Push the `codex/prototype-vercel` branch to GitHub.

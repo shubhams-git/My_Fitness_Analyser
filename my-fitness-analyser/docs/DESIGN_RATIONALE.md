@@ -1,5 +1,9 @@
 # F01 refinement rationale
 
+Historical second-study rationale. The owner has since selected B and requested
+a more expressive finish. Current decisions are in DESIGN.md and
+docs/DESIGN_RESEARCH_2026-11.md; current evidence is in docs/QA_REPORT.md.
+
 The activity is a personal record worth looking at. Give its route and distance
 space, then make the useful evidence easy to inspect.
 

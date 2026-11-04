@@ -1,72 +1,88 @@
-# Design contract v0.1
+# Field Notes: selected design direction
 
-Status: proposed, awaiting visual comparison and owner selection. The stable principles below reflect the brief; the concrete visual settings are candidates. Do not label them approved.
+Updated 5 November 2026. The owner selected Prototype B for all future work.
+The earlier visual finish was not accepted as sufficiently premium. Refine one
+Field Notes application; Trackside survives only in Git and legacy shared styles.
+The exact new palette/type/motion treatment awaits owner visual review.
 
-Latest refinement, 5 November 2026: Trackside now integrates route and measurements;
-Field Notes compares ink, ivory and champagne. Shared tokens record these current
-candidates. The original shortlist below is historical context; see
-docs/DESIGN_RATIONALE.md and docs/QA_REPORT.md for the current study and evidence.
+## Identity
 
-F01 update, 5 November 2026: both populated interactive alternatives are implemented under prototypes/. Trackside uses locally served Manrope display/figures; Field Notes compares locally served Newsreader display with system body and Manrope figures. Accompanying SIL Open Font Licenses are retained. Control borders were raised above 3:1 against all proposed surfaces and a separate focus token was added. These are provisional review refinements, not a selected visual identity. See docs/PROTOTYPE_REVIEW.md.
+An illuminated personal training folio. Ink and midnight depth, ivory editorial
+letterforms, warm champagne light around the athlete's route and recorded facts.
+The intended feeling is ownership, craftsmanship and composed authority. These
+are design goals, not psychological outcomes that can be guaranteed.
 
-## Intended feeling
+`design/tokens.json` remains the editable source. selectedTheme is field-notes;
+status remains proposed for the evolving visual treatment. Current core values:
+canvas #080D13, surface #111B25, raised #202D3B, text #F5F0E6, secondary #B8C2CE,
+champagne #DFC28D. Separate highlight, ambient blue/gold, focus and semantic data
+roles keep atmosphere distinct from meaning. All text/control contrast gates
+still apply to their actual backgrounds.
 
-Precise, athletic, composed and tactile. The feeling of care should come from details that agree: line weights, aligned numerals, thoughtful information hierarchy, responsive controls and a clear relationship between the map, chart and selected split.
+Typography: locally hosted Instrument Serif for titles, findings and narrative
+transitions; Manrope for navigation, measurements and controls. Tabular numerals
+keep data stable. Instrument Serif regular and italic are from google/fonts with
+OFL licence; no font CDN. Newsreader and the older shortlist are historical.
 
-Use original branding. Reference leading sports apps for interaction quality, not their logos, proprietary maps or complete screen copies.
+## Composition
 
-## Shortlist for the next design iteration
+Root opens the selected application. /studio contains source, state, viewport
+and accessibility review controls. Both use the same normalized activity model.
 
-| Direction | Hierarchy and layout | Palette and character | Trade-off |
-| --- | --- | --- | --- |
-| A. Trackside (recommended starting point) | Activity detail opens on route; prominent essential metrics; compact sheet for splits and check-in | Graphite, cool white, mineral blue; crisp sans; restrained depth | Strong sports utility, but must avoid generic dark-dashboard treatment |
-| B. Field Notes | Insight-led opening; generous editorial rhythm; route and metrics integrated into a continuous page | Deep ink, softened white, sea-glass accent; more expressive typography | Distinctive and calm; requires discipline to keep analysis dense enough |
+The opening pairs a large activity title and distance with the recorded route,
+followed by essential facts. A full-width observation introduces the evidence.
+The detail chapter pairs a sticky GPS outline with the chart and sampled time
+blocks on desktop, then stacks them on mobile. Four unanswered check-in decisions
+follow, with the original conditional location, notes and retry semantics. A
+closing recap returns to the activity facts.
 
-Compare genuinely different compositions and interactions, not only two recolours. Show the same real activity and missing-data state in both. Choose one shared system after review; do not implement two full products.
+Avoid generic dashboard cards, empty product destinations, invented trophies,
+false readiness claims, imitated proprietary maps or fake terrain. The optical
+route treatment is a presentation of recorded GPS geometry, not a 3D terrain map.
 
-## Candidate tokens
+## Motion
 
-`design/tokens.json` is the single editable token source. `npm run tokens` regenerates CSS; `npm run check` rejects drift. Exact values can change during the visual comparison. Once selected, log the decision and update all shared primitives together.
+Motion is central to the brief. Choreograph a clear entrance, route drawing,
+bounded scroll depth, section continuity and direct selection/replay feedback.
+Use native scroll; sections remain reachable by links and keyboard. A deliberate
+12-second replay follows recorded elapsed timestamps. Play/pause is explicit;
+manual chart/block inspection and source/dialog changes stop replay.
 
-Candidate A: canvas #0C1015; surface #151C24; raised #202B38; main text #F3F5F7; secondary text #A7B0BB; accent #7DB0FF. Candidate B has its own ink/sea-glass palette in the token file.
+The motion toggle is in the desktop header and preview settings on mobile. OS
+reduced motion takes priority. Reduced mode shows all content in a static
+composition, disables replay and removes scroll movement. No mandatory intro,
+autoplay replay, endless foreground animation, randomized counters or scroll trap.
 
-Define semantic colours (action, focus, positive, warning, danger) independently of visual series (pace, HR, elevation). A faster run is not automatically green or “good.” Pair colour with text, shapes or line styles. No colour-only status. Avoid translucent effects as the sole separation between controls and map.
+GSAP core and ScrollTrigger 3.15.1 are pinned and served locally with notices.
+Dispose of animation contexts, observers and replay on activity replacement.
+Cursor movement updates marker attributes/readouts; route/chart geometry is
+cached until activity, chart series or viewport changes. Do not regenerate the
+whole SVG on every pointer event.
 
-## Typography and layout
+## Functional and accessibility contracts
 
-- System sans is the prototype baseline for fast, dependable iPhone rendering; compare one licensed display family only if it improves character. Record actual font files and licensing if adopted.
-- Body and editable input text start at 16px; secondary labels 14px; key metrics 40–48px. Responsive/clamped sizes, tabular numerals, stable unit placement and wrapping at large text sizes.
-- Spacing scale 4/8/12/16/24/32/48px. Content gutters begin at 20px and adapt to width. Avoid boxing every fact.
-- Control, panel and sheet radii have distinct roles; proposed values 12/20/28px. Do not apply one radius universally.
-- Desktop uses available width intelligently, not an oversized phone card. Core flows remain identical.
+Four run check-in answers, all initially unanswered. Keep required discomfort
+location and optional notes/context, browser draft recovery and simulated
+error/offline retry. Preview completion is explicitly browser-only.
 
-## Interaction and motion
+Missing data stays null. GPS gaps remain gaps. Device laps and sampled time
+blocks have different labels. Screenshot summaries do not become GPS or chart
+series. Every finding retains method and provenance.
 
-- Primary controls have at least 44×44 CSS-pixel hit areas. Inputs/choices have visible labels, focus and selected states. Do not disable browser zoom.
-- Reachable primary action; no required hover. Sheet drag always has an accessible button alternative and reliable focus/scroll behaviour.
-- One action, immediate feedback; preserve entered data during navigation and network failures. “Saved” means server acknowledgement; show “Pending” for an offline queue.
-- Candidate durations: press 120ms, UI transition 180ms, sheet transition 280ms. Values are starting settings, not frame-rate guarantees.
-- Animate spatial relationships and continuity. Do not delay content to play an entrance sequence. No looping pulse, decorative number roulette, excessive parallax or swipe-only controls.
-- Respect reduced motion: remove spatial/spring movement and retain essential state feedback. Limit animation work to opacity/transform when suitable; profile the actual device.
+Minimum 44 CSS-pixel primary targets, visible focus, labels, non-colour selected
+cues, accessible text/table chart inspection and no hover-only actions. Body and
+inputs start at 16px; use scalable text and safe areas. At 200% text, use normal
+flow for the action dock and let headers/metrics grow. Fixed UI must not obscure
+focused controls. Hide the redundant quick-check-in dock during inline entry.
 
-## Chart and map grammar
+Verify actual renders at phone, landscape, tablet, desktop and ultrawide sizes,
+with missing-data/failure states and motion preferences. Token tests alone are
+not WCAG certification; desktop browser review is not actual iPhone Safari or
+observed owner completion timing. Record performance measurements before claiming
+Core Web Vitals or frame-rate targets.
 
-Every chart answers a named question. Units, selected interval, time window and missing-data gaps are explicit. Do not smooth data in a way that conceals interruptions or manufactures precision. Touchable inspection also has a text/table alternative.
+## Research and current evidence
 
-Activity detail should progress toward: select a split → highlight exactly its corresponding route interval → align chart selection and summary. Preserve camera/selection when opening detail. Store raw GPS separately from any display downsampling or map-matched route. Never invent a route from a screenshot summary.
-
-Do not imply an all-time PR with a medal when only selected activities are imported. Map tiles require a provider/licence decision and attribution. A map failure must not block the activity record.
-
-## All states are designed
-
-Default, selected, pressed, focused, loading, empty, partial data, error/retry, queued offline, sync delayed, key expired and success. Numeric absence uses a concise label or dash, never a fake zero. No blanket caution banners. Use one actionable error near its cause.
-
-Respect iPhone safe areas, dynamic viewport, onscreen keyboard, browser back/forward and text enlargement. A bottom action must not cover content or focused controls.
-
-## Acceptance
-
-Two populated prototypes are reviewed visually before broad screen implementation. Evaluate 360px, 393–440px, 768px and desktop layouts, keyboard and reduced motion. These widths are test classes, not a claim about the exact physical iPhone viewport.
-
-Text contrast target: at least 4.5:1 for normal text, 3:1 for qualifying large text. Interactive non-text contrast is checked separately. Target WCAG 2.2 AA for implemented flows; do not claim compliance from token checks alone.
-
-A real iPhone Safari pass is recorded separately from desktop/WebKit emulation. Regressions in agreed hierarchy, tokens or accessibility are release defects, not aesthetic preferences to defer forever.
+See [research and art direction](docs/DESIGN_RESEARCH_2026-11.md), the latest
+[QA report](docs/QA_REPORT.md), and the active feature. Work directly on master,
+pulling GitHub master before new work, unless a new branch is genuinely needed.

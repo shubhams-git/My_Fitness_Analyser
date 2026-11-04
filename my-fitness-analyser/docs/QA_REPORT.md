@@ -1,57 +1,86 @@
-# F01 refinement QA — 5 November 2026
+# Selected Field Notes QA — 5 November 2026
+
+## Result and scope
+
+B is the selected direction. This pass verifies the new root application and
+/studio; the preceding two-direction comparison is historical. The updated
+composition and motion still require owner visual approval.
 
 ## Automated checks
 
-`npm run check`: passed; 14 required documents, generated token agreement and
-38 text contrast pairs. `npm run test:prototypes`: all five tests passed,
-including non-text contrast, sampled calculations and local server boundaries.
-JavaScript syntax and Git whitespace checks passed.
+`npm run check`: passed; generated token agreement, required documents and 38
+normal-text contrast pairs. `npm run test:prototypes`: six tests passed, including
+recorded-time replay selection across irregular samples/gaps, existing sampled
+calculations, non-text contrast and local server boundaries. JavaScript syntax
+and Git whitespace checks passed. These checks are not a full accessibility audit.
 
-## Browser review
+## Browser layouts and states
 
-Both directions were rendered with the synthetic sample at requested 360, 375,
-393, 440, 768 and 1440 pixel widths, plus 852 × 393 landscape. No horizontal
-overflow was measured in 14 cases. The browser reports 394 for the requested
-393 width in this environment; requested and actual dimensions are distinct.
-The comparison backlink was below the touch-target floor in the first pass and
-was enlarged. Route info/zoom/fit buttons retain at least 44 CSS-pixel targets.
+Ten requested responsive layouts: 360×800, 375×812, 393×852, 440×900, 768×1024,
+1280×900, 1440×1000, 1920×1080, 2560×1440 and 852×393 landscape. No horizontal
+overflow or measured visible control under the 44px target was found. The browser
+reports 394px for requested 393 and 394px height for requested 393 landscape.
 
-Both directions were also checked at 360px with a 32px root font (200%) and
-reduced motion. No element extended beyond the viewport; button transitions
-were 0s. The bottom action becomes part of normal document flow at that size,
-and the header grows with its wrapped wordmark. This tests a text-size override,
-not iOS Dynamic Type or browser pinch zoom.
+All ten scenarios were rendered at 360 and 1440px: normal, missing GPS/HR, empty,
+loading, load error, check-in error, offline, delayed, expired and completion.
+None of the 20 cases overflowed; partial and screenshot-only records have no
+route line. Five local imported-source layouts were also checked on phone:
+Garmin run, track run, walk, Strava and NRC. Their existing source semantics and
+unavailable GPS/HR were retained.
 
-All ten review scenarios were rendered in both directions: normal, partial,
-empty, loading, load failure, check-in failure, offline, delayed, expired and
-completion. The missing-data state has no route line. None of these 20 cases
-produced horizontal overflow.
+At 360px, 200% text (32px root) plus reduced motion retained the content without
+horizontal overflow. Only the intentionally clipped decorative aura extended
+outside the viewport. Route projection is removed, replay disabled and the dock
+uses normal flow. Studio controls also produced the 32px/static alternative and
+partial state; its requested 360px frame was reported as 361px by this browser.
+This is a text-size override, not physical iPhone Dynamic Type or pinch zoom.
 
-## Interaction review
+## Motion and interaction
 
-- Empty check-in: all answers initially blank; submitting focuses effort.
-- Discomfort: Mild exposes a location; chosen Knee is retained after failure.
-- Failure: four answers plus the location survive. The failure result receives
-  focus and remains fully above the sticky action bar; retry completes.
-- Completion: focus moves to the completion heading after the form is replaced.
-- Offline inline check-in: answers remain pending, focus reaches the pending
-  message, retry completes, and None leaves the location null.
-- Exploration: selected time block highlights its route interval; keyboard End
-  on the chart reaches 20:00. Opening and closing the sheet with Escape preserves
-  the selected route interval.
-- Synthetic check-in was reset through the UI after review. Real activity
-  check-ins were not filled during this refinement pass.
+- Entrance: masked words keep one accessible heading label. Route drawing and
+  atmospheric depth appear in the running page, with all facts in the DOM.
+- Replay: Play advances the visible chart position; Pause stops it and presents
+  Resume. Both route representations show the same recorded cursor. Replay
+  selection is tied to recorded elapsed time; no interpolated GPS is invented.
+- Direct inspection: keyboard End reaches 20:00 in the synthetic sample; one
+  chart marker and two route markers remain. Block selection highlights both
+  route representations. New cursor movement updates attributes/readouts, with
+  cached geometry, instead of rebuilding the SVG on every pointer event.
+- Navigation: hash jumps preserve selection and no longer rebuild the page or
+  restart the entrance. The sticky route, active detail link and reading line
+  were inspected while scrolling. No native scroll interception is used.
+- Activity picker: selecting NRC shows its source, no GPS route and its summary;
+  browser Back restores the synthetic run. Optional native transitions and
+  fallback behavior leave the same data contracts.
+- Motion control: off restores plain headings, removes projection/movement and
+  disables replay; on restores the expressive mode. OS reduced-motion change
+  handling exists, but an actual OS-settings toggle was not exercised here.
+- Check-in: blank submit focuses effort. Mild exposes a location. Four answers
+  plus Knee survive the simulated failure; the result receives focus and stays
+  above fixed UI. Retry completes and focuses the completion heading.
+- Offline: pending answers and all four responses survive reload. Retry completes.
+  Choosing None leaves location null. The shortcut dock hides during inline
+  entry, and focused unanswered effort remains below the header.
+- Synthetic check-in was reset through the UI after review. Real activity answers
+  were not filled. Browser logs showed no reported errors in the inspected flows.
 
-## Visual critique and corrections
+## Corrections made from inspection
 
-The first pass improved number hierarchy but revealed three concrete issues:
-the report backlink had a small hit area; the arched Field Notes route clipped
-the source button; and the sticky check-in footer could cover a failure message.
-These were corrected with a 44px link, a top-centred route control, and deliberate
-result focus/spacing. Enlarged-text headers were allowed to grow as well.
+Fixed section/history events rebuilding the page; stopped replay on direct
+inspection, source dialogs and activity changes; removed repeated SVG redraws
+from cursor movement; made the shortcut recede during inline entry; shortened
+the mobile route composition; preserved tablet note access; accounted for sticky
+header offsets and enlarged text; kept data labels separate from atmospheric art.
 
-Synthetic screenshots and measured browser evidence are stored under ignored
-`private-data/prototypes/refinement/`. This is a browser-checked design prototype,
-not an actual iPhone Safari pass, WCAG certification or measured owner timing.
-Lighthouse/Core Web Vitals, real-device performance and production deployment
-have not been measured in this pass. No runtime dependency was added.
+## Payload and remaining evidence
+
+Pinned GSAP core plus ScrollTrigger: 118,036 bytes raw, 46,592 bytes when gzip
+compressed locally. This is an asset-size measurement, not a device/network
+benchmark. Font and script files are served from the same origin with licences.
+No map provider or external animation/font CDN was introduced.
+
+Synthetic screenshots and measured browser evidence are in ignored
+`private-data/prototypes/field-notes-premium/`. These are browser review artifacts,
+not physical iPhone Safari verification, owner completion timings, Lighthouse/Core
+Web Vitals, 60fps evidence, production persistence or WCAG certification. The
+application remains a local/browser design prototype with synthetic-only Git hosting.

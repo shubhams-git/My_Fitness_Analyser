@@ -4,6 +4,19 @@ import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { timeBlocks, pace, finite, demonstration } from '../prototypes/data.mjs';
+import { recordIndexAtElapsed } from '../prototypes/interaction-model.js';
+
+test('replay follows recorded elapsed times through irregular sampling and gaps', () => {
+  const records=[{t:0},{t:2},{t:18},{t:18},{t:90}];
+  assert.equal(recordIndexAtElapsed([],20),-1);
+  assert.equal(recordIndexAtElapsed(records,-5),0);
+  assert.equal(recordIndexAtElapsed(records,1),0);
+  assert.equal(recordIndexAtElapsed(records,2),1);
+  assert.equal(recordIndexAtElapsed(records,17),1);
+  assert.equal(recordIndexAtElapsed(records,18),3);
+  assert.equal(recordIndexAtElapsed(records,60),3);
+  assert.equal(recordIndexAtElapsed(records,900),4);
+});
 
 test('control boundaries and keyboard focus meet non-text contrast on all proposed surfaces', async () => {
   const tokens=JSON.parse(await readFile(new URL('../design/tokens.json',import.meta.url),'utf8'));

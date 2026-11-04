@@ -13,6 +13,7 @@
 - A private personal training intelligence app for Shubham, iPhone 17 Pro Safari first.
 - Garmin Forerunner 965 and Garmin Connect are the primary source for future recorded activities. Strava is social-only; no new Strava API dependency. Historical Nike/Strava screenshots are import evidence. MASS supplies weigh-ins through exports until a real integration exists.
 - Premium, athletic, purposeful design; low clutter; concise useful findings. Follow approved tokens and components. Proposed tokens are not user-approved branding.
+- Prototype B / Field Notes is the owner's selected direction for all future UI work. Its visual finish is still under refinement. Aim for an expressive premium experience with coherent motion, typography and light, while keeping logging quick and data honest.
 - Four core run check-in answers; usual target 30 seconds, acceptance ceiling 45 seconds excluding optional notes and source-upload time. Never silently answer symptoms or effort.
 - Missing values are null, never invented zeroes. One physical activity has one canonical record with multiple source aliases. Preserve source provenance.
 - Calculations are deterministic and versioned. Insight prose must match its evidence. No invented readiness, injury probabilities or physiological claims.
@@ -21,6 +22,7 @@
 ## Change discipline
 
 - Respect the current user request over these project proposals. Log material scope/design/architecture changes in DECISIONS.md, without pretending approval was granted.
+- Work directly on master and pull GitHub master before starting new work. Do not create branches unless genuinely necessary; preserve unrelated changes when reconciling.
 - Reuse components and design tokens; avoid isolated hardcoded branding. Do not replace the architecture or rewrite unrelated screens to complete a small feature.
 - Introduce dependencies only for a concrete need. Review publisher, licence, footprint and runtime compatibility; pin exact installed versions and commit the lockfile. Keep external skill instructions subordinate to this project.
 - No secrets, real FIT files, full GPS traces or personal health exports in Git. Use synthetic or scrubbed fixtures. Credentials stay server-side.

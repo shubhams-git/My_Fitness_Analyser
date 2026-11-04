@@ -1,5 +1,11 @@
 # F01 prototype review
 
+Historical comparison record. On 5 November the owner selected B for all future
+UI and requested a more expressive finish. Root now opens Field Notes; /studio
+contains the review tools. See docs/DESIGN_RESEARCH_2026-11.md and docs/QA_REPORT.md
+for the selected direction's latest treatment and evidence. The unselected
+statements below describe the initial delivery.
+
 Delivered for owner review: 5 November 2026 (Australia/Sydney). Neither visual direction is selected or approved branding.
 
 ## Open locally

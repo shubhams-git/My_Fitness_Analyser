@@ -1,8 +1,8 @@
-/* Generated from design/tokens.json. Both themes are PROPOSED, not selected branding. */
+/* Generated from design/tokens.json. Selected direction: field-notes. Visual treatment: proposed. */
 :root {
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-display: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-editorial: "Newsreader", Georgia, serif;
+  --font-editorial: "Instrument Serif", Georgia, serif;
   --target-min: 44px;
   --type-label: 14px;
   --type-body: 16px;
@@ -46,20 +46,23 @@
 
 [data-theme="field-notes"] {
   color-scheme: dark;
-  --color-canvas: #0D1217;
-  --color-surface: #161E25;
-  --color-raised: #25313B;
-  --color-text: #F3EFE6;
-  --color-muted: #B4BCCA;
-  --color-accent: #D8B677;
-  --color-onAccent: #0D1217;
+  --color-canvas: #080D13;
+  --color-surface: #111B25;
+  --color-raised: #202D3B;
+  --color-text: #F5F0E6;
+  --color-muted: #B8C2CE;
+  --color-accent: #DFC28D;
+  --color-onAccent: #080D13;
   --color-positive: #87C9B8;
   --color-warning: #E3C080;
   --color-danger: #EBA49F;
   --color-border: #78939C;
   --color-focus: #F1DDAF;
-  --color-divider: #3A4148;
+  --color-divider: #35424F;
   --color-pace: #D8B677;
   --color-heartRate: #E3AC91;
   --color-elevation: #B1BDE0;
+  --color-highlight: #F8E9CA;
+  --color-ambientBlue: #264A70;
+  --color-ambientGold: #80633E;
 }

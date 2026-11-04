@@ -1,7 +1,7 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F01, refined prototypes ready for owner review (features/F01-design-and-feasibility.md)
+Active increment: F01, B selected; new Field Notes experience ready for visual review (features/F01-design-and-feasibility.md)
 
 ## Completed
 
@@ -21,9 +21,15 @@ Active increment: F01, refined prototypes ready for owner review (features/F01-d
 - Pushed the original prototype and synthetic-only Vercel setup on codex/prototype-vercel, commit e0948bb. UI/UX Pro Max is installed globally and its local search works.
 - Refined both prototypes on codex/f01-design-refinement: integrated Trackside route/metrics, more distinct scale, ink/champagne Field Notes, section shortcuts, clearer chart readouts, reachable controls and 200% text review. Error/pending/completion focus is explicit. See docs/AUDIT.md, docs/DESIGN_RATIONALE.md and docs/QA_REPORT.md.
 
+- Owner selected B / Field Notes for all future UI; current finish was rejected as too flat. Pulled master from GitHub to 35f10d0 and continued directly on master.
+- Researched current official GPT-6.1 Sol/Codex guidance, perception research, motion guidance and skills. Recorded sources and design hypotheses in docs/DESIGN_RESEARCH_2026-11.md.
+- Built the selected root application and /studio, a coordinated typographic entrance/route draw, scroll-linked depth, sticky detail route, linked marker inspection, optional timestamp-based replay, activity transitions, motion controls and a static reduced-motion alternative.
+- Added exact GSAP 3.15.1 with same-origin assets/notices and self-hosted OFL Instrument Serif. Cached SVG geometry and changed cursor movement to update markers/readouts rather than redraw the full route/chart.
+- Preserved blank required responses, conditional location, draft recovery, error/offline retry and source provenance. Corrected section history rebuilding, redundant entry dock and keyboard/result visibility. Latest QA is in docs/QA_REPORT.md.
+
 ## Not implemented
 
-No production application UI, database importer, Garmin sync, MASS live integration or application authentication. Prototype Vercel configuration exists; this refinement has not been deployed by this agent. Check-ins remain browser-only demonstrations. Design selection and production runtime remain open. Initial authenticated retrieval is verified, not background sync or durable application storage.
+No production application UI, database importer, Garmin sync, MASS live integration or application authentication. Prototype Vercel configuration exists; this refinement has not been deployed by this agent. Check-ins remain browser-only demonstrations. B is selected; the new finish and production runtime remain open. Initial authenticated retrieval is verified, not background sync or durable application storage.
 
 ## Known owner context
 
@@ -31,16 +37,16 @@ Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one 
 
 ## Verification
 
-Windows/Node: npm run check and five npm run test:prototypes cases passed. The refinement browser pass covered 14 responsive cases (360/375/393/440/768/1440 plus landscape for both), 20 states, 200% text with reduced motion at 360px, check-in failure/pending/completion focus and linked exploration. Browser evidence retains requested versus measured dimensions. Earlier seven FIT/API comparisons and capture hashes also passed. See docs/QA_REPORT.md for the latest pass. Actual iPhone Safari, observed owner timing, database persistence, production sync and restore remain unverified.
+Six prototype tests and foundation/token checks pass. Browser review covered ten requested responsive layouts from 360 to 2560px and landscape, twenty state/width cases, five imported source layouts, 200% text/reduced motion, replay/pause, marker inspection, activity switching/back, section navigation, draft recovery and check-in retries. Browser rounding differences are recorded separately. No physical iPhone Safari, observed owner timing, Core Web Vitals/frame-rate benchmark, production persistence or production sync is claimed. See docs/QA_REPORT.md.
 
 ## Next action
 
-Review the refined Trackside and Field Notes prototypes with the owner and choose the visual direction.
+Review the new selected Field Notes experience with the owner and refine its visual/motion finish.
 
 ## Inputs needed at the next increment
 
-Owner visual choice and feedback; later an actual iPhone Safari pass and five timed check-ins. A normal FR965 Run will eventually validate that device's running-field coverage; current running samples are from FR255 Music. Future screenshots will arrive with dates. Production storage/authentication and hosting remain later work. Do not request passwords or paste keys into chat.
+Owner visual/motion feedback on Field Notes; later an actual iPhone Safari pass and five timed check-ins. A normal FR965 Run will eventually validate that device's running-field coverage; current running samples are from FR255 Music. Future screenshots will arrive with dates. Production storage/authentication and hosting remain later work. Do not request passwords or paste keys into chat.
 
 ## Open decisions
 
-Visual direction; exact runtime/hosting; remote visibility; production API retry/rate-limit/expiry behavior and 965 running coverage. Initial list/detail/download endpoints are now verified for this account. Do not re-ask settled ownership, screenshot-date or Strava-role questions.
+Final visual treatment for selected B; exact production runtime/hosting; remote visibility; production API retry/rate-limit/expiry behavior and 965 running coverage. Initial list/detail/download endpoints are now verified for this account. Do not re-ask settled ownership, screenshot-date or Strava-role questions.

@@ -1,5 +1,9 @@
 # Prototype refinement audit — 5 November 2026
 
+Update: B is now selected; root opens the app and /studio holds review tools.
+The newer research/audit conclusions are in docs/DESIGN_RESEARCH_2026-11.md.
+The snapshot below describes the pre-selection second study.
+
 Scope: improve the two F01 activity/check-in prototypes. The attached Sonnet
 prompt is inspiration, not a new application specification.
 

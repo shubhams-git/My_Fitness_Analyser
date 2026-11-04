@@ -1,14 +1,76 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/prototypes/index.html" },
-    { "source": "/app.html", "destination": "/prototypes/app.html" },
-    { "source": "/app.js", "destination": "/prototypes/app.js" },
-    { "source": "/app.css", "destination": "/prototypes/app.css" },
-    { "source": "/readability.css", "destination": "/prototypes/readability.css" },
-    { "source": "/refinement.css", "destination": "/prototypes/refinement.css" },
-    { "source": "/review.css", "destination": "/prototypes/review.css" },
-    { "source": "/review-sizing.css", "destination": "/prototypes/review-sizing.css" },
-    { "source": "/review.js", "destination": "/prototypes/review.js" },
-    { "source": "/assets/fonts/(.*)", "destination": "/prototypes/assets/fonts/$1" }
+    {
+      "source": "/",
+      "destination": "/prototypes/index.html"
+    },
+    {
+      "source": "/app.html",
+      "destination": "/prototypes/app.html"
+    },
+    {
+      "source": "/app.js",
+      "destination": "/prototypes/app.js"
+    },
+    {
+      "source": "/app.css",
+      "destination": "/prototypes/app.css"
+    },
+    {
+      "source": "/readability.css",
+      "destination": "/prototypes/readability.css"
+    },
+    {
+      "source": "/refinement.css",
+      "destination": "/prototypes/refinement.css"
+    },
+    {
+      "source": "/review.css",
+      "destination": "/prototypes/review.css"
+    },
+    {
+      "source": "/review-sizing.css",
+      "destination": "/prototypes/review-sizing.css"
+    },
+    {
+      "source": "/review.js",
+      "destination": "/prototypes/review.js"
+    },
+    {
+      "source": "/assets/fonts/(.*)",
+      "destination": "/prototypes/assets/fonts/$1"
+    },
+    {
+      "source": "/field-notes.css",
+      "destination": "/prototypes/field-notes.css"
+    },
+    {
+      "source": "/field-notes.js",
+      "destination": "/prototypes/field-notes.js"
+    },
+    {
+      "source": "/premium-motion.js",
+      "destination": "/prototypes/premium-motion.js"
+    },
+    {
+      "source": "/interaction-model.js",
+      "destination": "/prototypes/interaction-model.js"
+    },
+    {
+      "source": "/studio.css",
+      "destination": "/prototypes/studio.css"
+    },
+    {
+      "source": "/studio.html",
+      "destination": "/prototypes/studio.html"
+    },
+    {
+      "source": "/studio",
+      "destination": "/prototypes/studio.html"
+    },
+    {
+      "source": "/assets/vendor/(.*)",
+      "destination": "/prototypes/assets/vendor/$1"
+    }
   ]
 }

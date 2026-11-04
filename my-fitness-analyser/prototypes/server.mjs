@@ -22,7 +22,7 @@ const server=http.createServer(async(req,res)=>{
     if(evidence)file=fileURLToPath(new URL(`../private-data/historical/screenshots/image-${evidence[1]}.png`,import.meta.url));
     else if(pathname==='/design/tokens.css')file=fileURLToPath(new URL('../design/tokens.css',import.meta.url));
     else {
-      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname));
+      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname));
       const rel=relative(root,file);
       if(rel.startsWith('..')||isAbsolute(rel)||!/\.(html|css|js|svg|ttf|txt)$/.test(file))throw new Error('Not served');
     }

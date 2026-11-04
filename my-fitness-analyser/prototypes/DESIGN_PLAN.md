@@ -1,5 +1,9 @@
 # F01 visual study
 
+Historical two-direction study. Owner selected B for all future development.
+The new selected Field Notes composition and motion score are in DESIGN.md and
+docs/DESIGN_RESEARCH_2026-11.md. Trackside is no longer an active UI direction.
+
 Second study, 5 November 2026: see docs/DESIGN_RATIONALE.md for the current
 composition and palette decisions. The original plan below records the first
 comparison; Field Notes now compares ink/champagne, and Trackside integrates its

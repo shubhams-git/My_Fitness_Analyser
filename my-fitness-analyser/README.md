@@ -19,8 +19,16 @@ These files reduce dependence on conversation memory. They cannot guarantee an a
 
 ## UI prototype
 
-Run `npm run prototype` for the local, interactive design comparison. To publish
-the synthetic-only shareable preview from GitHub to Vercel, follow
+Run `npm run dev` (or `npm run prototype`) and open http://127.0.0.1:4173/ for
+the selected **Field Notes** application. Review states, viewport and text/motion
+controls are at http://127.0.0.1:4173/studio. Prototype B is the sole future UI
+direction; its new visual finish is still being refined with the owner.
+
+The activity picker includes a clearly labelled synthetic sample and any local
+private fixtures. Online deployments from GitHub contain the synthetic sample
+only. `npm run vendor:motion` refreshes locally served files from pinned GSAP.
+See [design research](docs/DESIGN_RESEARCH_2026-11.md) and
+[current QA](docs/QA_REPORT.md). To publish the shareable preview, follow
 [the hosting steps](docs/HOSTING_PROTOTYPE.md). Never add Garmin credentials or
 private activity data to a hosted prototype deployment.
 

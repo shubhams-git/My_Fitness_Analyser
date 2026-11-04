@@ -14,7 +14,7 @@ export function renderTokens(tokens) {
   ];
   const themes = Object.entries(tokens.themes).map(([name, theme]) =>
     `[data-theme="${name}"] {\n  color-scheme: dark;\n${Object.entries(theme).map(([k, v]) => `  --color-${k}: ${v};`).join('\n')}\n}`);
-  return `/* Generated from design/tokens.json. Both themes are PROPOSED, not selected branding. */\n:root {\n${base.join('\n')}\n}\n\n${themes.join('\n\n')}\n`;
+  return `/* Generated from design/tokens.json. Selected direction: ${tokens.selectedTheme || 'none'}. Visual treatment: ${tokens.status}. */\n:root {\n${base.join('\n')}\n}\n\n${themes.join('\n\n')}\n`;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
