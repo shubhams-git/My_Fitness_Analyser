@@ -37,14 +37,18 @@ export function mountPremiumMotion({records,reduced,onCursor,onPreferenceChange}
         const titleWords=splitWords('.fn-intro h1');
         if(titleWords.length)gsap.from(titleWords,{yPercent:115,rotation:3,duration:1.1,stagger:.07,ease:'power3.out',clearProps:'all'});
         gsap.from('.fn-distance',{y:28,duration:1.2,ease:'power3.out',clearProps:'all'});
-        gsap.from('.fn-orbit',{scale:.86,rotation:-12,opacity:0,duration:1.6,ease:'power3.out',clearProps:'all'});
+        gsap.from('.fn-course-grid',{scaleX:.8,opacity:0,duration:1,ease:'power3.out',clearProps:'all'});
+        gsap.from('.fn-hero-footer .metric',{y:18,opacity:0,duration:.6,stagger:.07,ease:'power3.out',clearProps:'all'});
+        const trace=document.querySelector('.fn-trace-path');
+        if(trace){const length=trace.getTotalLength();gsap.fromTo(trace,{strokeDasharray:length,strokeDashoffset:length},{strokeDashoffset:0,duration:1.3,ease:'power2.out',clearProps:'strokeDasharray,strokeDashoffset'});}
         const route=document.querySelector('.fn-art .route-line');
         if(route){const length=route.getTotalLength();gsap.fromTo(route,{strokeDasharray:length,strokeDashoffset:length},{strokeDashoffset:0,duration:1.5,ease:'power2.inOut',clearProps:'strokeDasharray,strokeDashoffset'});}
-        gsap.to('.fn-art',{yPercent:10,rotation:3,scale:.94,ease:'none',scrollTrigger:{trigger:'.fn-hero',start:'top top',end:'bottom top',scrub:.65}});
+        gsap.to('.fn-art',{yPercent:4,scale:.98,ease:'none',scrollTrigger:{trigger:'.fn-hero',start:'top top',end:'bottom top',scrub:.65}});
         gsap.to('.fn-aura',{yPercent:24,ease:'none',scrollTrigger:{trigger:'.fn-hero',start:'top top',end:'bottom top',scrub:1}});
         const findingWords=splitWords('.fn-finding .observation h2');
         if(findingWords.length)gsap.from(findingWords,{yPercent:115,rotation:2,duration:.95,stagger:.055,ease:'power3.out',scrollTrigger:{trigger:'.fn-finding',start:'top 74%',once:true},clearProps:'all'});
         gsap.utils.toArray('.fn-hairline').forEach(el=>gsap.from(el,{scaleX:0,transformOrigin:'left',ease:'power2.out',duration:.8,scrollTrigger:{trigger:el,start:'top 88%',once:true}}));
+        gsap.utils.toArray('.chart-trace').forEach(el=>{const length=el.getTotalLength();gsap.fromTo(el,{strokeDasharray:length,strokeDashoffset:length},{strokeDashoffset:0,duration:1.1,ease:'power2.out',scrollTrigger:{trigger:el,start:'top 85%',once:true},clearProps:'strokeDasharray,strokeDashoffset'});});
         gsap.from('.fn-note-mark',{rotation:-20,y:60,ease:'none',scrollTrigger:{trigger:'.fn-notes-section',start:'top bottom',end:'center center',scrub:.6}});
         gsap.to('.fn-reading-progress',{scaleX:1,transformOrigin:'left',ease:'none',scrollTrigger:{start:0,end:'max',scrub:true}});
         ScrollTrigger.create({start:10,end:'max',toggleClass:{targets:'.fn-header',className:'is-scrolled'}});

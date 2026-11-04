@@ -1,9 +1,11 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F01, B selected; new Field Notes experience ready for visual review (features/F01-design-and-feasibility.md)
+Active increment: F01, B selected; athletic Field Notes redesign ready for visual review (features/F01-design-and-feasibility.md)
 
 ## Completed
+
+- Latest owner feedback: premium quality accepted, hotel-like styling rejected; active fitness identity requested. Pulled origin/master (already current at 4c405be). Replaced serif/champagne treatment with self-hosted OFL Barlow Condensed, carbon/orange/glacier tokens, compact training hierarchy and prominent check-in action. Added recorded pace trace with keyboard inspection, linked replay time/pace/chart/route cursor, replay beacon and chart entrance. See docs/ACTIVE_DESIGN.md and docs/QA_ACTIVE_DESIGN.md. This iteration is local, awaiting visual review.
 
 - Reconciled current user request with three earlier STRIDE research/brief documents.
 - Recorded product contract, candidate visual system, design tokens, data rules, feature workflow and quality gates.
@@ -37,11 +39,16 @@ Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one 
 
 ## Verification
 
+Latest athletic iteration: seven automated tests and foundation checks pass;
+nine responsive layouts, ten phone states, 200% text/reduced motion, replay and
+keyboard synchronization, screenshot-only source and check-in validation checked.
+See docs/QA_ACTIVE_DESIGN.md. Evidence below describes the preceding folio pass.
+
 Six prototype tests and foundation/token checks pass. Browser review covered ten requested responsive layouts from 360 to 2560px and landscape, twenty state/width cases, five imported source layouts, 200% text/reduced motion, replay/pause, marker inspection, activity switching/back, section navigation, draft recovery and check-in retries. Browser rounding differences are recorded separately. No physical iPhone Safari, observed owner timing, Core Web Vitals/frame-rate benchmark, production persistence or production sync is claimed. See docs/QA_REPORT.md.
 
 ## Next action
 
-Review the new selected Field Notes experience with the owner and refine its visual/motion finish.
+Review the athletic Field Notes redesign with the owner.
 
 ## Inputs needed at the next increment
 

@@ -1,36 +1,40 @@
 # Field Notes: selected design direction
 
 Updated 5 November 2026. The owner selected Prototype B for all future work.
-The earlier visual finish was not accepted as sufficiently premium. Refine one
-Field Notes application; Trackside survives only in Git and legacy shared styles.
-The exact new palette/type/motion treatment awaits owner visual review.
+The owner liked the premium finish but requested a stronger active fitness
+identity. Refine one Field Notes application; Trackside remains historical.
+The latest athletic treatment awaits owner visual review.
 
 ## Identity
 
-An illuminated personal training folio. Ink and midnight depth, ivory editorial
-letterforms, warm champagne light around the athlete's route and recorded facts.
-The intended feeling is ownership, craftsmanship and composed authority. These
-are design goals, not psychological outcomes that can be guaranteed.
+A premium training workspace. Carbon surfaces, condensed athletic typography,
+signal-orange route/pace, glacier-blue heart rate and directional ambient light.
+The route, effort trace and precise figures convey movement and performance.
+Use the design brief in docs/ACTIVE_DESIGN.md for the latest rationale.
 
 `design/tokens.json` remains the editable source. selectedTheme is field-notes;
 status remains proposed for the evolving visual treatment. Current core values:
-canvas #080D13, surface #111B25, raised #202D3B, text #F5F0E6, secondary #B8C2CE,
-champagne #DFC28D. Separate highlight, ambient blue/gold, focus and semantic data
+canvas #080E16, surface #111C29, raised #1C2B3C, text #F2F7FC, secondary #B8C2CE,
+orange #FFAE89. Separate highlight, ambient blue/ember, focus and semantic data
 roles keep atmosphere distinct from meaning. All text/control contrast gates
 still apply to their actual backgrounds.
 
-Typography: locally hosted Instrument Serif for titles, findings and narrative
-transitions; Manrope for navigation, measurements and controls. Tabular numerals
-keep data stable. Instrument Serif regular and italic are from google/fonts with
-OFL licence; no font CDN. Newsreader and the older shortlist are historical.
+Typography: locally hosted Barlow Condensed bold/italic for athletic titles,
+findings and figures; Manrope for navigation, supporting copy and controls.
+Tabular numerals keep data stable. Barlow is from google/fonts under OFL;
+no font CDN. Instrument Serif and Newsreader are historical treatments.
 
 ## Composition
 
 Root opens the selected application. /studio contains source, state, viewport
 and accessibility review controls. Both use the same normalized activity model.
 
-The opening pairs a large activity title and distance with the recorded route,
-followed by essential facts. A full-width observation introduces the evidence.
+The opening pairs an athletic activity title and distance with recorded route,
+explicit replay and a compact pace trace. A shared cursor links the trace,
+elapsed/pace readout, both route outlines and detailed chart. A keyboard-operable
+slider supports manual inspection even with reduced motion. Mobile puts the
+essential facts before the route; check-in is reachable beside the distance.
+A compact observation introduces the evidence.
 The detail chapter pairs a sticky GPS outline with the chart and sampled time
 blocks on desktop, then stacks them on mobile. Four unanswered check-in decisions
 follow, with the original conditional location, notes and retry semantics. A

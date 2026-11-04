@@ -1,5 +1,8 @@
 # Selected Field Notes QA — 5 November 2026
 
+The royal/folio styling below is historical. Latest athletic redesign and
+verification: [QA_ACTIVE_DESIGN.md](QA_ACTIVE_DESIGN.md).
+
 ## Result and scope
 
 B is the selected direction. This pass verifies the new root application and

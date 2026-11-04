@@ -1,6 +1,10 @@
 # F01: Design and data feasibility
 
-Status: B selected; new Field Notes treatment ready for visual review; physical-device gates pending
+Status: B selected; athletic redesign ready for visual review; physical-device gates pending
+Latest iteration: owner liked premium quality but rejected hotel styling. Athletic
+Barlow Condensed, carbon/orange/glacier palette, compact session layout, prominent
+check-in and linked route/pace replay inspection. See docs/ACTIVE_DESIGN.md and
+docs/QA_ACTIVE_DESIGN.md. Previous folio treatment below is historical.
 Refinement, 5 November 2026: stronger route/metric hierarchy, ink/champagne Field Notes,
 section shortcuts, 200% text review and corrected feedback-result focus. See
 docs/DESIGN_RATIONALE.md and docs/QA_REPORT.md. The reference prompt informed this

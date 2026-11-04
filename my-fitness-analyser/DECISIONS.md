@@ -40,4 +40,13 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D19 — Owner-directed redesign, 5 November 2026. Keep selected B and premium
+craft, replace the royal/hotel identity with an active fitness workspace.
+Supersedes D17's serif/champagne visual treatment. Adopt proposed Barlow
+Condensed/Manrope and carbon/orange/glacier styling, compact session hierarchy,
+recorded pace trace and shared replay/inspection readouts. Four-answer check-in,
+source provenance, missing-value and local-preview boundaries remain in force.
+No new runtime dependency. Verification: docs/QA_ACTIVE_DESIGN.md. Exact visual
+finish requires owner review; work remains directly on master.
+
 For a material change record: ID, date, status, problem, chosen option, alternatives, consequence, verification and superseded ID. Small implementation choices belong in the feature record, not an unnecessary full architecture essay.

@@ -11,7 +11,7 @@ Turn running, strength, body-weight and recovery records into clear answers to: 
 ## Confirmed requirements
 
 - Personal use, high professional quality, mobile-first and eventually online with private access.
-- Prototype B / Field Notes is selected for all future UI development. The owner requests a much more impressive editorial, premium experience with strong coordinated motion, scroll flows, atmospheric gradients and distinctive typography. Selection of B is not approval of its previous visual finish.
+- Prototype B / Field Notes is selected for all future UI development. Retain the premium finish but express an active fitness application through athletic typography, performance visualizations, coordinated motion and gradients. The owner rejected the hotel-like royal presentation. The latest finish remains under review.
 - User owns a Garmin Forerunner 965, already paired with the phone, Garmin Connect and Strava. Those connections do not authorize this new application's access.
 - New recordings come from Garmin. Strava continues for social sharing only. Historic NRC and Strava screenshots are legitimate user-supplied historical inputs. No ongoing NRC dependency.
 - MASS remains the weight-entry source initially. Re-import its JSON without duplicate weigh-ins. Live fetching is a separate integration, not assumed.

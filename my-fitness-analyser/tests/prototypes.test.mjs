@@ -5,6 +5,17 @@ import http from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { timeBlocks, pace, finite, demonstration } from '../prototypes/data.mjs';
 import { recordIndexAtElapsed } from '../prototypes/interaction-model.js';
+import { paceTrace } from '../prototypes/field-notes.js';
+
+test('compact pace trace preserves missing samples, stationary periods and time gaps', () => {
+  assert.equal(paceTrace([]),'');
+  assert.equal(paceTrace([{t:0,speed:null},{t:1,speed:0}]),'');
+  const d=paceTrace([{t:0,speed:2},{t:1,speed:4},{t:2,speed:null},{t:3,speed:2},{t:60,speed:4}]);
+  assert.equal((d.match(/M/g)||[]).length,3);
+  assert.equal((d.match(/L/g)||[]).length,1);
+  assert.match(d,/M600\.00,12\.00/);
+  assert.doesNotMatch(d,/NaN|Infinity/);
+});
 
 test('replay follows recorded elapsed times through irregular sampling and gaps', () => {
   const records=[{t:0},{t:2},{t:18},{t:18},{t:90}];
