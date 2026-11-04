@@ -1,0 +1,11 @@
+.env
+.env.*
+private-data/
+*.fit
+*.FIT
+*.tcx
+*.gpx
+node_modules/
+tests/
+scripts/
+docs/

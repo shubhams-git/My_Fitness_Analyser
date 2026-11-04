@@ -17,6 +17,13 @@ Start with [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md) and [STATE.md](STATE
 
 These files reduce dependence on conversation memory. They cannot guarantee an agent follows instructions. Checks, review and actual release evidence enforce the important contracts.
 
+## UI prototype
+
+Run `npm run prototype` for the local, interactive design comparison. To publish
+the synthetic-only shareable preview from GitHub to Vercel, follow
+[the hosting steps](docs/HOSTING_PROTOTYPE.md). Never add Garmin credentials or
+private activity data to a hosted prototype deployment.
+
 ## Use this pack
 
 Unzip the package. The repository content is in `my-fitness-analyser/`. To recover its initial Git history, run `git clone my-fitness-analyser.bundle my-fitness-analyser-project` from the extracted package's parent directory. Work in the cloned directory. Keep raw health data and credentials outside Git.

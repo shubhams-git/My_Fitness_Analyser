@@ -1,0 +1,13 @@
+{
+  "rewrites": [
+    { "source": "/", "destination": "/prototypes/index.html" },
+    { "source": "/app.html", "destination": "/prototypes/app.html" },
+    { "source": "/app.js", "destination": "/prototypes/app.js" },
+    { "source": "/app.css", "destination": "/prototypes/app.css" },
+    { "source": "/readability.css", "destination": "/prototypes/readability.css" },
+    { "source": "/review.css", "destination": "/prototypes/review.css" },
+    { "source": "/review-sizing.css", "destination": "/prototypes/review-sizing.css" },
+    { "source": "/review.js", "destination": "/prototypes/review.js" },
+    { "source": "/assets/fonts/(.*)", "destination": "/prototypes/assets/fonts/$1" }
+  ]
+}
