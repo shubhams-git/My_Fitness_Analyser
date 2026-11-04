@@ -1,6 +1,10 @@
 # F01: Design and data feasibility
 
 Status: prototypes ready for owner review; visual selection and physical-device gates pending
+Refinement, 5 November 2026: stronger route/metric hierarchy, ink/champagne Field Notes,
+section shortcuts, 200% text review and corrected feedback-result focus. See
+docs/DESIGN_RATIONALE.md and docs/QA_REPORT.md. The reference prompt informed this
+activity-detail slice; its broad application scope was not adopted.
 Owner outcome: choose a mobile activity/check-in design grounded in actual source capabilities.
 Scope: authenticated read-only Garmin capture, source inspection, historical/MASS inventory, two visual prototypes.
 Exclusions: production synchronization, database import, deployment, broad screen implementation.

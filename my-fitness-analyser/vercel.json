@@ -5,6 +5,7 @@
     { "source": "/app.js", "destination": "/prototypes/app.js" },
     { "source": "/app.css", "destination": "/prototypes/app.css" },
     { "source": "/readability.css", "destination": "/prototypes/readability.css" },
+    { "source": "/refinement.css", "destination": "/prototypes/refinement.css" },
     { "source": "/review.css", "destination": "/prototypes/review.css" },
     { "source": "/review-sizing.css", "destination": "/prototypes/review-sizing.css" },
     { "source": "/review.js", "destination": "/prototypes/review.js" },
