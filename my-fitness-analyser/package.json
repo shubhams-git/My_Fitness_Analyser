@@ -1,0 +1,14 @@
+{
+  "name": "my-fitness-analyser",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "tokens": "node scripts/tokens.mjs",
+    "check": "node scripts/check-foundation.mjs"
+  },
+  "displayName": "My Fitness Analyser"
+}

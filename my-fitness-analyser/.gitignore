@@ -1,0 +1,16 @@
+node_modules/
+.next/
+dist/
+coverage/
+.env
+.env.*
+!.env.example
+private-data/
+*.fit
+*.FIT
+*.tcx
+*.gpx
+artifacts/private/
+playwright-report/
+test-results/
+.DS_Store

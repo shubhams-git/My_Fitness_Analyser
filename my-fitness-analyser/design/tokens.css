@@ -1,0 +1,59 @@
+/* Generated from design/tokens.json. Both themes are PROPOSED, not selected branding. */
+:root {
+  --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --target-min: 44px;
+  --type-label: 14px;
+  --type-body: 16px;
+  --type-title: 28px;
+  --type-metric: 48px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --radius-control: 12px;
+  --radius-panel: 20px;
+  --radius-sheet: 28px;
+  --motion-pressMs: 120ms;
+  --motion-transitionMs: 180ms;
+  --motion-sheetMs: 280ms;
+  --motion-ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+[data-theme="trackside"] {
+  color-scheme: dark;
+  --color-canvas: #0C1015;
+  --color-surface: #151C24;
+  --color-raised: #202B38;
+  --color-text: #F3F5F7;
+  --color-muted: #A7B0BB;
+  --color-accent: #7DB0FF;
+  --color-onAccent: #0C1015;
+  --color-positive: #73CDA8;
+  --color-warning: #E5C377;
+  --color-danger: #F19A9A;
+  --color-border: #435165;
+  --color-pace: #7DB0FF;
+  --color-heartRate: #E5A16B;
+  --color-elevation: #B7A8E1;
+}
+
+[data-theme="field-notes"] {
+  color-scheme: dark;
+  --color-canvas: #101C22;
+  --color-surface: #182A32;
+  --color-raised: #233B46;
+  --color-text: #F1F1E9;
+  --color-muted: #ACBCBD;
+  --color-accent: #87C9B8;
+  --color-onAccent: #101C22;
+  --color-positive: #87C9B8;
+  --color-warning: #E3C080;
+  --color-danger: #EBA49F;
+  --color-border: #526A73;
+  --color-pace: #87C9B8;
+  --color-heartRate: #E3AC91;
+  --color-elevation: #B1BDE0;
+}
