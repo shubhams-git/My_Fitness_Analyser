@@ -1,6 +1,8 @@
 /* Generated from design/tokens.json. Both themes are PROPOSED, not selected branding. */
 :root {
   --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-editorial: "Newsreader", Georgia, serif;
   --target-min: 44px;
   --type-label: 14px;
   --type-body: 16px;
@@ -34,7 +36,8 @@
   --color-positive: #73CDA8;
   --color-warning: #E5C377;
   --color-danger: #F19A9A;
-  --color-border: #435165;
+  --color-border: #788A9E;
+  --color-focus: #AFCFFF;
   --color-pace: #7DB0FF;
   --color-heartRate: #E5A16B;
   --color-elevation: #B7A8E1;
@@ -52,7 +55,8 @@
   --color-positive: #87C9B8;
   --color-warning: #E3C080;
   --color-danger: #EBA49F;
-  --color-border: #526A73;
+  --color-border: #78939C;
+  --color-focus: #C4EADD;
   --color-pace: #87C9B8;
   --color-heartRate: #E3AC91;
   --color-elevation: #B1BDE0;

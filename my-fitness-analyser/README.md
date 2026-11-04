@@ -2,7 +2,7 @@
 
 Version 1.0.1 · 4 November 2026 · Owner: Shubham
 
-This is the project foundation plus a verified data-feasibility capture, not a running application. Product requirements are recorded; visual direction, runtime stack and hosting remain proposals. Read-only Garmin account access and original FIT inspection now work locally. No application database or deployment exists.
+This repository contains the project foundation, verified data-feasibility capture and two interactive UI prototypes. The production application is not implemented. Visual direction, runtime stack and hosting remain proposals. Read-only Garmin retrieval and UI previews work locally; no application database or deployment exists.
 
 Start with [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md) and [STATE.md](STATE.md). A coding agent starts with [AGENTS.md](AGENTS.md). [ROADMAP.md](ROADMAP.md) defines the first usable release and deliberately defers advanced features.
 
@@ -23,7 +23,9 @@ Unzip the package. The repository content is in `my-fitness-analyser/`. To recov
 
 Run `npm run check` with Node 22 or newer. This foundation command needs no install step and validates document presence, token shape, text contrast and generated CSS consistency. It does not test an application or validate live Garmin access. Run `npm ci --ignore-scripts` for the pinned official Garmin FIT SDK used by the separate inspection scripts.
 
-Recommended next iteration: make two populated mobile visual prototypes for the same activity-detail and check-in flow using the inspected source capabilities. Real account JSON and seven original FIT files have been captured; historical screenshots and MASS export have been inventoried privately. See [data feasibility](docs/DATA_FEASIBILITY.md) and the [active feature record](features/F01-design-and-feasibility.md). Do not build the full backlog before a visual direction is selected.
+Real account JSON and seven original FIT files have been captured; historical screenshots and MASS export have been inventoried privately. See [data feasibility](docs/DATA_FEASIBILITY.md) and the [active feature record](features/F01-design-and-feasibility.md). The next decision is the visual direction to refine; broad application work follows that review.
+
+The two interactive prototypes are now ready for owner review. Run `npm run prototype` and open `http://127.0.0.1:4173/` to compare Trackside and Field Notes, source samples, failure states and accessibility options. See the [prototype review guide](docs/PROTOTYPE_REVIEW.md) for deliverables, checks and remaining gates. Check-ins are browser-only demonstrations; this is not a production app release.
 
 ## Contents
 

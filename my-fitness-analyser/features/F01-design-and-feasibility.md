@@ -1,6 +1,6 @@
 # F01: Design and data feasibility
 
-Status: designing; initial data feasibility verified
+Status: prototypes ready for owner review; visual selection and physical-device gates pending
 Owner outcome: choose a mobile activity/check-in design grounded in actual source capabilities.
 Scope: authenticated read-only Garmin capture, source inspection, historical/MASS inventory, two visual prototypes.
 Exclusions: production synchronization, database import, deployment, broad screen implementation.
@@ -12,13 +12,14 @@ Relevant decisions: R01-R06, D02-D05; source-first sequencing requested in the c
 - Passed: source hashes and available summary measurements compared between API and FIT; originals remain private.
 - Passed: six screenshots preserved and grouped into two candidate records; dates owner-confirmed, rounding/disagreements retained, absent HR null.
 - Passed: MASS structure inspected, including the deleted session marker.
-- Pending: two genuinely different populated compositions, missing-data/failure states, responsive/accessibility review and owner selection.
+- Passed: two genuinely different populated compositions, shared source selection, synchronized route/chart/time blocks, modal versus inline check-ins, missing-data/failure states and browser responsive/accessibility review. See docs/PROTOTYPE_REVIEW.md.
+- Pending: owner selection, actual iPhone Safari and observed owner check-in timing. Neither proposed theme has been marked approved.
 - Pending: first 965 Run validation; older owned running files are valid initial data examples, not a substitute for that device-specific check.
 
 ## Commands and limits
 
-See `docs/DATA_FEASIBILITY.md` for capture/inspection/verification commands and official sources. Private artifacts include an owner review and verification records. No application database, live background sync, browser test or release exists yet.
+See `docs/DATA_FEASIBILITY.md` for capture commands and `docs/PROTOTYPE_REVIEW.md` for prototype/browser evidence. `npm run test:prototypes` and `npm run check` pass. Private artifacts include source data, screenshots and browser verification. No production database, background sync or release exists yet.
 
 ## Handover
 
-Next action: build the two Activity Detail/Quick Check-In prototypes from the inspected field capabilities and compare them with the owner.
+Next action: owner reviews Trackside and Field Notes and chooses the direction to refine before production implementation.

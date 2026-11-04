@@ -8,7 +8,9 @@
   },
   "scripts": {
     "tokens": "node scripts/tokens.mjs",
-    "check": "node scripts/check-foundation.mjs"
+    "check": "node scripts/check-foundation.mjs",
+    "prototype": "node --watch prototypes/server.mjs",
+    "test:prototypes": "node --test tests/prototypes.test.mjs"
   },
   "displayName": "My Fitness Analyser",
   "devDependencies": {

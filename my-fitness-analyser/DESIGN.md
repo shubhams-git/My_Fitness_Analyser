@@ -2,6 +2,8 @@
 
 Status: proposed, awaiting visual comparison and owner selection. The stable principles below reflect the brief; the concrete visual settings are candidates. Do not label them approved.
 
+F01 update, 5 November 2026: both populated interactive alternatives are implemented under prototypes/. Trackside uses locally served Manrope display/figures; Field Notes compares locally served Newsreader display with system body and Manrope figures. Accompanying SIL Open Font Licenses are retained. Control borders were raised above 3:1 against all proposed surfaces and a separate focus token was added. These are provisional review refinements, not a selected visual identity. See docs/PROTOTYPE_REVIEW.md.
+
 ## Intended feeling
 
 Precise, athletic, composed and tactile. The feeling of care should come from details that agree: line weights, aligned numerals, thoughtful information hierarchy, responsive controls and a clear relationship between the map, chart and selected split.

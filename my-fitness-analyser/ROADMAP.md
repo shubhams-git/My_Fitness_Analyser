@@ -2,8 +2,8 @@
 
 | Increment | User-visible outcome | Completion evidence |
 | --- | --- | --- |
-| F00 Foundation, current | Shared vision, candidate design system and repeatable process recorded | Docs/tokens checks and portable Git snapshot; no claim of an app release |
-| F01 Design and feasibility | Two populated activity/check-in prototypes; one visual direction selected | Rendered comparisons; user choice logged; one real FIT inspected or explicitly pending |
+| F00 Foundation, completed | Shared vision, candidate design system and repeatable process recorded | Docs/tokens checks and portable Git snapshot; no claim of an app release |
+| F01 Design and feasibility, current | Two populated activity/check-in prototypes; one visual direction selected | Real FIT/API inspection and interactive prototypes verified; owner choice and physical-device gates pending |
 | F02 Core activity slice | Import a real FIT; inspect correct summary/splits; save/edit feedback privately | Source comparison; duplicate import check; save/reload/ownership tests; browser QA |
 | F03 First usable MVP | MASS weight trend, simple deterministic finding and export/restore | Original IDs/deletions respected; trend math tested; private deployment and restore proven |
 | F04 Garmin sync | Pull new workouts through verified Personal API | Authenticated account test; pagination/retries/idempotency; expiry and sync status; FIT fallback |

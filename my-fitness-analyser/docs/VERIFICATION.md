@@ -44,3 +44,13 @@ Six owner-supplied screenshots were preserved with hashes and visually transcrib
 No credential or full raw health export was added to source control. Private artifacts are ignored local files, not durable application storage or an off-device backup. Application UI, browser/device verification, production sync reliability, database isolation and restore remain pending. See docs/DATA_FEASIBILITY.md for source references and reproduction limits.
 
 Additional local negative/partial-data checks: encoded a small synthetic activity with the official SDK and verified inspection retains missing GPS as absence; truncated the same file and verified integrity rejection with nonzero exit. Synthetic fixture/results are under ignored private-data/verification-fixtures. These checks exercise the inspection tool, not a production import pipeline.
+
+## Interactive prototypes, 5 November 2026
+
+`npm run check` passes with provisional display fonts/focus/border tokens and regenerated CSS. `npm run test:prototypes` passes five cases covering control/focus contrast, irregular sample boundaries, missing/stationary values, coherent synthetic sample generation and local server source/host restrictions. Static browser code passes Node syntax checks.
+
+Browser review used the connected in-app browser through computer-use tools. Two compositions were evaluated at five requested widths (360, 393, 440, 768, 1440) with no measured horizontal overflow or visible default-view buttons below 44px. Requested 393px reports 394px innerWidth due to browser rounding; evidence preserves both values. Twenty visible-state cases passed. Narrow phone larger-text/reduced-motion overrides produce 20px root/body, 17.5px secondary labels, zero transitions, automatic scrolling and no horizontal overflow.
+
+Direct interaction checks covered unanswered defaults, required fields, conditional discomfort/location, stale-location clearing, optional note, Escape/close, draft recovery on reload, preview completion/edit, retained answers after failure, offline pending/retry, linked interval/chart/route selection, preserved route zoom/selection and keyboard chart inspection. Historical duration types and missing HR/GPS remain distinct; source screenshots load via explicit local allowlist.
+
+Evidence and rendered screenshots are under ignored private-data/prototypes. The two designs are ready for owner comparison, not approved visual baselines or a production release. Actual iPhone Safari/safe-area/keyboard behavior, measured owner check-in timing and production persistence remain pending. See docs/PROTOTYPE_REVIEW.md.
