@@ -2,7 +2,7 @@
 
 Version 1.0.1 · 4 November 2026 · Owner: Shubham
 
-This is the project foundation, not a running application. Product requirements are recorded; visual direction, runtime stack and hosting are proposals. No Garmin account has been accessed, database provisioned, external skill installed or app deployed in this iteration.
+This is the project foundation plus a verified data-feasibility capture, not a running application. Product requirements are recorded; visual direction, runtime stack and hosting remain proposals. Read-only Garmin account access and original FIT inspection now work locally. No application database or deployment exists.
 
 Start with [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md) and [STATE.md](STATE.md). A coding agent starts with [AGENTS.md](AGENTS.md). [ROADMAP.md](ROADMAP.md) defines the first usable release and deliberately defers advanced features.
 
@@ -21,9 +21,9 @@ These files reduce dependence on conversation memory. They cannot guarantee an a
 
 Unzip the package. The repository content is in `my-fitness-analyser/`. To recover its initial Git history, run `git clone my-fitness-analyser.bundle my-fitness-analyser-project` from the extracted package's parent directory. Work in the cloned directory. Keep raw health data and credentials outside Git.
 
-Run `npm run check` with Node 22 or newer. This foundation has no third-party dependencies and needs no install step. This command validates document presence, token shape, text contrast and generated CSS consistency. It does not test an application or validate live Garmin access.
+Run `npm run check` with Node 22 or newer. This foundation command needs no install step and validates document presence, token shape, text contrast and generated CSS consistency. It does not test an application or validate live Garmin access. Run `npm ci --ignore-scripts` for the pinned official Garmin FIT SDK used by the separate inspection scripts.
 
-Recommended next iteration: make two populated mobile visual prototypes for the same activity-detail and check-in flow. In parallel, obtain one owner-supplied Garmin original FIT file and check Personal API setup availability. Do not build the full backlog before a visual direction is selected.
+Recommended next iteration: make two populated mobile visual prototypes for the same activity-detail and check-in flow using the inspected source capabilities. Real account JSON and seven original FIT files have been captured; historical screenshots and MASS export have been inventoried privately. See [data feasibility](docs/DATA_FEASIBILITY.md) and the [active feature record](features/F01-design-and-feasibility.md). Do not build the full backlog before a visual direction is selected.
 
 ## Contents
 

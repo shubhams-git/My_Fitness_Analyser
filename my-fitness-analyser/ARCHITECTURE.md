@@ -1,6 +1,6 @@
 # Architecture proposal
 
-Status: proposed; no runtime scaffold, cloud database or deployment exists in this pack.
+Status: proposed; no application runtime scaffold, cloud database or deployment exists. Read-only Node capture/inspection scripts now verify initial Garmin access; see docs/DATA_FEASIBILITY.md. They do not select the application framework or establish production synchronization.
 
 ## Small default
 

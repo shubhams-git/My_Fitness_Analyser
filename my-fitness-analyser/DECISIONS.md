@@ -19,6 +19,10 @@ Date: 4 November 2026. “Confirmed” means stated by the user; “proposed” 
 | D07 | Proposed | Use one design-generation skill at a time and a separate review checklist. Inspect and pin any installed skills/dependencies. None installed by this pack. |
 | D08 | Deferred | Gemini explanations, sleep dashboard, best-effort medals, personal segments, heatmaps and advanced comparisons. Preserve their value in the roadmap without building them now. |
 | D09 | Open | Private Git remote, hosting and chosen visual direction. Local foundation commit is portable in the included Git bundle. |
+| D10 | Owner-directed, 4 November 2026 | Inspect real data before the UI comparison. Use the key already in local .env for official read-only Garmin access; inspect supplied historical screenshots and MASS backup. Older returned Garmin activities are confirmed as the owner's and included. This verifies initial access without claiming production sync. |
+| D11 | Adopted for feasibility, 4 November 2026 | Pin official @garmin/fitsdk 21.221.0 as a development-only file-inspection dependency with lockfile. Keep captures, screenshots, decoded streams and extracted health measurements under ignored private-data. Application runtime and storage remain undecided. |
+
+Current checkout reconciliation: origin is configured and the active branch is master; the Git root is the parent of the project folder. Remote visibility has not been verified. D09's remote-selection wording describes the earlier foundation pack, not the present local configuration. The included bundle is historical, not a continually updated backup.
 
 ## Reconciliation with prior documents
 
