@@ -1,5 +1,10 @@
 # F01 visual study
 
+Second study, 5 November 2026: see docs/DESIGN_RATIONALE.md for the current
+composition and palette decisions. The original plan below records the first
+comparison; Field Notes now compares ink/champagne, and Trackside integrates its
+route and measurements into one composition. Neither direction is approved.
+
 Two local, interactive alternatives; neither is selected branding. Same inspected Garmin Run, same four-answer contract, same source boundaries. No production stack selection or hosting in this increment.
 
 ## Trackside

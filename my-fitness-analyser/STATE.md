@@ -1,7 +1,7 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F01, prototypes ready for owner review (features/F01-design-and-feasibility.md)
+Active increment: F01, refined prototypes ready for owner review (features/F01-design-and-feasibility.md)
 
 ## Completed
 
@@ -18,10 +18,12 @@ Active increment: F01, prototypes ready for owner review (features/F01-design-an
 - Implemented sampled time-block/route/chart synchronization, keyboard chart inspection, source provenance/images, blank required answers, conditional discomfort location, browser draft recovery and simulated completion/failure/offline retry.
 - Added comparison controls for source, state, viewport, larger text and reduced motion. Fonts are served locally with licences; shared tokens remain proposed with separate focus and stronger control boundaries.
 - Verified five prototype tests, ten responsive cases, twenty visible-state cases and narrow larger-text/reduced-motion layouts. Private screenshots/evidence and docs/PROTOTYPE_REVIEW.md record what passed and remaining gates.
+- Pushed the original prototype and synthetic-only Vercel setup on codex/prototype-vercel, commit e0948bb. UI/UX Pro Max is installed globally and its local search works.
+- Refined both prototypes on codex/f01-design-refinement: integrated Trackside route/metrics, more distinct scale, ink/champagne Field Notes, section shortcuts, clearer chart readouts, reachable controls and 200% text review. Error/pending/completion focus is explicit. See docs/AUDIT.md, docs/DESIGN_RATIONALE.md and docs/QA_REPORT.md.
 
 ## Not implemented
 
-No production application UI, database importer, Garmin sync, MASS live integration, application authentication or cloud deployment. Two local browser-only prototypes now exist; check-ins do not write real training records. Design selection and runtime stack remain open. Initial authenticated retrieval is verified, not background sync or durable application storage. No new third-party skill was installed.
+No production application UI, database importer, Garmin sync, MASS live integration or application authentication. Prototype Vercel configuration exists; this refinement has not been deployed by this agent. Check-ins remain browser-only demonstrations. Design selection and production runtime remain open. Initial authenticated retrieval is verified, not background sync or durable application storage.
 
 ## Known owner context
 
@@ -29,11 +31,11 @@ Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one 
 
 ## Verification
 
-Windows/Node v26.5.0: npm run check and five npm run test:prototypes cases passed. Browser review covered both directions at nominal 360/393/440/768/1440 widths, twenty scenario cases, larger-text/reduced-motion overrides, check-in recovery and linked inspection. Browser evidence retains requested versus measured dimensions. Earlier seven FIT/API comparisons and capture hashes also passed. See docs/PROTOTYPE_REVIEW.md and docs/VERIFICATION.md. Actual iPhone Safari, observed owner timing, database persistence, production sync and restore remain unverified.
+Windows/Node: npm run check and five npm run test:prototypes cases passed. The refinement browser pass covered 14 responsive cases (360/375/393/440/768/1440 plus landscape for both), 20 states, 200% text with reduced motion at 360px, check-in failure/pending/completion focus and linked exploration. Browser evidence retains requested versus measured dimensions. Earlier seven FIT/API comparisons and capture hashes also passed. See docs/QA_REPORT.md for the latest pass. Actual iPhone Safari, observed owner timing, database persistence, production sync and restore remain unverified.
 
 ## Next action
 
-Review the two populated prototypes with the owner and select the visual direction to refine.
+Review the refined Trackside and Field Notes prototypes with the owner and choose the visual direction.
 
 ## Inputs needed at the next increment
 
