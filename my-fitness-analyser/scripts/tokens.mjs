@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 export function renderTokens(tokens) {
   const base = [
     `  --font-body: ${tokens.fontFamily};`,
+    ...(tokens.fontFamilyDisplay ? [`  --font-display: ${tokens.fontFamilyDisplay};`] : []),
+    ...(tokens.fontFamilyEditorial ? [`  --font-editorial: ${tokens.fontFamilyEditorial};`] : []),
     `  --target-min: ${tokens.minTargetPx}px;`,
     ...Object.entries(tokens.fontSize).map(([k, v]) => `  --type-${k}: ${v}px;`),
     ...Object.entries(tokens.space).map(([k, v]) => `  --space-${k}: ${v}px;`),

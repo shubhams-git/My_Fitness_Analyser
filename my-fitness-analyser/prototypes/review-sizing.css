@@ -1,0 +1,3 @@
+/* Width controls refer to the iframe viewport, excluding its presentation frame. */
+.device{box-sizing:content-box;max-width:calc(100% - 18px)}
+@media(max-width:700px){.device{max-width:calc(100% - 12px)}}
