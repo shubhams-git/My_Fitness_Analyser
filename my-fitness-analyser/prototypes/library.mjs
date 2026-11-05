@@ -2,6 +2,7 @@ import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { Decoder, Stream } from '@garmin/fitsdk';
 import { timeBlocks,observation,ANALYSIS_VERSION } from './data.mjs';
+import { mergeMass,restoreMass,massDigest } from './mass.mjs';
 
 const finite=x=>Number.isFinite(x)?x:null;
 const providerSignature=d=>JSON.stringify([d?.activityName,d?.activityTypeDTO?.typeKey,...['distance','duration','elapsedDuration','movingDuration','averageHR','maxHR','elevationGain','startTimeLocal','startTimeGMT'].map(k=>d?.summaryDTO?.[k])]);
@@ -53,6 +54,7 @@ export class LocalLibrary {
   mutate(fn){const work=this.queue.then(async()=>{const data=await this.read(),result=await fn(data);await mkdir(this.directory,{recursive:true});const temp=new URL('library.tmp',this.directory);await writeFile(temp,JSON.stringify(data));await rename(temp,this.file);return result;});this.queue=work.catch(()=>{});return work;}
   async import(bytes,seeds=[]){const activity=decodeActivity(bytes);return this.mutate(data=>{const existing=Object.values(data.activities).find(a=>a.sourceHash===activity.sourceHash);if(existing)return {activity:existing,duplicate:true};data.activities[activity.id]=activity;data.originals[activity.sourceHash]=bytes.toString('base64');return {activity,duplicate:false};});}
   async save(id,draft,knownIds){if(!knownIds.includes(id))throw new Error('Activity was not found.');const value=validateFeedback(draft);return this.mutate(data=>{if(!Object.hasOwn(data.activities,id))throw new Error('Activity changed while saving. Refresh the library and retry.');data.feedback[id]=value;return value;});}
+  async importMass(incoming,expectedDigest){return this.mutate(data=>{if(expectedDigest!==massDigest(data.mass))throw new Error('Your journal changed. Review this file again before importing.');const merged=mergeMass(data.mass,incoming);data.mass=merged.state;return {counts:merged.counts,duplicate:merged.duplicate};});}
   async importGarmin(bytes,id,detail){const incoming=applyGarmin(decodeActivity(bytes),id,detail);return this.mutate(data=>{
     const alias=Object.values(data.activities).find(a=>a.provider?.id===String(id));const same=Object.values(data.activities).find(a=>a.sourceHash===incoming.sourceHash);const existing=alias||same;
     if(alias&&same&&alias.id!==same.id){const content=d=>JSON.stringify([d.answers,d.location,d.note,d.context]);if(data.feedback[alias.id]&&data.feedback[same.id]&&content(data.feedback[alias.id])!==content(data.feedback[same.id]))throw new Error('Two check-ins need review before these source records can be merged.');data.feedback[alias.id]??=data.feedback[same.id];delete data.feedback[same.id];delete data.activities[same.id];}
@@ -69,6 +71,7 @@ export class LocalLibrary {
       const decoded=decodeActivity(Buffer.from(raw,'base64'));if(decoded.sourceHash!==a.sourceHash)throw new Error('A backup file hash did not match.');decoded.id=id;if(a.provider&&/^[1-9]\d{0,15}$/.test(a.provider.id))applyGarmin(decoded,a.provider.id,a.provider.detail,a.provider.fetchedAt);activities[id]=decoded;originals[a.sourceHash]=raw;
     }
     for(const [id,draft]of Object.entries(backup.feedback)){if(!Object.hasOwn(activities,id)&&!seedIds.includes(id))throw new Error('The backup references an unknown activity.');feedback[id]=validateFeedback(draft);}
-    return this.mutate(data=>{data.activities={...activities,...data.activities};data.originals={...originals,...data.originals};data.feedback={...feedback,...data.feedback};return {restored:Object.keys(activities).length};});
+    if(backup.mass)restoreMass(undefined,backup.mass);
+    return this.mutate(data=>{const mass=backup.mass?restoreMass(data.mass,backup.mass):data.mass;data.activities={...activities,...data.activities};data.originals={...originals,...data.originals};data.feedback={...feedback,...data.feedback};if(mass)data.mass=mass;return {restored:Object.keys(activities).length,massRestored:Boolean(backup.mass)};});
   }
 }

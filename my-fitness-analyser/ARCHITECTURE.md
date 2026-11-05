@@ -1,5 +1,10 @@
 # Architecture proposal
 
+F03b: `/journal` adds a MASS format 2 adapter and pure versioned body/session
+read model. It uses the existing atomic LocalLibrary, source JSON hashes and
+complete-library export/restore. Preview/commit runs only on the loopback server;
+the public adapter returns generated records. No database or model dependency.
+
 F03a preparation: `cloud/` and the SQL migration adapt the existing library to
 Supabase Auth, owner-scoped JSONB state and private original files on Vercel.
 Authentication and conflict behaviour have local/synthetic test evidence; the
@@ -19,7 +24,10 @@ loopback, validates Host and requires same-origin POSTs. Production private
 hosting/authentication/database remain open. Vercel serves the synthetic UI and
 does not receive the local health library.
 
-Status: proposed; no application runtime scaffold, cloud database or deployment exists. Read-only Node capture/inspection scripts now verify initial Garmin access; see docs/DATA_FEASIBILITY.md. They do not select the application framework or establish production synchronization.
+Production architecture remains proposed. The working local application uses
+Node plus static JavaScript/CSS, real Garmin/FIT imports and the MASS journal.
+Cloud provisioning/deployment remain unverified. Feasibility research below is
+historical context rather than a claim that the local application is unbuilt.
 
 ## Small default
 

@@ -40,6 +40,16 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D24 — Owner-directed independent progress, 5 November 2026. Gemini, Vercel and
+Supabase credentials are deferred. Advance the missing F03 MASS journal slice
+locally: reviewable format 2 import, atomic source-ID/revision/tombstone merge,
+original JSON preservation, weight chart and source-labelled session log, all
+included in complete-library recovery. Treat Cardio separately from Strength;
+unknown focus stays generic and no Garmin alias is inferred from a same-day
+match. Use neutral descriptive weight statistics, not physiological claims.
+No new dependency, external upload or model call. The next product slice is a
+unified session/calendar and check-in queue; pending keys do not block it.
+
 D23 — Owner-directed training UI and Gemini, 5 November 2026. Defer Supabase
 provisioning; use the actual local Garmin library for a new training overview.
 Keep Gemini on synthetic data only even after a key is added. Billing is

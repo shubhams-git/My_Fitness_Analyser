@@ -1,5 +1,11 @@
 # My Fitness Analyser
 
+Body and session journal: open http://127.0.0.1:4173/journal after starting the
+local app. Review/import a MASS format 2 JSON backup, inspect weight history and
+source-labelled strength/cardio sessions, and export the complete local library.
+The supplied history is already imported locally. Read the
+[MASS journal and recovery guide](features/F03-mass-journal.md).
+
 Training overview: run `npm ci`, then `npm run dev` and open
 http://127.0.0.1:4173/training. Inspect real local Garmin sessions, historical
 summaries, weekly distance, pace and sensor coverage. Open any session for its
@@ -25,7 +31,7 @@ computer under ignored `private-data/library/`. See
 [local alpha instructions](features/F02-local-alpha.md). Hosted Vercel remains
 the synthetic design preview.
 
-Version 1.1.0-alpha.4 · 5 November 2026 · Owner: Shubham
+Version 1.1.0-alpha.5 · 5 November 2026 · Owner: Shubham
 
 This repository contains the selected athletic Field Notes UI, a working local
 Garmin/FIT library and a bounded synthetic analysis lab. Private online access

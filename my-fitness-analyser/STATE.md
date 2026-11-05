@@ -1,9 +1,13 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F05a training overview and synthetic Gemini lab (features/F05-training-intelligence.md)
+Active increment: F03b MASS body and session journal (features/F03-mass-journal.md)
 
 ## Completed
+
+- Added `/journal` with MASS import review, duplicate/update/deletion handling, raw source preservation, daily weight readings, trailing seven-day means, date windows, keyboard chart inspection and session history. Imported the supplied export locally: 29 weights, four active sessions (two Strength, two Cardio), one excluded session tombstone. Repeat import adds no duplicates. See features/F03-mass-journal.md.
+- Complete-library export/merge restore now includes MASS originals and records. A fresh private restore verified seven Garmin activities, 29 weigh-ins and four active MASS sessions. Earlier backups do not erase an existing journal. Preview is read-only and stale previews fail before saving. Public journal preview is synthetic only.
+- Owner explicitly defers Gemini/Vercel/Supabase credentials and asks for autonomous product progress. External setup is not the next blocking task. Gemini remains synthetic-only; no new model/provider call was made for this increment.
 
 - Added `/training`: actual local Garmin sessions plus historical screenshot summaries, last-90-day/all windows, running/walking filters, weekly distance, actual HR trace, source-labelled pace, sensor coverage and session links. The accepted athletic typography/palette continues with bounded motion and a static preference. Root detail remains intact; mobile navigation now reaches both Training and Activities.
 - Added the Gemini synthetic-only evidence/tool pipeline: bounded aliased facts, strict request-specific JSON Schema, Ajv validation, evidence checks, source-backed charts, single-flight requests and a versioned private local response cache. Official Google docs mark 3.5 Flash deprecated; the configurable default is 3.6 Flash. Owner confirmed active billing but has not added the key; **use synthetic only**. No live Gemini request was made. See docs/GEMINI_ANALYSIS.md.
@@ -41,13 +45,22 @@ Active increment: F05a training overview and synthetic Gemini lab (features/F05-
 
 ## Not implemented
 
-No verified private online deployment or provisioned cloud database, scheduled/background Garmin sync or MASS import UI. Authentication/cloud storage code is prepared but unverified against live Supabase; setup is now deferred by owner direction. The current local app and actual Garmin library remain usable. Public Vercel stays synthetic and its Gemini generation is disabled. No live Gemini generation, personal-data AI analysis, strength/MASS analysis or generated-output quality evaluation is claimed.
+No verified private online deployment or provisioned cloud database, scheduled/background Garmin sync, manual strength entry/check-in or unified session calendar. Authentication/cloud storage code is prepared but unverified against live Supabase; credentials/setup are deferred by owner direction. Local Garmin and MASS libraries remain usable. Public Vercel stays synthetic and its Gemini generation is disabled. No live Gemini generation, personal-data AI analysis, physiological body/strength analysis or generated-output quality evaluation is claimed.
 
 ## Known owner context
 
 Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one short walk and no 965 Run yet in the inspected capture. Account also contains older owned FR255 Music activities, including running. Garmin is future recording source; strength logging need not rely on Garmin; Strava social-only; historical NRC/Strava screenshots; MASS weigh-ins. One athlete initially. Supplied screenshots are incomplete history; owner will supply more with dates.
 
 ## Verification
+
+F03b: 38 automated tests pass, including nine MASS/data/import/restore/HTTP tests.
+The real supplied file passed browser import/reload/re-import with no duplicates;
+malformed JSON leaves saved data unchanged. Date filters, keyboard cursor,
+source reading table, source session classification, motion and mobile navigation
+checked. Responsive layouts: 320, 393, 768 and desktop; no page overflow or short
+nav/button targets in inspected views. Actual complete backup restored to a fresh
+private local library. No owner check-in answers or hosted personal data created.
+No actual iPhone, 200% text or performance claim for this increment. See F03b.
 
 F05a: 29 automated tests pass, including window/source/duration rules, evidence
 privacy, strict schema/reference/claim rejection, mocked Interactions parsing,
@@ -83,11 +96,11 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-After the owner adds GEMINI_API_KEY locally, run and evaluate one synthetic-only Gemini review from `/training`.
+Build a unified session calendar and an outstanding-check-in view from the saved Garmin and MASS records.
 
 ## Inputs needed at the next increment
 
-Gemini key is pending; billing is confirmed active and only synthetic model inputs are authorized for now. Owner visual feedback on the new overview; later actual iPhone Safari and timed check-ins. A normal outdoor FR965 Run remains useful: the current FR965 treadmill record has HR but unusable distance. Future screenshots arrive with dates. Production storage/authentication/hosting remain deferred. Do not request passwords or paste keys into chat.
+Gemini/Vercel/Supabase credentials will be supplied later; keep progressing on local product features. Billing is confirmed active and only synthetic model inputs are authorized. Later owner visual feedback, actual iPhone Safari and timed check-ins remain useful. A normal outdoor FR965 Run will validate additional device fields. Future screenshots arrive with dates. Do not request passwords or paste keys into chat.
 
 ## Open decisions
 

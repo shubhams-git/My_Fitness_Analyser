@@ -1,6 +1,6 @@
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath,pathToFileURL } from 'node:url';
 import { extname, resolve, relative, isAbsolute } from 'node:path';
 import { loadPrototypeData } from './data.mjs';
 import { LocalLibrary } from './library.mjs';
@@ -8,13 +8,16 @@ import { GarminSync } from './garmin.mjs';
 import { privateHandler } from '../cloud/handler.mjs';
 import { trainingDataset,mergeTrainingActivities } from './training-data.mjs';
 import { GeminiReviews } from '../analysis/gemini.mjs';
+import { randomUUID } from 'node:crypto';
+import { parseMass,importPreview,journalDataset } from './mass.mjs';
 
 const root=fileURLToPath(new URL('./',import.meta.url));
 const port=Number(process.env.PROTOTYPE_PORT||4173);
 const data=await loadPrototypeData();
-const library=new LocalLibrary(new URL('../private-data/library/',import.meta.url));
+const library=new LocalLibrary(process.env.FITNESS_LIBRARY_DIR?pathToFileURL(resolve(process.env.FITNESS_LIBRARY_DIR)+'/'):new URL('../private-data/library/',import.meta.url));
 const garmin=new GarminSync(library);
 const reviews=new GeminiReviews();
+const massPreviews=new Map();
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.ttf':'font/ttf','.txt':'text/plain; charset=utf-8','.png':'image/png'};
 const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
@@ -25,6 +28,15 @@ const server=http.createServer(async(req,res)=>{
   const pathname=new URL(req.url,`http://127.0.0.1:${port}`).pathname;
   const json=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
   if(pathname==='/api/private'){await privateHandler(req,res,new URL(req.url,'http://localhost').searchParams.get('route'));return;}
+  if(process.env.FITNESS_CLOUD_ENABLED!=='1'&&pathname==='/api/journal'&&req.method==='GET'){try{const saved=await library.read();json(200,{...journalDataset(saved.mass,{window:['30','all'].includes(new URL(req.url,'http://localhost').searchParams.get('window'))?new URL(req.url,'http://localhost').searchParams.get('window'):'90'}),local:true});}catch{json(500,{error:'Your saved journal could not be read.'});}return;}
+  if(process.env.FITNESS_CLOUD_ENABLED!=='1'&&['/api/mass/preview','/api/mass/commit'].includes(pathname)&&req.method==='POST'){
+    if(req.headers.origin!==`http://${req.headers.host}`){json(403,{error:'Open the local app to import MASS.'});return;}
+    try{let size=0;const chunks=[];for await(const chunk of req){size+=chunk.length;if(size>(pathname.endsWith('preview')?10*1024*1024:4096))throw new Error('The import request is too large.');chunks.push(chunk);}const bytes=Buffer.concat(chunks);
+      for(const [id,item]of massPreviews)if(Date.now()-item.created>600000)massPreviews.delete(id);
+      if(pathname.endsWith('preview')){const incoming=parseMass(bytes),saved=await library.read(),preview=importPreview(saved.mass,incoming),token=randomUUID();while(massPreviews.size>=4)massPreviews.delete(massPreviews.keys().next().value);massPreviews.set(token,{incoming,baseDigest:preview.baseDigest,created:Date.now()});json(200,{...preview,token});}
+      else{const {token}=JSON.parse(bytes.toString()),pending=massPreviews.get(token);if(!pending)throw new Error('This import preview expired. Choose the file again.');pending.promise??=library.importMass(pending.incoming,pending.baseDigest).catch(e=>{pending.promise=null;throw e;});json(200,await pending.promise);}
+    }catch(e){json(400,{error:e.message});}return;
+  }
   if(process.env.FITNESS_CLOUD_ENABLED==='1'&&pathname.startsWith('/api/')){const routes={'/api/data':'data','/api/training':'training','/api/import':'import','/api/feedback':'feedback','/api/restore':'restore','/api/export':'export','/api/garmin/sync':'sync'};if(routes[pathname])await privateHandler(req,res,routes[pathname]);else if(pathname==='/api/analysis/status')json(200,{configured:false,model:'gemini-3.6-flash',dataMode:'synthetic-only',review:null,evidence:null,reason:'The Gemini lab is enabled in the local app.'});else json(404,{error:'Not available'});return;}
   if(pathname==='/api/training'&&req.method==='GET'){try{const saved=await library.read(),window=new URL(req.url,'http://localhost').searchParams.get('window')==='all'?'all':'90';json(200,{...trainingDataset(mergeTrainingActivities(data.activities,Object.values(saved.activities)),saved.feedback,{window}),lastSync:saved.garminSync?.lastSuccessAt||null,local:true});}catch{json(500,{error:'Your saved training record could not be read.'});}return;}
   if(pathname==='/api/analysis/status'&&req.method==='GET'){try{json(200,await reviews.status());}catch{json(500,{error:'Analysis configuration could not be read.'});}return;}
@@ -58,7 +70,7 @@ const server=http.createServer(async(req,res)=>{
     if(evidence)file=fileURLToPath(new URL(`../private-data/historical/screenshots/image-${evidence[1]}.png`,import.meta.url));
     else if(pathname==='/design/tokens.css')file=fileURLToPath(new URL('../design/tokens.css',import.meta.url));
     else {
-      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname));
+      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname==='/journal'?'/journal.html':pathname));
       const rel=relative(root,file);
       if(rel.startsWith('..')||isAbsolute(rel)||!/\.(html|css|js|svg|ttf|txt)$/.test(file))throw new Error('Not served');
     }
