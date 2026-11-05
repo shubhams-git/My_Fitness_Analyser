@@ -40,6 +40,12 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D20 — Local alpha, 5 November 2026. Owner requests basic features and a
+professional map. F02a uses existing Node runtime/pinned Garmin SDK for FIT
+import, atomic private library, check-ins, export/merge restore and expanded GPS
+exploration. Cloud architecture, basemap provider and private deployment remain
+open. B's athletic direction is owner-accepted. No new runtime dependency/branch.
+
 D19 — Owner-directed redesign, 5 November 2026. Keep selected B and premium
 craft, replace the royal/hotel identity with an active fitness workspace.
 Supersedes D17's serif/champagne visual treatment. Adopt proposed Barlow

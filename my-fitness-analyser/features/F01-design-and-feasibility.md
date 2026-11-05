@@ -1,6 +1,6 @@
 # F01: Design and data feasibility
 
-Status: B selected; athletic redesign ready for visual review; physical-device gates pending
+Status: athletic B direction accepted; local implementation continues in F02a; physical-device gates pending
 Latest iteration: owner liked premium quality but rejected hotel styling. Athletic
 Barlow Condensed, carbon/orange/glacier palette, compact session layout, prominent
 check-in and linked route/pace replay inspection. See docs/ACTIVE_DESIGN.md and

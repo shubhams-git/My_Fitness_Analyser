@@ -1,5 +1,11 @@
 # Architecture proposal
 
+F02a update: a local alpha uses the existing Node server and pinned official FIT
+SDK for import, atomic private JSON storage and export/restore. It binds only to
+loopback, validates Host and requires same-origin POSTs. Production private
+hosting/authentication/database remain open. Vercel serves the synthetic UI and
+does not receive the local health library.
+
 Status: proposed; no application runtime scaffold, cloud database or deployment exists. Read-only Node capture/inspection scripts now verify initial Garmin access; see docs/DATA_FEASIBILITY.md. They do not select the application framework or establish production synchronization.
 
 ## Small default

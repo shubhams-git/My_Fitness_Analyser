@@ -1,9 +1,11 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F01, B selected; athletic Field Notes redesign ready for visual review (features/F01-design-and-feasibility.md)
+Active increment: F02a local activity alpha (features/F02-local-alpha.md)
 
 ## Completed
+
+- Owner accepted the athletic premium direction and requested basic features. Added local FIT import, atomic disk library, duplicate hashes, saved check-ins, export/merge restore and expanded route explorer. See features/F02-local-alpha.md. Private data stays in ignored private-data/library. Hosted Vercel remains a synthetic design preview.
 
 - Latest owner feedback: premium quality accepted, hotel-like styling rejected; active fitness identity requested. Pulled origin/master (already current at 4c405be). Replaced serif/champagne treatment with self-hosted OFL Barlow Condensed, carbon/orange/glacier tokens, compact training hierarchy and prominent check-in action. Added recorded pace trace with keyboard inspection, linked replay time/pace/chart/route cursor, replay beacon and chart entrance. See docs/ACTIVE_DESIGN.md and docs/QA_ACTIVE_DESIGN.md. This iteration is local, awaiting visual review.
 
@@ -31,13 +33,17 @@ Active increment: F01, B selected; athletic Field Notes redesign ready for visua
 
 ## Not implemented
 
-No production application UI, database importer, Garmin sync, MASS live integration or application authentication. Prototype Vercel configuration exists; this refinement has not been deployed by this agent. Check-ins remain browser-only demonstrations. B is selected; the new finish and production runtime remain open. Initial authenticated retrieval is verified, not background sync or durable application storage.
+No private online deployment, cloud database, Garmin sync, MASS import UI or application authentication. Imported local FIT activities support disk-backed check-ins and backup restoration. Reference samples retain preview check-ins until imported. Initial Garmin retrieval is verified; background sync remains unimplemented.
 
 ## Known owner context
 
 Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one short walk and no 965 Run yet in the inspected capture. Account also contains older owned FR255 Music activities, including running. Garmin is future recording source; strength logging need not rely on Garmin; Strava social-only; historical NRC/Strava screenshots; MASS weigh-ins. One athlete initially. Supplied screenshots are incomplete history; owner will supply more with dates.
 
 ## Verification
+
+F02a: ten automated tests pass, including disk reload and backup restore. Browser
+FIT import/reload/re-import and expanded-map zoom/time inspection checked on phone
+and desktop. Same-origin POST rejection and invalid-feedback rejection verified.
 
 Latest athletic iteration: seven automated tests and foundation checks pass;
 nine responsive layouts, ten phone states, 200% text/reduced motion, replay and
@@ -48,7 +54,7 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Review the athletic Field Notes redesign with the owner.
+Choose street/terrain map provider and private online storage/authentication setup for the next release.
 
 ## Inputs needed at the next increment
 

@@ -1,4 +1,5 @@
 import { readFile, readdir } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 export const ANALYSIS_VERSION = 'prototype-sampled-blocks-v1';
 
 export const finite = value => Number.isFinite(value) ? value : null;
@@ -76,6 +77,7 @@ export async function loadPrototypeData() {
         const start=records[0]?.t||0;records.forEach(r=>r.t-=start);
         const sport=detail.activityTypeDTO.typeKey;
         const activity={ id:sport==='running'?'run':sport==='track_running'?'track':'walk',title:detail.activityName,date:summary.startTimeLocal.slice(0,10),time:summary.startTimeLocal.slice(11,16),sport:sport==='walking'?'Walk':sport==='track_running'?'Track run':'Run',source:'Garmin Connect',device:decoded.deviceInfoMesgs?.some(x=>x.garminProduct==='fr965')?'Forerunner 965':'Forerunner 255 Music',synthetic:false,distance:finite(summary.distance),timer:finite(summary.duration),elapsed:finite(summary.elapsedDuration),moving:finite(summary.movingDuration),hr:finite(summary.averageHR),maxHr:finite(summary.maxHR),cadence:finite(summary.averageRunCadence),elevationGain:finite(summary.elevationGain),records,laps:(decoded.lapMesgs||[]).map(x=>({distance:finite(x.totalDistance),duration:finite(x.totalTimerTime)})),sourceNote:null,sourceIssues:[],sourceFile:'Original FIT + API summary',blockLabel:'1-minute blocks'};
+        activity.sourceHash=createHash('sha256').update(await readFile(new URL(capture+'fits/'+filename.replace('.decoded.json',''),privateRoot))).digest('hex');
         activity.blocks=timeBlocks(records);activity.observation=observation(activity);activities.push(activity);
       }
     }

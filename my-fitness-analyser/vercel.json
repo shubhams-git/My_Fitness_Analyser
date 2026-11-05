@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/route-view.js", "destination": "/prototypes/route-view.js" },
     {
       "source": "/",
       "destination": "/prototypes/index.html"

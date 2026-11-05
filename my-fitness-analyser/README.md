@@ -1,5 +1,12 @@
 # My Fitness Analyser project foundation
 
+Local alpha: run `npm install` then `npm run dev`; open
+http://127.0.0.1:4173/. Import an original running/walking `.fit`, inspect it,
+save a check-in and export/restore your private library. Data stays on this
+computer under ignored `private-data/library/`. See
+[local alpha instructions](features/F02-local-alpha.md). Hosted Vercel remains
+the synthetic design preview.
+
 Version 1.0.1 · 4 November 2026 · Owner: Shubham
 
 This repository contains the project foundation, verified data-feasibility capture and two interactive UI prototypes. The production application is not implemented. Visual direction, runtime stack and hosting remain proposals. Read-only Garmin retrieval and UI previews work locally; no application database or deployment exists.

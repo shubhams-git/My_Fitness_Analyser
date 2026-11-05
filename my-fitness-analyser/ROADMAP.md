@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | F00 Foundation, completed | Shared vision, candidate design system and repeatable process recorded | Docs/tokens checks and portable Git snapshot; no claim of an app release |
 | F01 Design and feasibility, current | Two populated activity/check-in prototypes; one visual direction selected | Real FIT/API inspection and interactive prototypes verified; owner choice and physical-device gates pending |
-| F02 Core activity slice | Import a real FIT; inspect correct summary/splits; save/edit feedback privately | Source comparison; duplicate import check; save/reload/ownership tests; browser QA |
+| F02 Core activity slice, local alpha available | Import a real FIT; inspect summary/laps; save/edit feedback; export/restore locally | F02a verified; private online ownership/authentication and physical-device pass remain open |
 | F03 First usable MVP | MASS weight trend, simple deterministic finding and export/restore | Original IDs/deletions respected; trend math tested; private deployment and restore proven |
 | F04 Garmin sync | Pull new workouts through verified Personal API | Authenticated account test; pagination/retries/idempotency; expiry and sync status; FIT fallback |
 | F05 Historical backfill | Correct historical Nike/Strava evidence joins the log | Reviewable extraction; dates/units/provenance; duplicates resolved; no invented route/HR |
