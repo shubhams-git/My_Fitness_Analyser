@@ -40,6 +40,18 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D23 — Owner-directed training UI and Gemini, 5 November 2026. Defer Supabase
+provisioning; use the actual local Garmin library for a new training overview.
+Keep Gemini on synthetic data only even after a key is added. Billing is
+confirmed active, key pending. Use official Interactions REST documentation,
+one forced review tool, request-specific schema plus local Ajv 8.20.0 validation,
+bounded evidence and source-resolved chart values. Google currently deprecates
+3.5 Flash in favor of 3.6, so default to configurable gemini-3.6-flash. Do not
+claim live model verification or semantic certainty from schema validation.
+This advances the bounded Gemini slice previously deferred in D08; it does not
+enable personal-data AI or replace the existing activity UI. See F05 and
+docs/GEMINI_ANALYSIS.md. D22 provisioning remains deferred, code retained.
+
 D22 — Private-access candidate, 5 November 2026. Continue the owner's online/iPhone
 plan with existing Vercel hosting and proposed Supabase Auth/Postgres/private
 objects. Retain the existing app/runtime. Session identity is checked by Auth,

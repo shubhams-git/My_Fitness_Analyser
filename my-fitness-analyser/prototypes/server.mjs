@@ -6,12 +6,15 @@ import { loadPrototypeData } from './data.mjs';
 import { LocalLibrary } from './library.mjs';
 import { GarminSync } from './garmin.mjs';
 import { privateHandler } from '../cloud/handler.mjs';
+import { trainingDataset,mergeTrainingActivities } from './training-data.mjs';
+import { GeminiReviews } from '../analysis/gemini.mjs';
 
 const root=fileURLToPath(new URL('./',import.meta.url));
 const port=Number(process.env.PROTOTYPE_PORT||4173);
 const data=await loadPrototypeData();
 const library=new LocalLibrary(new URL('../private-data/library/',import.meta.url));
 const garmin=new GarminSync(library);
+const reviews=new GeminiReviews();
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.svg':'image/svg+xml','.ttf':'font/ttf','.txt':'text/plain; charset=utf-8','.png':'image/png'};
 const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
@@ -22,7 +25,13 @@ const server=http.createServer(async(req,res)=>{
   const pathname=new URL(req.url,`http://127.0.0.1:${port}`).pathname;
   const json=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
   if(pathname==='/api/private'){await privateHandler(req,res,new URL(req.url,'http://localhost').searchParams.get('route'));return;}
-  if(process.env.FITNESS_CLOUD_ENABLED==='1'&&pathname.startsWith('/api/')){const routes={'/api/data':'data','/api/import':'import','/api/feedback':'feedback','/api/restore':'restore','/api/export':'export','/api/garmin/sync':'sync'};if(routes[pathname])await privateHandler(req,res,routes[pathname]);else json(404,{error:'Not available'});return;}
+  if(process.env.FITNESS_CLOUD_ENABLED==='1'&&pathname.startsWith('/api/')){const routes={'/api/data':'data','/api/training':'training','/api/import':'import','/api/feedback':'feedback','/api/restore':'restore','/api/export':'export','/api/garmin/sync':'sync'};if(routes[pathname])await privateHandler(req,res,routes[pathname]);else if(pathname==='/api/analysis/status')json(200,{configured:false,model:'gemini-3.6-flash',dataMode:'synthetic-only',review:null,evidence:null,reason:'The Gemini lab is enabled in the local app.'});else json(404,{error:'Not available'});return;}
+  if(pathname==='/api/training'&&req.method==='GET'){try{const saved=await library.read(),window=new URL(req.url,'http://localhost').searchParams.get('window')==='all'?'all':'90';json(200,{...trainingDataset(mergeTrainingActivities(data.activities,Object.values(saved.activities)),saved.feedback,{window}),lastSync:saved.garminSync?.lastSuccessAt||null,local:true});}catch{json(500,{error:'Your saved training record could not be read.'});}return;}
+  if(pathname==='/api/analysis/status'&&req.method==='GET'){try{json(200,await reviews.status());}catch{json(500,{error:'Analysis configuration could not be read.'});}return;}
+  if(pathname==='/api/analysis/demo'&&req.method==='POST'){
+    if(req.headers.origin!==`http://${req.headers.host}`){json(403,{error:'Open the local app to request a review.'});return;}
+    try{let size=0;const parts=[];for await(const chunk of req){size+=chunk.length;if(size>4096)throw new Error('Unsupported review request.');parts.push(chunk);}const body=JSON.parse(Buffer.concat(parts).toString()||'{}');if(body.dataset!=='synthetic')throw new Error('Only synthetic Gemini reviews are enabled.');json(200,await reviews.generate());}catch(e){json(400,{error:e.message});}return;
+  }
   if(req.method==='GET'&&pathname==='/api/garmin/status'){try{json(200,await garmin.status());}catch{json(500,{error:'Garmin sync status is unavailable.'});}return;}
   if(req.method==='POST'&&pathname==='/api/garmin/sync'){
     if(req.headers.origin!==`http://${req.headers.host}`){json(403,{error:'Open the local app to sync Garmin.'});return;}
@@ -49,7 +58,7 @@ const server=http.createServer(async(req,res)=>{
     if(evidence)file=fileURLToPath(new URL(`../private-data/historical/screenshots/image-${evidence[1]}.png`,import.meta.url));
     else if(pathname==='/design/tokens.css')file=fileURLToPath(new URL('../design/tokens.css',import.meta.url));
     else {
-      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname));
+      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname));
       const rel=relative(root,file);
       if(rel.startsWith('..')||isAbsolute(rel)||!/\.(html|css|js|svg|ttf|txt)$/.test(file))throw new Error('Not served');
     }

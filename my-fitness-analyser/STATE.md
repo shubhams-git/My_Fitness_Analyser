@@ -1,9 +1,13 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F03a private online release candidate (features/F03-private-cloud.md)
+Active increment: F05a training overview and synthetic Gemini lab (features/F05-training-intelligence.md)
 
 ## Completed
+
+- Added `/training`: actual local Garmin sessions plus historical screenshot summaries, last-90-day/all windows, running/walking filters, weekly distance, actual HR trace, source-labelled pace, sensor coverage and session links. The accepted athletic typography/palette continues with bounded motion and a static preference. Root detail remains intact; mobile navigation now reaches both Training and Activities.
+- Added the Gemini synthetic-only evidence/tool pipeline: bounded aliased facts, strict request-specific JSON Schema, Ajv validation, evidence checks, source-backed charts, single-flight requests and a versioned private local response cache. Official Google docs mark 3.5 Flash deprecated; the configurable default is 3.6 Flash. Owner confirmed active billing but has not added the key; **use synthetic only**. No live Gemini request was made. See docs/GEMINI_ANALYSIS.md.
+- Repeated live Garmin pull: seven unchanged supported records, zero updates/failures. Full overview shows nine sessions (seven Garmin, two historical summaries); last 90 days contains four. No owner check-in answers were generated. Supabase provisioning is explicitly deferred by the owner.
 
 - Prepared Vercel/Supabase private-access candidate: owner-verified sign-in, HttpOnly cookies, owner-scoped PostgreSQL policies, private FIT bucket, revision-checked saves, sync leases and cloud API routes. Sign-in UI follows the accepted athletic theme. Twenty local tests pass, including PostgreSQL migration/RLS execution with synthetic schemas. Deployment is not complete: Vercel CLI authentication was invalid and both provider connections were unconfirmed. No real health data uploaded. See docs/PRIVATE_DEPLOYMENT.md.
 
@@ -37,13 +41,27 @@ Active increment: F03a private online release candidate (features/F03-private-cl
 
 ## Not implemented
 
-No verified private online deployment or provisioned cloud database, scheduled/background Garmin sync or MASS import UI. Authentication/cloud storage code is prepared but unverified against live Supabase. The current local app and its actual Garmin library remain usable. Public Vercel preview remains synthetic unless private mode is explicitly configured.
+No verified private online deployment or provisioned cloud database, scheduled/background Garmin sync or MASS import UI. Authentication/cloud storage code is prepared but unverified against live Supabase; setup is now deferred by owner direction. The current local app and actual Garmin library remain usable. Public Vercel stays synthetic and its Gemini generation is disabled. No live Gemini generation, personal-data AI analysis, strength/MASS analysis or generated-output quality evaluation is claimed.
 
 ## Known owner context
 
 Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one short walk and no 965 Run yet in the inspected capture. Account also contains older owned FR255 Music activities, including running. Garmin is future recording source; strength logging need not rely on Garmin; Strava social-only; historical NRC/Strava screenshots; MASS weigh-ins. One athlete initially. Supplied screenshots are incomplete history; owner will supply more with dates.
 
 ## Verification
+
+F05a: 29 automated tests pass, including window/source/duration rules, evidence
+privacy, strict schema/reference/claim rejection, mocked Interactions parsing,
+cache/single-flight behavior, missing key/quota handling, HTTP origin/body guards
+and synthetic public-preview links. Foundation checks and diff whitespace pass.
+Actual overview checked at phone and desktop; mocked review checked at 320,
+393, 768, 1440 and 1920px without horizontal overflow or short nav/button targets.
+History/type filters, keyboard session link and mobile return navigation checked.
+Separate loopback fixtures verify rendered review/citations/chart/provenance,
+invalid-response retry and empty history; they make no provider requests.
+Missing-key lab state is verified against the actual local app. Live Garmin
+refresh passed. OS reduced-motion guards are implemented; the manual motion
+toggle was exercised. No physical Safari, 200% text or performance benchmark is
+claimed for this new overview. See features/F05-training-intelligence.md.
 
 F03a: 20 local tests pass. Auth HTTP tests are mocked; PostgreSQL RLS and storage
 policies run via PGlite with synthetic Supabase schemas. Actual provider and
@@ -65,11 +83,11 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Connect Vercel and Supabase, then provision and verify the prepared private deployment.
+After the owner adds GEMINI_API_KEY locally, run and evaluate one synthetic-only Gemini review from `/training`.
 
 ## Inputs needed at the next increment
 
-Owner visual/motion feedback on Field Notes; later an actual iPhone Safari pass and five timed check-ins. A normal FR965 Run will eventually validate that device's running-field coverage; current running samples are from FR255 Music. Future screenshots will arrive with dates. Production storage/authentication and hosting remain later work. Do not request passwords or paste keys into chat.
+Gemini key is pending; billing is confirmed active and only synthetic model inputs are authorized for now. Owner visual feedback on the new overview; later actual iPhone Safari and timed check-ins. A normal outdoor FR965 Run remains useful: the current FR965 treadmill record has HR but unusable distance. Future screenshots arrive with dates. Production storage/authentication/hosting remain deferred. Do not request passwords or paste keys into chat.
 
 ## Open decisions
 

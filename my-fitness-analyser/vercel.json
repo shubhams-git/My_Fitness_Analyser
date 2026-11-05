@@ -1,6 +1,11 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/training", "destination": "/prototypes/training.html" },
+    { "source": "/training.html", "destination": "/prototypes/training.html" },
+    { "source": "/training.js", "destination": "/prototypes/training.js" },
+    { "source": "/training.css", "destination": "/prototypes/training.css" },
+    { "source": "/api/analysis/status", "destination": "/api/review" },
     { "source": "/sign-in.html", "destination": "/prototypes/sign-in.html" },
     { "source": "/sign-in.js", "destination": "/prototypes/sign-in.js" },
     { "source": "/sign-in.css", "destination": "/prototypes/sign-in.css" },

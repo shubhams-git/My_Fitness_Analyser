@@ -1,0 +1,1 @@
+export default function handler(_request,response){response.setHeader('Cache-Control','no-store');response.status(200).json({configured:false,model:'gemini-3.6-flash',dataMode:'synthetic-only',review:null,evidence:null,reason:'The Gemini lab is enabled in the local app.'});}

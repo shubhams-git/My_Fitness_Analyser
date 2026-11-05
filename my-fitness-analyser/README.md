@@ -1,4 +1,14 @@
-# My Fitness Analyser project foundation
+# My Fitness Analyser
+
+Training overview: run `npm ci`, then `npm run dev` and open
+http://127.0.0.1:4173/training. Inspect real local Garmin sessions, historical
+summaries, weekly distance, pace and sensor coverage. Open any session for its
+route, samples and check-in. Supabase setup is deferred.
+
+Gemini lab: **synthetic data only**. Add `GEMINI_API_KEY` to local `.env`, reload
+and choose **Test synthetic review**. No personal activity is sent. The key is
+currently pending; model behavior is tested with mocked responses. Read the
+[evidence and output contract](docs/GEMINI_ANALYSIS.md).
 
 Private online access candidate: [setup and release gates](docs/PRIVATE_DEPLOYMENT.md).
 Authentication and cloud storage code is prepared; the live deployment still
@@ -15,9 +25,12 @@ computer under ignored `private-data/library/`. See
 [local alpha instructions](features/F02-local-alpha.md). Hosted Vercel remains
 the synthetic design preview.
 
-Version 1.0.1 · 4 November 2026 · Owner: Shubham
+Version 1.1.0-alpha.4 · 5 November 2026 · Owner: Shubham
 
-This repository contains the project foundation, verified data-feasibility capture and two interactive UI prototypes. The production application is not implemented. Visual direction, runtime stack and hosting remain proposals. Read-only Garmin retrieval and UI previews work locally; no application database or deployment exists.
+This repository contains the selected athletic Field Notes UI, a working local
+Garmin/FIT library and a bounded synthetic analysis lab. Private online access
+is prepared but not verified against live providers. Public preview data is
+synthetic. The earlier two-prototype studies remain historical reference.
 
 Start with [PRODUCT.md](PRODUCT.md), [DESIGN.md](DESIGN.md) and [STATE.md](STATE.md). A coding agent starts with [AGENTS.md](AGENTS.md). [ROADMAP.md](ROADMAP.md) defines the first usable release and deliberately defers advanced features.
 

@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { CloudLibrary,CloudError,cloudConfig } from './supabase.mjs';
 import { authorize,requireOrigin,signIn,signOut } from './auth.mjs';
 import { GarminSync } from '../prototypes/garmin.mjs';
+import { trainingDataset } from '../prototypes/training-data.mjs';
 
 export async function readBody(request,limit=3.5*1024*1024){
   if(request.body!==undefined){const bytes=Buffer.isBuffer(request.body)?request.body:Buffer.from(typeof request.body==='string'?request.body:JSON.stringify(request.body));if(bytes.length>limit)throw new CloudError(413,'Choose a file smaller than 3.5 MB.');return bytes;}
@@ -17,6 +18,7 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     if(route==='logout'&&request.method==='POST'){await signOut(request,response,config);send(200,{signedOut:true});return;}
     const api=await auth(request,response,config),library=libraryFactory(api);
     if(request.method==='POST')requireOrigin(request,config);
+    if(route==='training'&&request.method==='GET'){const data=await library.read();send(200,{...trainingDataset(Object.values(data.activities),data.feedback,{window:new URL(request.url,'http://localhost').searchParams.get('window')==='all'?'all':'90'}),lastSync:data.garminSync?.lastSuccessAt||null,local:false});return;}
     if(route==='data'&&request.method==='GET'){
       const data=await library.read(),activities=Object.values(data.activities).sort((a,b)=>b.startInstant.localeCompare(a.startInstant));
       send(200,{activities,defaultId:activities[0]?.id||null,feedback:data.feedback,localLibrary:true,cloudLibrary:true,importLimitMB:3.5,garmin:{...data.garminSync,configured:Boolean(env.GARMIN_PERSONAL_API_KEY),running:false}});return;

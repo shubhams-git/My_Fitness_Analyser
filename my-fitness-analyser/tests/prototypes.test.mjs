@@ -80,6 +80,13 @@ test('local preview serves its UI while denying credential/source paths and fore
     assert.match(data.headers.get('content-security-policy'),/connect-src 'self'/);
     const payload=await data.json();assert.ok(payload.activities.length>=1);
     assert.ok(!JSON.stringify(payload).includes('API_KEY'));
+    assert.equal((await fetch(base+'/training')).status,200);
+    assert.equal((await fetch(base+'/training.js')).status,200);
+    const training=await fetch(base+'/api/training?window=all').then(r=>r.json());assert.equal(training.dataset,'personal');assert.equal(training.window,'all');assert.ok(training.sessions.every(s=>!s.synthetic));
+    const analysis=await fetch(base+'/api/analysis/status').then(r=>r.json());assert.equal(analysis.dataMode,'synthetic-only');assert.equal(analysis.evidence.dataset,'synthetic');assert.ok(!JSON.stringify(analysis).includes('GEMINI_API_KEY'));
+    assert.equal((await fetch(base+'/api/analysis/demo',{method:'POST',headers:{Origin:'https://foreign.invalid','Content-Type':'application/json'},body:JSON.stringify({dataset:'synthetic'})})).status,403);
+    const personal=await fetch(base+'/api/analysis/demo',{method:'POST',headers:{Origin:base,'Content-Type':'application/json'},body:JSON.stringify({dataset:'personal'})});assert.equal(personal.status,400);assert.match((await personal.json()).error,/Only synthetic/);
+    assert.equal((await fetch(base+'/api/analysis/demo',{method:'POST',headers:{Origin:base},body:'x'.repeat(5000)})).status,400);
     for(const path of ['/.env','/private-data/DATA_REVIEW.md','/server.mjs','/data.mjs','/.git/config','/%2e%2e/.env'])assert.equal((await fetch(base+path)).status,404);
     const foreign=await new Promise((resolve,reject)=>{http.get({host:'127.0.0.1',port,path:'/api/data',headers:{host:'foreign.invalid'}},res=>{res.resume();resolve(res.statusCode);}).on('error',reject);});
     assert.equal(foreign,403);
