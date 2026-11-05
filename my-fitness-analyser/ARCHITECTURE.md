@@ -1,5 +1,13 @@
 # Architecture proposal
 
+F03a preparation: `cloud/` and the SQL migration adapt the existing library to
+Supabase Auth, owner-scoped JSONB state and private original files on Vercel.
+Authentication and conflict behaviour have local/synthetic test evidence; the
+actual services are not yet provisioned or deployed. See docs/PRIVATE_DEPLOYMENT.md.
+This alpha uses one revisioned state document per owner; broad queryable history
+and long-running jobs still require further design. Production claims below are
+proposals, not a description of a verified live service.
+
 F04a: explicit Garmin Personal API sync now runs in the local Node server using
 the existing key in `.env`, in-memory bearer tokens and fixed official endpoints.
 It writes into the same atomic library as manual imports. Cloud/runtime proposals

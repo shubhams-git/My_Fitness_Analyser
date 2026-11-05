@@ -5,6 +5,7 @@ import { extname, resolve, relative, isAbsolute } from 'node:path';
 import { loadPrototypeData } from './data.mjs';
 import { LocalLibrary } from './library.mjs';
 import { GarminSync } from './garmin.mjs';
+import { privateHandler } from '../cloud/handler.mjs';
 
 const root=fileURLToPath(new URL('./',import.meta.url));
 const port=Number(process.env.PROTOTYPE_PORT||4173);
@@ -20,6 +21,8 @@ const server=http.createServer(async(req,res)=>{
   if(!['127.0.0.1:'+port,'localhost:'+port].includes(req.headers.host)){res.writeHead(403);res.end('Local access only');return;}
   const pathname=new URL(req.url,`http://127.0.0.1:${port}`).pathname;
   const json=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
+  if(pathname==='/api/private'){await privateHandler(req,res,new URL(req.url,'http://localhost').searchParams.get('route'));return;}
+  if(process.env.FITNESS_CLOUD_ENABLED==='1'&&pathname.startsWith('/api/')){const routes={'/api/data':'data','/api/import':'import','/api/feedback':'feedback','/api/restore':'restore','/api/export':'export','/api/garmin/sync':'sync'};if(routes[pathname])await privateHandler(req,res,routes[pathname]);else json(404,{error:'Not available'});return;}
   if(req.method==='GET'&&pathname==='/api/garmin/status'){try{json(200,await garmin.status());}catch{json(500,{error:'Garmin sync status is unavailable.'});}return;}
   if(req.method==='POST'&&pathname==='/api/garmin/sync'){
     if(req.headers.origin!==`http://${req.headers.host}`){json(403,{error:'Open the local app to sync Garmin.'});return;}

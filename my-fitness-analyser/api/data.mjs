@@ -1,10 +1,12 @@
 import { loadPrototypeData } from '../prototypes/data.mjs';
+import { privateHandler } from '../cloud/handler.mjs';
 
 // GitHub/Vercel preview is deliberately synthetic-only. The private-data folder
 // is ignored by Git and is not part of the deployment bundle.
-const payload = await loadPrototypeData();
+const payload = process.env.FITNESS_CLOUD_ENABLED==='1'?null:await loadPrototypeData();
 
 export default function handler(_request, response) {
+  if(process.env.FITNESS_CLOUD_ENABLED==='1')return privateHandler(_request,response,'data');
   response.setHeader('Cache-Control', 'no-store');
   response.setHeader('Content-Type', 'application/json; charset=utf-8');
   response.setHeader('X-Content-Type-Options', 'nosniff');

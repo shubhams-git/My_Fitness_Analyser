@@ -1,9 +1,11 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F04a Garmin local sync (features/F04-garmin-local-sync.md)
+Active increment: F03a private online release candidate (features/F03-private-cloud.md)
 
 ## Completed
+
+- Prepared Vercel/Supabase private-access candidate: owner-verified sign-in, HttpOnly cookies, owner-scoped PostgreSQL policies, private FIT bucket, revision-checked saves, sync leases and cloud API routes. Sign-in UI follows the accepted athletic theme. Twenty local tests pass, including PostgreSQL migration/RLS execution with synthetic schemas. Deployment is not complete: Vercel CLI authentication was invalid and both provider connections were unconfirmed. No real health data uploaded. See docs/PRIVATE_DEPLOYMENT.md.
 
 - Live Garmin Personal API sync now saves originals, summaries and activity streams into the local library. Eight activities found; seven supported records saved, one breathwork unsupported. Repeat pull: zero added/updated, seven unchanged, no failures. FR965 treadmill run has HR but no GPS/usable distance; its UI selects HR and withholds misleading pace. Credentials remain server-only. See features/F04-garmin-local-sync.md.
 
@@ -35,13 +37,17 @@ Active increment: F04a Garmin local sync (features/F04-garmin-local-sync.md)
 
 ## Not implemented
 
-No private online deployment, cloud database, scheduled/background Garmin sync, MASS import UI or application authentication. Explicit local Garmin sync and manual FIT imports support disk-backed check-ins and backup restoration. Reference/synthetic samples remain labelled previews.
+No verified private online deployment or provisioned cloud database, scheduled/background Garmin sync or MASS import UI. Authentication/cloud storage code is prepared but unverified against live Supabase. The current local app and its actual Garmin library remain usable. Public Vercel preview remains synthetic unless private mode is explicitly configured.
 
 ## Known owner context
 
 Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one short walk and no 965 Run yet in the inspected capture. Account also contains older owned FR255 Music activities, including running. Garmin is future recording source; strength logging need not rely on Garmin; Strava social-only; historical NRC/Strava screenshots; MASS weigh-ins. One athlete initially. Supplied screenshots are incomplete history; owner will supply more with dates.
 
 ## Verification
+
+F03a: 20 local tests pass. Auth HTTP tests are mocked; PostgreSQL RLS and storage
+policies run via PGlite with synthetic Supabase schemas. Actual provider and
+iPhone checks are pending. `check:cloud` reports missing cloud variable names.
 
 F04a: 14 automated tests pass. Live account sync and repeat idempotency verified;
 real-data browser checks are recorded in features/F04-garmin-local-sync.md.
@@ -59,7 +65,7 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Prepare the private online environment so the owner can access the real-data library from the iPhone.
+Connect Vercel and Supabase, then provision and verify the prepared private deployment.
 
 ## Inputs needed at the next increment
 

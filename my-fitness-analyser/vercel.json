@@ -1,5 +1,14 @@
 {
+  "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/sign-in.html", "destination": "/prototypes/sign-in.html" },
+    { "source": "/sign-in.js", "destination": "/prototypes/sign-in.js" },
+    { "source": "/sign-in.css", "destination": "/prototypes/sign-in.css" },
+    { "source": "/api/feedback", "destination": "/api/private?route=feedback" },
+    { "source": "/api/import", "destination": "/api/private?route=import" },
+    { "source": "/api/restore", "destination": "/api/private?route=restore" },
+    { "source": "/api/export", "destination": "/api/private?route=export" },
+    { "source": "/api/garmin/sync", "destination": "/api/private?route=sync" },
     { "source": "/route-view.js", "destination": "/prototypes/route-view.js" },
     {
       "source": "/",

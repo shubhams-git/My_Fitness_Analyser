@@ -1,5 +1,9 @@
 # Host the design prototype on Vercel
 
+For the newer private real-data deployment candidate, use
+[PRIVATE_DEPLOYMENT.md](PRIVATE_DEPLOYMENT.md). The instructions below continue to
+describe the public synthetic preview, not the private application.
+
 This is a shareable, read-only design demo. A Git deployment contains only the
 synthetic demonstration activity: Garmin captures, API keys, screenshot imports,
 and personal records are excluded. The online version has no sign-in, durable

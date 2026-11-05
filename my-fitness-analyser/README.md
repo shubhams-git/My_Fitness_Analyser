@@ -1,5 +1,9 @@
 # My Fitness Analyser project foundation
 
+Private online access candidate: [setup and release gates](docs/PRIVATE_DEPLOYMENT.md).
+Authentication and cloud storage code is prepared; the live deployment still
+requires connected Vercel/Supabase accounts and target-service verification.
+
 Garmin sync: open the local app and choose **Sync Garmin** to fetch real activities
 using the key already in project `.env`. Data stays in the local private library.
 See [Garmin sync behaviour](features/F04-garmin-local-sync.md).

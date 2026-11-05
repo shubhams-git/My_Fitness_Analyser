@@ -40,6 +40,14 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D22 — Private-access candidate, 5 November 2026. Continue the owner's online/iPhone
+plan with existing Vercel hosting and proposed Supabase Auth/Postgres/private
+objects. Retain the existing app/runtime. Session identity is checked by Auth,
+rows/files are owner-scoped, updates use revision checks and sync uses a lease.
+Use PT409 for application conflicts. PGlite 0.5.15 is a pinned development-only
+PostgreSQL verifier. Provider connections/deployment remain required; this is not
+an online release or a completed production architecture. See docs/PRIVATE_DEPLOYMENT.md.
+
 D21 — Owner-directed Garmin progression, 5 November 2026. Advance F04a explicit
 local Personal API sync using the existing .env key and official endpoints.
 Persist FIT originals/API summaries, stable provider aliases and sync status;
