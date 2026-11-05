@@ -1,5 +1,9 @@
 # My Fitness Analyser project foundation
 
+Garmin sync: open the local app and choose **Sync Garmin** to fetch real activities
+using the key already in project `.env`. Data stays in the local private library.
+See [Garmin sync behaviour](features/F04-garmin-local-sync.md).
+
 Local alpha: run `npm install` then `npm run dev`; open
 http://127.0.0.1:4173/. Import an original running/walking `.fit`, inspect it,
 save a check-in and export/restore your private library. Data stays on this

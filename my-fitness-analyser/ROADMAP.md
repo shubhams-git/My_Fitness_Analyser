@@ -6,7 +6,7 @@
 | F01 Design and feasibility, current | Two populated activity/check-in prototypes; one visual direction selected | Real FIT/API inspection and interactive prototypes verified; owner choice and physical-device gates pending |
 | F02 Core activity slice, local alpha available | Import a real FIT; inspect summary/laps; save/edit feedback; export/restore locally | F02a verified; private online ownership/authentication and physical-device pass remain open |
 | F03 First usable MVP | MASS weight trend, simple deterministic finding and export/restore | Original IDs/deletions respected; trend math tested; private deployment and restore proven |
-| F04 Garmin sync | Pull new workouts through verified Personal API | Authenticated account test; pagination/retries/idempotency; expiry and sync status; FIT fallback |
+| F04 Garmin sync, local manual pull available | Pull new workouts through verified Personal API | F04a verified live: pagination, retry, idempotency and sync status; background/private online sync remains open |
 | F05 Historical backfill | Correct historical Nike/Strava evidence joins the log | Reviewable extraction; dates/units/provenance; duplicates resolved; no invented route/HR |
 | F06 Plan context | Match actual workouts to versioned planned sessions | Rescheduling/unscheduled/modified sessions; old plan preserved |
 | F07 Recovery and deeper analysis | Available sleep/HRV and comparable-run insights | Real fields verified; suitable baseline; explicit eligibility rules and deterministic tests |

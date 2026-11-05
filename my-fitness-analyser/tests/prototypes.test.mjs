@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { timeBlocks, pace, finite, demonstration } from '../prototypes/data.mjs';
+import { timeBlocks, pace, finite, demonstration, ANALYSIS_VERSION } from '../prototypes/data.mjs';
 import { recordIndexAtElapsed } from '../prototypes/interaction-model.js';
 import { paceTrace } from '../prototypes/field-notes.js';
 
@@ -60,7 +60,7 @@ test('demonstration is explicitly synthetic and describes its four-minute blocks
   assert.ok(sample.blocks.every(block=>block.duration===240));
   assert.match(sample.observation.title,/blocks/);
   assert.ok(Math.abs(sample.blocks.reduce((sum,b)=>sum+b.distance,0)-sample.distance)<0.001);
-  assert.match(sample.observation.version,/v1$/);
+  assert.equal(sample.observation.version,ANALYSIS_VERSION);
   assert.equal(sample.records[1].speed,sample.records[1].distance);
 });
 

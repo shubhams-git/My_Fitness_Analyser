@@ -1,5 +1,10 @@
 # Architecture proposal
 
+F04a: explicit Garmin Personal API sync now runs in the local Node server using
+the existing key in `.env`, in-memory bearer tokens and fixed official endpoints.
+It writes into the same atomic library as manual imports. Cloud/runtime proposals
+below remain unresolved; this sync is not enabled on the public Vercel preview.
+
 F02a update: a local alpha uses the existing Node server and pinned official FIT
 SDK for import, atomic private JSON storage and export/restore. It binds only to
 loopback, validates Host and requires same-origin POSTs. Production private

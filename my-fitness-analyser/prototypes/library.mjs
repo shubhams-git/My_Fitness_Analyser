@@ -1,9 +1,24 @@
 import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { Decoder, Stream } from '@garmin/fitsdk';
-import { timeBlocks } from './data.mjs';
+import { timeBlocks,observation,ANALYSIS_VERSION } from './data.mjs';
 
 const finite=x=>Number.isFinite(x)?x:null;
+const providerSignature=d=>JSON.stringify([d?.activityName,d?.activityTypeDTO?.typeKey,...['distance','duration','elapsedDuration','movingDuration','averageHR','maxHR','elevationGain','startTimeLocal','startTimeGMT'].map(k=>d?.summaryDTO?.[k])]);
+export function applyGarmin(activity,id,detail,fetchedAt=new Date().toISOString()){
+  const s=detail.summaryDTO||{};
+  if(detail.activityId!=null&&String(detail.activityId)!==String(id))throw new Error('Garmin detail did not match the requested activity.');
+  if(s.startTimeGMT){const utc=/Z$|[+-]\d\d:\d\d$/.test(s.startTimeGMT)?s.startTimeGMT:s.startTimeGMT+'Z';if(Math.abs(Date.parse(utc)-Date.parse(activity.startInstant))>2000)throw new Error('Garmin summary and FIT start times did not match.');}
+  activity.fitSummary??={distance:activity.distance,timer:activity.timer,elapsed:activity.elapsed,hr:activity.hr};
+  activity.provider={id:String(id),detail,fetchedAt};activity.garminActivityId=String(id);activity.source='Garmin Connect';
+  activity.title=typeof detail.activityName==='string'?detail.activityName:activity.title;
+  if(/^\d{4}-\d\d-\d\dT\d\d:\d\d/.test(s.startTimeLocal||'')){activity.date=s.startTimeLocal.slice(0,10);activity.time=s.startTimeLocal.slice(11,16)+' (recorded local time)';}
+  for(const [key,field]of Object.entries({distance:'distance',timer:'duration',elapsed:'elapsedDuration',moving:'movingDuration',hr:'averageHR',maxHr:'maxHR',elevationGain:'elevationGain'}))if(Number.isFinite(s[field]))activity[key]=s[field];
+  if(detail.activityTypeDTO?.typeKey==='track_running')activity.sport='Track run';
+  activity.sourceFile='Garmin API + original FIT';activity.sourceIssues=['Summary values come from Garmin; recorded samples and device laps come from the original FIT. FIT summary values are retained separately.'];
+  activity.observation={...observation(activity),version:ANALYSIS_VERSION};
+  return activity;
+}
 export function decodeActivity(bytes) {
   const decoder=new Decoder(Stream.fromBuffer(bytes));
   if(!decoder.isFIT()||!decoder.checkIntegrity())throw new Error('This file is not a valid, intact FIT activity.');
@@ -18,7 +33,8 @@ export function decodeActivity(bytes) {
   const records=(messages.recordMesgs||[]).map(r=>({t:new Date(r.timestamp).getTime()/1000-base,distance:finite(r.distance),speed:finite(r.enhancedSpeed??r.speed),hr:finite(r.heartRate),elevation:finite(r.enhancedAltitude??r.altitude),lat:coordinate(r.positionLat,90),lon:coordinate(r.positionLong,180),cadence:r.cadence==null?null:(r.cadence+(r.fractionalCadence||0))*2,power:finite(r.power)})).filter(r=>Number.isFinite(r.t)&&r.t>=0).sort((a,b)=>a.t-b.t);
   const hash=createHash('sha256').update(bytes).digest('hex');
   const date=start.toISOString().slice(0,10),time=start.toISOString().slice(11,16)+' UTC';
-  const activity={id:'fit-'+hash,title:s.sport==='walking'?'Imported walk':'Imported run',date,time,startInstant:start.toISOString(),sport:s.sport==='walking'?'Walk':'Run',source:'Original FIT',device:'FIT recording device',synthetic:false,sourceHash:hash,parserVersion:'fit-local-v1',distance:finite(s.totalDistance),timer:finite(s.totalTimerTime),elapsed:finite(s.totalElapsedTime),moving:null,hr:finite(s.avgHeartRate),maxHr:finite(s.maxHeartRate),cadence:s.avgCadence==null?null:s.avgCadence*2,elevationGain:finite(s.totalAscent),records,laps:(messages.lapMesgs||[]).map(l=>({distance:finite(l.totalDistance),duration:finite(l.totalTimerTime)})),blockLabel:'1-minute blocks',sourceNote:null,sourceIssues:['Start time is displayed in UTC. Moving time is unavailable in this import.'],sourceFile:'Original FIT'};
+  const device=messages.deviceInfoMesgs?.find(d=>d.garminProduct==='fr965'||d.garminProduct==='fr255Music')?.garminProduct;
+  const activity={id:'fit-'+hash,title:s.sport==='walking'?'Imported walk':'Imported run',date,time,startInstant:start.toISOString(),sport:s.sport==='walking'?'Walk':'Run',source:'Original FIT',device:device==='fr965'?'Forerunner 965':device==='fr255Music'?'Forerunner 255 Music':'FIT recording device',synthetic:false,sourceHash:hash,parserVersion:'fit-local-v1',distance:finite(s.totalDistance),timer:finite(s.totalTimerTime),elapsed:finite(s.totalElapsedTime),moving:null,hr:finite(s.avgHeartRate),maxHr:finite(s.maxHeartRate),cadence:s.avgCadence==null?null:s.avgCadence*2,elevationGain:finite(s.totalAscent),records,laps:(messages.lapMesgs||[]).map(l=>({distance:finite(l.totalDistance),duration:finite(l.totalTimerTime)})),blockLabel:'1-minute blocks',sourceNote:null,sourceIssues:['Start time is displayed in UTC. Moving time is unavailable in this import.'],sourceFile:'Original FIT'};
   activity.blocks=timeBlocks(records);
   activity.observation={title:'Your session is ready to explore.',evidence:'Inspect the recorded route, measurements and device laps, then add how it felt.',method:'Source summary from one FIT session. Time blocks use recorded sample boundaries; device laps remain separate.',version:'fit-local-v1'};
   return activity;
@@ -33,17 +49,24 @@ export function validateFeedback(draft) {
 
 export class LocalLibrary {
   constructor(directory){this.directory=directory;this.file=new URL('library.json',directory);this.queue=Promise.resolve();}
-  async read(){try{const value=JSON.parse(await readFile(this.file,'utf8'));if(value.schemaVersion!==1||!value.activities||!value.feedback)throw new Error('Unsupported library');for(const [id,a]of Object.entries(value.activities)){const canonical='fit-'+a.sourceHash;if(a.parserVersion==='fit-local-v1'&&id!==canonical){value.activities[canonical]={...a,id:canonical};delete value.activities[id];if(value.feedback[id]){value.feedback[canonical]??=value.feedback[id];delete value.feedback[id];}}}return value;}catch(e){if(e.code==='ENOENT')return {schemaVersion:1,activities:{},feedback:{},originals:{}};throw e;}}
+  async read(){try{const value=JSON.parse(await readFile(this.file,'utf8'));if(value.schemaVersion!==1||!value.activities||!value.feedback)throw new Error('Unsupported library');for(const [id,a]of Object.entries(value.activities)){const canonical='fit-'+a.sourceHash;if(a.parserVersion==='fit-local-v1'&&!id.startsWith('fit-')){value.activities[canonical]={...a,id:canonical};delete value.activities[id];if(value.feedback[id]){value.feedback[canonical]??=value.feedback[id];delete value.feedback[id];}}}for(const a of Object.values(value.activities))if(a.provider)a.observation={...observation(a),version:ANALYSIS_VERSION};return value;}catch(e){if(e.code==='ENOENT')return {schemaVersion:1,activities:{},feedback:{},originals:{}};throw e;}}
   mutate(fn){const work=this.queue.then(async()=>{const data=await this.read(),result=await fn(data);await mkdir(this.directory,{recursive:true});const temp=new URL('library.tmp',this.directory);await writeFile(temp,JSON.stringify(data));await rename(temp,this.file);return result;});this.queue=work.catch(()=>{});return work;}
   async import(bytes,seeds=[]){const activity=decodeActivity(bytes);return this.mutate(data=>{const existing=Object.values(data.activities).find(a=>a.sourceHash===activity.sourceHash);if(existing)return {activity:existing,duplicate:true};data.activities[activity.id]=activity;data.originals[activity.sourceHash]=bytes.toString('base64');return {activity,duplicate:false};});}
   async save(id,draft,knownIds){if(!knownIds.includes(id))throw new Error('Activity was not found.');const value=validateFeedback(draft);return this.mutate(data=>{data.feedback[id]=value;return value;});}
+  async importGarmin(bytes,id,detail){const incoming=applyGarmin(decodeActivity(bytes),id,detail);return this.mutate(data=>{
+    const alias=Object.values(data.activities).find(a=>a.provider?.id===String(id));const same=Object.values(data.activities).find(a=>a.sourceHash===incoming.sourceHash);const existing=alias||same;
+    if(alias&&same&&alias.id!==same.id){const content=d=>JSON.stringify([d.answers,d.location,d.note,d.context]);if(data.feedback[alias.id]&&data.feedback[same.id]&&content(data.feedback[alias.id])!==content(data.feedback[same.id]))throw new Error('Two check-ins need review before these source records can be merged.');data.feedback[alias.id]??=data.feedback[same.id];delete data.feedback[same.id];delete data.activities[same.id];}
+    if(existing)incoming.id=existing.id;
+    const outcome=!existing?'imported':existing.sourceHash===incoming.sourceHash&&existing.provider&&providerSignature(existing.provider.detail)===providerSignature(detail)?'unchanged':'updated';
+    data.activities[incoming.id]=incoming;data.originals[incoming.sourceHash]=bytes.toString('base64');return outcome;
+  });}
   async restore(backup,seedIds=[]){
     if(backup?.schemaVersion!==1||!backup.activities||!backup.originals||!backup.feedback)throw new Error('Choose a fitness-library.json export.');
     const activities={},originals={},feedback={};
     for(const [id,a] of Object.entries(backup.activities)){
       if(!/^fit-[a-f0-9]{64}$/.test(id)&&!seedIds.includes(id))throw new Error('The backup has an unknown activity identity.');
       const raw=backup.originals[a.sourceHash];if(typeof raw!=='string')throw new Error('The backup is missing an original FIT.');
-      const decoded=decodeActivity(Buffer.from(raw,'base64'));if(decoded.sourceHash!==a.sourceHash)throw new Error('A backup file hash did not match.');decoded.id=id;activities[id]=decoded;originals[a.sourceHash]=raw;
+      const decoded=decodeActivity(Buffer.from(raw,'base64'));if(decoded.sourceHash!==a.sourceHash)throw new Error('A backup file hash did not match.');decoded.id=id;if(a.provider&&/^[1-9]\d{0,15}$/.test(a.provider.id))applyGarmin(decoded,a.provider.id,a.provider.detail,a.provider.fetchedAt);activities[id]=decoded;originals[a.sourceHash]=raw;
     }
     for(const [id,draft]of Object.entries(backup.feedback)){if(!Object.hasOwn(activities,id)&&!seedIds.includes(id))throw new Error('The backup references an unknown activity.');feedback[id]=validateFeedback(draft);}
     return this.mutate(data=>{data.activities={...activities,...data.activities};data.originals={...originals,...data.originals};data.feedback={...feedback,...data.feedback};return {restored:Object.keys(activities).length};});

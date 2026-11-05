@@ -40,6 +40,14 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D21 — Owner-directed Garmin progression, 5 November 2026. Advance F04a explicit
+local Personal API sync using the existing .env key and official endpoints.
+Persist FIT originals/API summaries, stable provider aliases and sync status;
+preserve check-ins and idempotent retries. Eight account records verified, seven
+supported imported. No cloud data exposure or background automation is implied.
+Display eligibility rules suppress pace on insufficient-distance recordings;
+source values remain intact. See features/F04-garmin-local-sync.md.
+
 D20 — Local alpha, 5 November 2026. Owner requests basic features and a
 professional map. F02a uses existing Node runtime/pinned Garmin SDK for FIT
 import, atomic private library, check-ins, export/merge restore and expanded GPS

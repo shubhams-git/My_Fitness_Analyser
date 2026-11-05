@@ -1,9 +1,11 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F02a local activity alpha (features/F02-local-alpha.md)
+Active increment: F04a Garmin local sync (features/F04-garmin-local-sync.md)
 
 ## Completed
+
+- Live Garmin Personal API sync now saves originals, summaries and activity streams into the local library. Eight activities found; seven supported records saved, one breathwork unsupported. Repeat pull: zero added/updated, seven unchanged, no failures. FR965 treadmill run has HR but no GPS/usable distance; its UI selects HR and withholds misleading pace. Credentials remain server-only. See features/F04-garmin-local-sync.md.
 
 - Owner accepted the athletic premium direction and requested basic features. Added local FIT import, atomic disk library, duplicate hashes, saved check-ins, export/merge restore and expanded route explorer. See features/F02-local-alpha.md. Private data stays in ignored private-data/library. Hosted Vercel remains a synthetic design preview.
 
@@ -33,13 +35,16 @@ Active increment: F02a local activity alpha (features/F02-local-alpha.md)
 
 ## Not implemented
 
-No private online deployment, cloud database, Garmin sync, MASS import UI or application authentication. Imported local FIT activities support disk-backed check-ins and backup restoration. Reference samples retain preview check-ins until imported. Initial Garmin retrieval is verified; background sync remains unimplemented.
+No private online deployment, cloud database, scheduled/background Garmin sync, MASS import UI or application authentication. Explicit local Garmin sync and manual FIT imports support disk-backed check-ins and backup restoration. Reference/synthetic samples remain labelled previews.
 
 ## Known owner context
 
 Shubham; iPhone 17 Pro Safari; Forerunner 965 arrived 4 November 2026, with one short walk and no 965 Run yet in the inspected capture. Account also contains older owned FR255 Music activities, including running. Garmin is future recording source; strength logging need not rely on Garmin; Strava social-only; historical NRC/Strava screenshots; MASS weigh-ins. One athlete initially. Supplied screenshots are incomplete history; owner will supply more with dates.
 
 ## Verification
+
+F04a: 14 automated tests pass. Live account sync and repeat idempotency verified;
+real-data browser checks are recorded in features/F04-garmin-local-sync.md.
 
 F02a: ten automated tests pass, including disk reload and backup restore. Browser
 FIT import/reload/re-import and expanded-map zoom/time inspection checked on phone
@@ -54,7 +59,7 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Choose street/terrain map provider and private online storage/authentication setup for the next release.
+Prepare the private online environment so the owner can access the real-data library from the iPhone.
 
 ## Inputs needed at the next increment
 
