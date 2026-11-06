@@ -5,6 +5,8 @@ Active increment: database v2 design review before population (docs/DATABASE_DES
 
 ## Completed
 
+- Owner scope clarification: database v2 backfill/active history starts 1 July 2026 inclusive, based on source record date rather than fetch time. Audited Garmin manifest has five eligible activities and six excluded older ones. Updated design for staged NRC/Strava screenshot review and future direct weigh-in capture. Current journal still provides MASS import/display only; no direct weight-entry form shipped. Existing local archive/UI filters have not yet been migrated to this new boundary.
+
 - 6 November design-only audit: live Garmin inventory now has 11 activities, including a new FR965 GPS run, treadmill and indoor cycling. Newly inspected originals decode without errors. Daily summary/HR/sleep/HRV response shapes verified read-only; captures remain local/private. Proposed 16-table relational/evidence design and resumable population plan recorded in docs/DATABASE_DESIGN_V2.md. No v2 migration or personal-data insertion into Supabase performed; owner requested design discussion first. Earlier seven-record library remains intact.
 
 - 6 November live database setup: applied the tested SQL migration plus owner allowlist in the existing signed-in Supabase dashboard. Verified owner account/allowlist, RLS on all three app tables and private storage bucket; library remains empty. Anonymous library REST read denied (401/42501). APP_ORIGIN normalized and check:cloud passes. Hosted app still synthetic; private application sign-in/save verification and personal-data upload remain separate gates.

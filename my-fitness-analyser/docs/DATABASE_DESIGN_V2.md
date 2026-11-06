@@ -6,6 +6,27 @@ and FIT inspection are saved only under ignored private-data/design-audit.
 
 ## Recommendation
 
+Owner clarification: use **1 July 2026 inclusive** as the proposed hard history
+boundary. Eligibility uses the activity's source-local start date, a measurement's
+dateKey, or the health endpoint's calendar date—not download/import time. A new
+download or correction of a 2025 record does not bring it into scope. Unknown
+dates await review; they are not silently included. Cross-midnight activity
+belongs to its source start date, while sleep uses Garmin's labelled sleep date.
+Retain timezone/precision evidence at this boundary.
+
+The audited eleven-activity Garmin list contains **five in-scope activities**:
+one outdoor run, two treadmill runs, indoor cycling and a walk. Six older
+activities are excluded from v2 population/analysis, including the older track
+and breathwork records. These counts describe the audited snapshot; enumerate
+again at import time. Existing local originals/backups are not destructively
+purged by this design change and will not be migrated as active older history.
+Filter before original downloads where the list provides reliable dates, and
+record lightweight excluded-by-cutoff outcomes for reconciliation.
+
+The MASS readings and the two reviewed October screenshot runs are in scope.
+Garmin health backfill must not go earlier than the same boundary. Existing
+date filters such as “All imported” mean all **eligible** history after cutover.
+
 Use PostgreSQL for queryable records, ownership, revisions and ingestion state;
 private Supabase Storage for immutable originals and large sensor streams;
 deterministic versioned projections for charts and analysis. Preserve information
@@ -179,10 +200,10 @@ claim that every Garmin Connect screen is exposed by this API.
    running/strength scope. Do not silently pull unrelated sensitive domains;
    mark excluded-by-scope and extend explicitly if wanted.
 4. Start recent health windows around the new watch, then use documented range
-   endpoints to discover older coverage. Do not assume pre-FR965 health is absent:
-   older FR255 activities exist. A no-data run is coverage evidence, not a reason
-   to issue unbounded daily requests back to an arbitrary year. Historical range
-   backfill is checkpointed and bounded; unresolved history is labelled partial.
+   endpoints to discover coverage back to **1 July 2026 only**. Do not fetch last
+   year's history. A no-data run is coverage evidence, not a reason to issue
+   unbounded daily requests. Historical range backfill is checkpointed and
+   bounded; unresolved history is labelled partial.
 5. Capture today as provisional; re-fetch yesterday/recent seven days for delayed
    sleep/HRV corrections. Revisit recent activity revisions and perform periodic
    older-history audits since change feeds/updated-since guarantees are not
@@ -202,6 +223,49 @@ the run budget is exhausted; bounded transient retries leave resumable failures.
 different ledger outcomes. Tokens stay server-side and out of raw captures.
 
 ## How initial filling works
+
+### NRC/Strava screenshot ingestion
+
+Keep screenshot imports first-class in the same design. A staged ingestion item
+holds a versioned extraction candidate with source image references, grouped run
+ID, date/time precision, units, per-field evidence, discrepancies and review
+status. Stage it without requiring an accepted canonical activity. The existing
+two October candidates need no repeated date question; use the owner's confirmed
+dates. Request missing evidence only for new/ambiguous submissions.
+
+For each future run request (1) summary showing date, distance, pace and time;
+(2) kilometre splits including final partial split; (3) optional detail showing
+elapsed/moving time, elevation and cadence. A map screenshot is optional visual
+evidence, not a GPS file. Group multiple images of one run under a stable import
+UUID; new images revise that candidate rather than create another workout.
+
+Visible numbers can support summary metrics and split comparisons without HR.
+Do not reconstruct exact GPS, continuous pace/elevation, power, running dynamics,
+pauses or HR from a screenshot graph. Distinguish fastest pace from fastest
+split, total ascent from maximum elevation, and moving from elapsed time.
+Keep rounded partial distances/contradictory figures as source assertions with
+review flags. “0 bpm”/“--” means unavailable, not a measured zero.
+
+On review, attach the candidate as a source alias to an existing matching run
+when confirmed, or create one canonical activity. Same-date/distance matches
+alone are suggestions, especially if Garmin and Strava/NRC describe the same
+physical effort. Accepted aliases count once. Originals, extraction version,
+reviewer/time and rejected values remain traceable. Do not send personal images
+to the free Gemini API for extraction.
+
+### Weigh-in capture scope
+
+Current shipped UI imports/displays MASS history; it does **not** provide direct
+weigh-in entry. MASS remains the initial recording source, as agreed. The product
+direction also includes quick, intuitive direct logging; implement that as its
+own slice after the current data foundation, not as an unannounced replacement
+of MASS. Reuse body_measurements with an app/manual source and a client-generated
+idempotency key; preserve measured date/time, kg and edit revisions. A network
+retry must not duplicate a reading. Same-day MASS/manual matches require review,
+not automatic merging or a unique-day constraint. Keep the primary recording
+action reachable in one clear navigation step; no questionnaire for a weigh-in.
+
+### Population sequence
 
 1. After design review, create additive v2 migrations and adapter/read-model
    tests using synthetic fixtures. Preserve the existing schema/local backup.

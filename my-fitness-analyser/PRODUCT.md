@@ -15,6 +15,7 @@ Turn running, strength, body-weight and recovery records into clear answers to: 
 - User owns a Garmin Forerunner 965, already paired with the phone, Garmin Connect and Strava. Those connections do not authorize this new application's access.
 - New recordings come from Garmin. Strava continues for social sharing only. Historic NRC and Strava screenshots are legitimate user-supplied historical inputs. No ongoing NRC dependency.
 - MASS remains the weight-entry source initially. Re-import its JSON without duplicate weigh-ins. Live fetching is a separate integration, not assumed.
+- Owner clarification, 6 November: active history begins 1 July 2026 inclusive. NRC/Strava screenshot runs remain first-class inputs. Quick, intuitive recording is part of the product promise, alongside intelligence; direct weigh-in entry is planned but not yet implemented, and MASS remains the recording source meanwhile.
 - Check-ins take roughly 30 seconds and no more than 45 seconds in the usual workflow, excluding optional notes and activity-upload time.
 - Rich activity exploration, accurate route/splits when available, useful progress and weight context. Add features incrementally.
 - Visual quality includes hierarchy, typography, touch behaviour, coherent states, smooth useful motion and precise charts. No generic administration dashboard, marketing copy or gratuitous animated decoration.

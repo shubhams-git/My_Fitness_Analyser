@@ -40,6 +40,15 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D27 — Owner clarification, 6 November 2026. Interpret the July boundary as
+1 July 2026 inclusive for v2 active history and backfill; source-local activity
+date/measurement dateKey/health calendar date governs eligibility. Exclude older
+records from migration/analysis without destructively purging existing backups.
+Keep NRC/Strava screenshot candidates and source aliases in the proposed design.
+MASS remains the initial weight recorder; app import/display exists and direct
+quick weigh-in capture is a planned subsequent slice, not already shipped. These
+clarifications refine D26 without replacing the agreed incremental plan.
+
 D26 — Proposed database v2, 6 November 2026. Owner requests a thought-through
 data/ingestion design before real population. Propose normalized owner-scoped
 records, immutable private raw evidence/stream objects, revisioned source aliases,
