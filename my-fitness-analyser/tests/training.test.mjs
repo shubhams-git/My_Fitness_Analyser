@@ -59,6 +59,9 @@ test('Interactions request forces one known tool, stateless storage and source-s
  const valid={status:'requires_action',steps:[{type:'function_call',name:TOOL_NAME,arguments:report(pack)}]};assert.equal(extractReport(valid,pack).dataset,'synthetic');
  for(const result of [{...valid,status:'incomplete'},{...valid,steps:[]},{...valid,steps:[...valid.steps,...valid.steps]},{...valid,steps:[{...valid.steps[0],name:'execute_sql'}]},{...valid,steps:[{...valid.steps[0],arguments:'{}'}]}])assert.throws(()=>extractReport(result,pack));
 });
+test('unconfirmed free-tier configuration blocks generation without a provider request',async()=>{
+ const directory=await temporaryCache();let calls=0;try{const service=new GeminiReviews({directory,configReader:async()=>({key:'SYNTHETIC_TEST_KEY',model:'gemini-3.8-flash',freeTierConfirmed:false}),fetcher:async()=>{calls++;}});assert.equal((await service.status()).configured,false);await assert.rejects(service.generate(),/Free plan/);assert.equal(calls,0);}finally{await removeCache(directory);}
+});
 test('Gemini requests deduplicate, cache only validated responses and invalidate with the model',async()=>{
  const directory=await temporaryCache();let calls=0,model='gemini-3.6-flash';
  try{const pack=demoEvidence(),service=new GeminiReviews({directory,configReader:async()=>({key:'SYNTHETIC_TEST_KEY',model}),fetcher:async(url,options)=>{calls++;assert.equal(url,'https://generativelanguage.googleapis.com/v1beta/interactions');assert.equal(options.headers['x-goog-api-key'],'SYNTHETIC_TEST_KEY');assert.equal(JSON.parse(options.body).store,false);return new Response(JSON.stringify({status:'requires_action',model,steps:[{type:'function_call',name:TOOL_NAME,arguments:report(pack)}]}));}});

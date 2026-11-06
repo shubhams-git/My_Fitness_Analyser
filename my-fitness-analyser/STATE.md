@@ -1,9 +1,11 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: F03b MASS body and session journal (features/F03-mass-journal.md)
+Active increment: credential verification and street-map preparation (docs/CREDENTIAL_STATUS.md)
 
 ## Completed
+
+- 6 November credential check: Gemini key authenticates model listing; Supabase URL/publishable key authenticate Auth settings, admin read finds zero Auth users, app tables absent (PGRST205). Local environment aliases mapped to existing runtime names. Owner confirms Gemini Free plan and free-products-only constraint. Added free-tier attestation gate and high-thinking 3.8 Flash configuration. One synthetic generation returned HTTP 503; no live analysis success claimed. See docs/CREDENTIAL_STATUS.md.
 
 - Added `/journal` with MASS import review, duplicate/update/deletion handling, raw source preservation, daily weight readings, trailing seven-day means, date windows, keyboard chart inspection and session history. Imported the supplied export locally: 29 weights, four active sessions (two Strength, two Cardio), one excluded session tombstone. Repeat import adds no duplicates. See features/F03-mass-journal.md.
 - Complete-library export/merge restore now includes MASS originals and records. A fresh private restore verified seven Garmin activities, 29 weigh-ins and four active MASS sessions. Earlier backups do not erase an existing journal. Preview is read-only and stale previews fail before saving. Public journal preview is synthetic only.
@@ -96,7 +98,7 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Build a unified session calendar and an outstanding-check-in view from the saved Garmin and MASS records.
+Build a street-labelled recorded-route map using a verified free basemap setup; preserve linked chart inspection and no-GPS handling.
 
 ## Inputs needed at the next increment
 

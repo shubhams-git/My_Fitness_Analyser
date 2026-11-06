@@ -40,6 +40,16 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D25 — Free-only credentials and maps priority, 6 November 2026. Owner confirms
+the Gemini key's project is on the Free plan; the earlier billing assumption
+does not authorize paid requests. Configure 3.8 Flash/high thinking based on the
+current official free-tier listing, require explicit free-plan attestation,
+retain synthetic-only model input and no paid fallback. Model listing works;
+one live synthetic Interactions request returned 503, so generation is not yet
+verified. Supabase credentials authenticate but owner account and migration
+remain missing. The next development priority is a real street-labelled map,
+superseding the calendar as the immediate next slice. See credential status.
+
 D24 — Owner-directed independent progress, 5 November 2026. Gemini, Vercel and
 Supabase credentials are deferred. Advance the missing F03 MASS journal slice
 locally: reviewable format 2 import, atomic source-ID/revision/tombstone merge,
