@@ -52,12 +52,13 @@ Active increment: F09 real geographic route exploration
 
 ## Verification and deployment
 
-57 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
+61 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
 publication, stale-save rejection and cross-owner foreign keys using synthetic
 schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and
 diff whitespace checks pass. Production deployment results are recorded in F07.
-Commit ee38eb5 is pushed and the Vercel production build is Ready. Production
+Map code release 481ce29 is pushed and its Vercel production build is Ready.
+Live geographic route/inspection evidence is recorded in F09. Production
 root redirects to sign-in; anonymous data/training/journal/profile return 401
 without records; invalid credentials return 401 and logout clears cookies.
 

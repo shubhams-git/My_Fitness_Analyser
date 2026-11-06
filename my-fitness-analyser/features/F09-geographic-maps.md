@@ -54,7 +54,12 @@ panning, fit and Night cartography. Selecting the recorded 2 km marker displayed
 16:40 / 9:04 per km / 172 bpm and moved the shared time cursor. No DB or source
 measurements were changed. Provider sprite gaps use a generic POI fallback, and
 minor-road labels appear from zoom 14 so fitted short routes retain useful names.
-7d1c474 deployed successfully; final polish deployment verification follows.
+Code release 481ce29 deployed successfully through GitHub master to Vercel.
+Final live recheck confirmed Streets/Night loading-to-ready transitions, fit,
+2 km inspection and replay progression on the actual Garmin record. Browser
+session remains signed in; no authentication credentials were read or changed.
+Private proof screenshots: private-data/map-qa/production-streets.png and
+production-night.png. Actual iPhone Safari touch/WebGL behaviour remains pending.
 
 References: [MapLibre installation/CSP](https://maplibre.org/maplibre-gl-js/docs/),
 [OpenFreeMap quick start](https://openfreemap.org/quick_start/),
