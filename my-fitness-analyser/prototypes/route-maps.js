@@ -74,7 +74,13 @@ export function mountRouteMaps({records,block=null,cursor=null,onSelect,reduced=
     const style=event.target.closest('[data-map-style]'),retry=event.target.closest('[data-map-retry]');
     if(retry){const el=retry.closest('[data-real-map]'),item=instances.get(el);if(item)remove(item);void create(el);}
     if(style){const next=style.dataset.mapStyle;if(next===appearance)return;appearance=next;try{localStorage.setItem('mfa-map-appearance',next);}catch{}
-      for(const item of instances.values()){buttonState(item.el);if(item.map){item.ready=false;item.failed=false;item.geography=false;item.map.setStyle(mapStyle(item.base,appearance),{diff:false});}}
+      for(const item of instances.values()){
+        buttonState(item.el);if(!item.map)continue;
+        item.ready=false;item.failed=false;item.geography=false;item.el.dataset.mapState='loading';
+        item.el.querySelector('.geo-status').hidden=false;item.el.querySelector('.geo-recovery').hidden=true;
+        clearTimeout(item.timer);item.timer=setTimeout(()=>showError(item),22000);
+        item.map.setStyle(mapStyle(item.base,appearance),{diff:false});
+      }
     }
   },{signal:abort.signal});
   scan();
