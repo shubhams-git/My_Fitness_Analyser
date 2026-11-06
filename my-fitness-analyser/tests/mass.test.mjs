@@ -61,8 +61,8 @@ test('review is read-only; import and complete-library restore survive fresh ins
  assert.notEqual(massDigest(persisted.mass),preview.baseDigest);
  }finally{await cleanup(a.path);await cleanup(b.path);}
 });
-test('public journal is explicitly synthetic and excludes source originals',()=>{
- const response={setHeader(){},status(n){assert.equal(n,200);return this;},json(v){this.value=v;}};publicJournal({url:'/api/journal?window=30'},response);assert.equal(response.value.dataset,'synthetic');assert.equal(response.value.window,'30');assert.equal(response.value.local,false);assert.ok(response.value.entries.every(r=>r.id.startsWith('demo-')));assert.ok(!JSON.stringify(response.value).includes('"raw"'));assert.equal(journalDataset(syntheticMass(),{window:'all'}).metrics.strengthSessions,2);
+test('hosted journal fails closed without a member session and never serves synthetic readings',async()=>{
+ const response={setHeader(){},end(v){this.value=JSON.parse(v);}};await publicJournal({method:'GET',headers:{},url:'/api/journal?window=30'},response);assert.ok([401,503].includes(response.statusCode));assert.equal(response.value.dataset,undefined);assert.equal(response.value.entries,undefined);assert.equal(journalDataset(syntheticMass(),{window:'all'}).metrics.strengthSessions,2);
 });
 test('local MASS HTTP review, commit retries and origin boundaries use an isolated library',async()=>{
  const directory=await temp(),port=4191,base=`http://127.0.0.1:${port}`,child=spawn(process.execPath,['prototypes/server.mjs'],{cwd:new URL('../',import.meta.url),env:{...process.env,FITNESS_CLOUD_ENABLED:'0',FITNESS_LIBRARY_DIR:directory.path,PROTOTYPE_PORT:String(port)},stdio:['ignore','pipe','pipe']});

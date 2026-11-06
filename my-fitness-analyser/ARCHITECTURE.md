@@ -1,5 +1,26 @@
 # Architecture proposal
 
+## Current implementation — 7 November 2026
+
+F07 replaces hosted synthetic adapters with invite-only Supabase Auth and
+member-bound reads. One Postgres schema uses owner_id foreign keys and RLS;
+Auth manages email/password, fitness_owners grants membership, fitness_profiles
+stores display name/timezone. Request ownership is the verified Auth ID, never a
+query/body ID or FITNESS_OWNER_ID. Storage paths use the same namespace. The latter
+environment variable now only binds the bootstrap Garmin key.
+
+The relational screenshot tables are populated and read by cloud/activities.mjs;
+selected-source segments/aliases project into the existing UI without creating
+GPS/HR streams. Check-ins have their own append-only revision table/RPC. Existing
+per-owner JSONB/FIT libraries remain a compatibility bridge for Garmin and MASS,
+merged with canonical evidence on read. Empty hosted history never falls back to
+synthetic data. Private screenshot intake waits for reviewed publication.
+Export v2 includes records and verified originals; restore needs a reviewed DB
+operation. See F07 for actual verification and remaining gates.
+
+Sections below record earlier proposals/increments; references to unprovisioned
+cloud services or public synthetic hosting describe those earlier stages.
+
 F03b: `/journal` adds a MASS format 2 adapter and pure versioned body/session
 read model. It uses the existing atomic LocalLibrary, source JSON hashes and
 complete-library export/restore. Preview/commit runs only on the loopback server;

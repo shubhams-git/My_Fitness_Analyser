@@ -12,6 +12,7 @@ import { randomUUID } from 'node:crypto';
 import { parseMass,importPreview,journalDataset } from './mass.mjs';
 
 const root=fileURLToPath(new URL('./',import.meta.url));
+try{process.loadEnvFile(fileURLToPath(new URL('../.env',import.meta.url)));}catch(error){if(error.code!=='ENOENT')throw error;}
 const port=Number(process.env.PROTOTYPE_PORT||4173);
 const data=await loadPrototypeData();
 const library=new LocalLibrary(process.env.FITNESS_LIBRARY_DIR?pathToFileURL(resolve(process.env.FITNESS_LIBRARY_DIR)+'/'):new URL('../private-data/library/',import.meta.url));
@@ -37,7 +38,7 @@ const server=http.createServer(async(req,res)=>{
       else{const {token}=JSON.parse(bytes.toString()),pending=massPreviews.get(token);if(!pending)throw new Error('This import preview expired. Choose the file again.');pending.promise??=library.importMass(pending.incoming,pending.baseDigest).catch(e=>{pending.promise=null;throw e;});json(200,await pending.promise);}
     }catch(e){json(400,{error:e.message});}return;
   }
-  if(process.env.FITNESS_CLOUD_ENABLED==='1'&&pathname.startsWith('/api/')){const routes={'/api/data':'data','/api/training':'training','/api/import':'import','/api/feedback':'feedback','/api/restore':'restore','/api/export':'export','/api/garmin/sync':'sync'};if(routes[pathname])await privateHandler(req,res,routes[pathname]);else if(pathname==='/api/analysis/status')json(200,{configured:false,model:'gemini-3.6-flash',dataMode:'synthetic-only',review:null,evidence:null,reason:'The Gemini lab is enabled in the local app.'});else json(404,{error:'Not available'});return;}
+  if(process.env.FITNESS_CLOUD_ENABLED==='1'&&pathname.startsWith('/api/')){const routes={'/api/data':'data','/api/training':'training','/api/journal':'journal','/api/import':'import','/api/feedback':'feedback','/api/restore':'restore','/api/export':'export','/api/garmin/sync':'sync'};if(routes[pathname])await privateHandler(req,res,routes[pathname]);else json(404,{error:'Not available'});return;}
   if(pathname==='/api/training'&&req.method==='GET'){try{const saved=await library.read(),window=new URL(req.url,'http://localhost').searchParams.get('window')==='all'?'all':'90';json(200,{...trainingDataset(mergeTrainingActivities(data.activities,Object.values(saved.activities)),saved.feedback,{window}),lastSync:saved.garminSync?.lastSuccessAt||null,local:true});}catch{json(500,{error:'Your saved training record could not be read.'});}return;}
   if(pathname==='/api/analysis/status'&&req.method==='GET'){try{json(200,await reviews.status());}catch{json(500,{error:'Analysis configuration could not be read.'});}return;}
   if(pathname==='/api/analysis/demo'&&req.method==='POST'){
@@ -70,7 +71,7 @@ const server=http.createServer(async(req,res)=>{
     if(evidence)file=fileURLToPath(new URL(`../private-data/historical/screenshots/image-${evidence[1]}.png`,import.meta.url));
     else if(pathname==='/design/tokens.css')file=fileURLToPath(new URL('../design/tokens.css',import.meta.url));
     else {
-      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname==='/journal'?'/journal.html':pathname));
+      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname==='/journal'?'/journal.html':pathname==='/account'?'/account.html':pathname==='/sign-in'?'/sign-in.html':pathname));
       const rel=relative(root,file);
       if(rel.startsWith('..')||isAbsolute(rel)||!/\.(html|css|js|svg|ttf|txt)$/.test(file))throw new Error('Not served');
     }

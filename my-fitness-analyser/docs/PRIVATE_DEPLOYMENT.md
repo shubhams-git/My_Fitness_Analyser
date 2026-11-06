@@ -1,30 +1,35 @@
 # Private online release candidate
 
-The implementation is prepared, not deployed. Vercel CLI authentication was
-invalid and neither Vercel nor Supabase was connected when checked. Only the
-existing local Garmin app has been verified against actual owner data.
+7 November: Supabase is provisioned with private evidence and membership data;
+Vercel is connected to GitHub master. F07 is the authenticated real-data cutover.
+See features/F07-private-members.md for actual verification and remaining gates.
 
 ## Account setup and migration
 
-1. Connect Vercel and Supabase in this chat. Select the existing Vercel project
+1. Select the existing Vercel project
    or a separate private project, with application root `my-fitness-analyser`.
 2. Choose a Supabase project/region and verify its current plan and quotas before
    creation. No paid subscription is assumed. Keep public signups disabled.
 3. Create the owner's Supabase Auth account through the provider dashboard.
    The owner sets their password directly; never paste it into chat or source.
-4. Apply `supabase/migrations/20261105_private_library.sql` to the chosen project.
+4. Apply the tracked migrations in chronological order, beginning with
+   `supabase/migrations/20261105_private_library.sql`, then the relational evidence
+   and member profile/feedback migrations. Do not reapply already executed DDL.
    It creates owner-scoped library state, conflict-checked updates, sync leases
    and a private `fitness-private` bucket. This is a new migration, not a reset.
 5. Copy the owner's Auth user UUID into the owner allowlist using SQL:
 
 ```sql
 insert into public.fitness_owners(owner_id)
-values ('REPLACE_WITH_OWNER_AUTH_UUID');
+values ('REPLACE_WITH_OWNER_AUTH_UUID') on conflict do nothing;
+insert into public.fitness_profiles(owner_id,display_name)
+values ('REPLACE_WITH_OWNER_AUTH_UUID','REPLACE_WITH_MEMBER_NAME')
+on conflict do nothing;
 ```
 
 The runtime uses the user's access token plus RLS. It does not need a service-role
-key. A second authenticated account is denied by the app's owner check; RLS also
-isolates rows and storage paths. Static UI assets can be public; health APIs and
+key. A second account must be invited to fitness_owners; then it receives its own
+records, never the bootstrap owner's. RLS isolates rows/storage paths. UI assets can be public; health APIs and
 originals require verified authentication.
 
 ## Production configuration
@@ -34,14 +39,16 @@ UI/connection, not Git. `.env.example` contains names only.
 
 - `SUPABASE_URL`: `https://PROJECT_REF.supabase.co`
 - `SUPABASE_ANON_KEY`: project's anon/publishable key (never service role)
-- `FITNESS_OWNER_ID`: owner's Auth UUID matching the allowlist
+- `FITNESS_OWNER_ID`: bootstrap Garmin owner's Auth UUID (not the signed-in identity)
 - `APP_ORIGIN`: exact HTTPS app origin, without a trailing slash
 - `GARMIN_PERSONAL_API_KEY`: existing owner's key, server-only
 - `FITNESS_CLOUD_ENABLED=1`: enables guarded real-data endpoints
 
-Keep `FITNESS_CLOUD_ENABLED` disabled and Garmin keys absent on public design
-previews. `npm run check:cloud` validates configuration format without printing
-values or making a network request. It currently reports missing cloud variables.
+Hosted routes always require Auth, even when FITNESS_CLOUD_ENABLED is zero.
+That flag selects private mode for the local server. Never ship personal-provider
+keys to public design previews. APP_ORIGIN must match the exact production host;
+preview hosts need their own origin/configuration. `npm run check:cloud` checks
+format without printing values or making network calls; it now passes locally.
 
 The existing Vercel configuration routes private API operations through one
 guarded handler and reserves a 300-second maximum duration for that function;
@@ -66,8 +73,8 @@ large backup restoration and durable background jobs remain later work.
    records. Alternatively restore a local export under the online size limit.
 8. Test iPhone Safari and record observed check-in timings.
 
-Do not report this release as online until these checks pass on the actual
-deployment. Sign-in and policy tests below currently use synthetic/local services.
+Report the exact checks performed; a deployed sign-in page alone is not verified
+owner login, and PostgreSQL stand-in tests are not a live two-person login test.
 
 ## Implementation and verified evidence
 
@@ -84,9 +91,11 @@ deployment. Sign-in and policy tests below currently use synthetic/local service
   policies, conflicts and leases passed. Auth HTTP calls are mocked separately;
   these are not live Supabase integration tests.
 
-The current alpha uses one versioned JSONB state document per owner and separately
-stored FIT originals. It is intentionally small; normalized activity queries and
-large-history delivery should precede a broader release. No framework migration.
+The alpha merges relational screenshot history with versioned owner JSONB/FIT
+state. Export v2 includes relational rows and checksum-verified originals,
+including pending screenshot uploads; restore v2 needs reviewed database tooling.
+Normalized Garmin/MASS ingestion and larger-history pagination remain later work.
+No framework migration. Membership records never contain passwords.
 
 ## Sources and dependency review
 

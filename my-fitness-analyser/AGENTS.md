@@ -10,14 +10,14 @@
 
 - Product name: My Fitness Analyser; technical slug: `my-fitness-analyser`. Earlier STRIDE names are historical references only.
 
-- A private personal training intelligence app for Shubham, iPhone 17 Pro Safari first.
+- A private, invite-only training intelligence app, initially Shubham and later Saurav, iPhone 17 Pro Safari first. Every record and connection belongs to the verified signed-in member.
 - Garmin Forerunner 965 and Garmin Connect are the primary source for future recorded activities. Strava is social-only; no new Strava API dependency. Historical Nike/Strava screenshots are import evidence. MASS supplies weigh-ins through exports until a real integration exists.
 - Premium, athletic, purposeful design; low clutter; concise useful findings. Follow approved tokens and components. Proposed tokens are not user-approved branding.
 - Prototype B / Field Notes is the owner's selected direction for all future UI work. Its visual finish is still under refinement. Aim for an expressive premium experience with coherent motion, typography and light, while keeping logging quick and data honest.
 - Four core run check-in answers; usual target 30 seconds, acceptance ceiling 45 seconds excluding optional notes and source-upload time. Never silently answer symptoms or effort.
 - Missing values are null, never invented zeroes. One physical activity has one canonical record with multiple source aliases. Preserve source provenance.
 - Calculations are deterministic and versioned. Insight prose must match its evidence. No invented readiness, injury probabilities or physiological claims.
-- One athlete initially. Future two-person support must isolate identities and records and verify provider terms.
+- Shared schema with per-member row/storage isolation. Never reuse Shubham's provider connection for another member; verify provider terms before expanding integrations.
 
 ## Change discipline
 

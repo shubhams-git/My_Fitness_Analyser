@@ -43,10 +43,8 @@ test('synthetic fixture is coherent, explicitly synthetic and has deliberate cov
  const a=syntheticHistory()[2];assert.ok(Math.abs(a.records.reduce((sum,r)=>sum+r.hr,0)/a.records.length-a.hr)<1e-9);assert.ok(Math.abs(a.records.at(-1).t-a.timer)<1e-9);
  assert.equal(dataset(syntheticHistory()).sessions.length,0);
 });
-test('public preview supplies synthetic detail records for every training link',()=>{
- const response={setHeader(){},status(value){assert.equal(value,200);return this;},json(value){this.value=value;}};
- publicData({method:'GET'},response);const activities=response.value.activities;assert.ok(activities.every(a=>a.synthetic));assert.equal(activities.length,11);
- publicTraining({method:'GET',url:'/api/training?window=all'},response);assert.equal(response.value.dataset,'synthetic');assert.equal(response.value.window,'all');assert.ok(response.value.sessions.every(s=>activities.some(a=>a.id===s.id)));assert.equal(response.value.local,false);
+test('hosted activity and training routes never fall back to a synthetic preview',async()=>{
+ for(const handler of [publicData,publicTraining]){const response={setHeader(){},end(value){this.value=JSON.parse(value);}};await handler({method:'GET',headers:{},url:'/api/training?window=all'},response);assert.ok([401,503].includes(response.statusCode));assert.equal(response.value.activities,undefined);assert.equal(response.value.sessions,undefined);assert.equal(response.value.dataset,undefined);}
 });
 test('review schema rejects extra fields, mismatched context, unknown refs, unsupported claims and unavailable charts',()=>{
  const pack=demoEvidence(),valid=report(pack);assert.equal(validateReview(valid,pack),valid);

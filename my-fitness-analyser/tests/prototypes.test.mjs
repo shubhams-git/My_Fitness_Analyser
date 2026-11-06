@@ -66,7 +66,7 @@ test('demonstration is explicitly synthetic and describes its four-minute blocks
 
 test('local preview serves its UI while denying credential/source paths and foreign hosts', async () => {
   const port=4186;
-  const child=spawn(process.execPath,['prototypes/server.mjs'],{cwd:new URL('../',import.meta.url),env:{...process.env,PROTOTYPE_PORT:String(port)},stdio:['ignore','pipe','pipe']});
+  const child=spawn(process.execPath,['prototypes/server.mjs'],{cwd:new URL('../',import.meta.url),env:{...process.env,FITNESS_CLOUD_ENABLED:'0',PROTOTYPE_PORT:String(port)},stdio:['ignore','pipe','pipe']});
   try {
     await new Promise((resolve,reject)=>{
       const timeout=setTimeout(()=>reject(new Error('Preview startup timed out')),10000);

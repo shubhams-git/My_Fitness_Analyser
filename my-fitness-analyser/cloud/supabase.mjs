@@ -1,14 +1,15 @@
-import { LocalLibrary } from '../prototypes/library.mjs';
+import { LocalLibrary,validateFeedback,decodeActivity } from '../prototypes/library.mjs';
 import { createHash } from 'node:crypto';
+import { activityEvidence,ownerRows } from './activities.mjs';
 
 export const emptyLibrary=()=>({schemaVersion:1,activities:{},feedback:{},originals:{}});
 export class CloudError extends Error { constructor(status,message){super(message);this.status=status;} }
 export function cloudConfig(env=process.env){
   const {SUPABASE_URL:url,SUPABASE_ANON_KEY:key,FITNESS_OWNER_ID:owner,APP_ORIGIN:origin}=env;
-  if(!url||!key||!owner||!origin)throw new CloudError(503,'Private hosting is not configured yet.');
+  if(!url||!key||!origin)throw new CloudError(503,'Private hosting is not configured yet.');
   let role;try{role=JSON.parse(Buffer.from(key.split('.')[1]||'','base64url').toString()).role;}catch{}
   if(key.startsWith('sb_secret_')||role==='service_role')throw new CloudError(503,'Use the Supabase publishable or anon key, not a privileged key.');
-  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url)||!/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(owner))throw new CloudError(503,'Private hosting configuration needs attention.');
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url)||(owner&&!/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(owner)))throw new CloudError(503,'Private hosting configuration needs attention.');
   const parsed=new URL(origin);if(parsed.origin!==origin||(parsed.protocol!=='https:'&&!['127.0.0.1','localhost'].includes(parsed.hostname))||(env.VERCEL&&parsed.protocol!=='https:'))throw new CloudError(503,'Set the private app HTTPS origin.');
   return {url,key,owner,origin};
 }
@@ -26,7 +27,28 @@ export class SupabaseApi {
 export class CloudLibrary extends LocalLibrary {
   constructor(api){super(null);this.api=api;this.owner=api.config.owner;}
   async snapshot(){const rows=await this.api.json(`/rest/v1/fitness_libraries?owner_id=eq.${this.owner}&select=revision,state`);if(!Array.isArray(rows))throw new CloudError(503,'The private library could not be read.');return rows[0]||{revision:0,state:emptyLibrary()};}
-  async read(){return structuredClone((await this.snapshot()).state);}
+  async read(){
+    const [snapshot,evidence]=await Promise.all([this.snapshot(),activityEvidence(this.api)]),data=structuredClone(snapshot.state);
+    data.activityAliases={};
+    for(const activity of evidence.activities){
+      for(const alias of activity.legacyAliases){data.activityAliases[alias]=activity.id;data.feedback[activity.id]??=data.feedback[alias];delete data.activities[alias];delete data.feedback[alias];}
+      data.activities[activity.id]=activity;
+    }
+    Object.assign(data.feedback,evidence.feedback);
+    data.activities=Object.fromEntries(Object.entries(data.activities).filter(([,a])=>!a.synthetic&&a.date>='2026-07-01'));
+    return data;
+  }
+  async save(id,draft,knownIds){
+    if(!knownIds.includes(id))throw new CloudError(404,'Activity was not found.');
+    if(!/^[0-9a-f-]{36}$/i.test(id))return super.save(id,draft,knownIds);
+    const value=validateFeedback(draft),expected=Number(draft.revision||0);
+    if(!Number.isSafeInteger(expected)||expected<0)throw new CloudError(400,'Reload this check-in before saving.');
+    const response=await this.api.request('/rest/v1/rpc/save_activity_feedback',{method:'POST',body:{target_activity:id,expected_revision:expected,new_state:value}});
+    if(response.status===409)throw new CloudError(409,'Your check-in changed on another device. Reload before saving.');
+    if(!response.ok)throw new CloudError(503,'Your check-in could not be saved. Please retry.');
+    return {...value,revision:Number(await response.json())};
+  }
+  async import(bytes,...args){if(decodeActivity(bytes).date<'2026-07-01')throw new CloudError(400,'This app currently keeps activity history from July 2026 onwards.');return super.import(bytes,...args);}
   async mutate(fn){
     for(let attempt=0;attempt<4;attempt++){
       const {revision,state}=await this.snapshot(),data=structuredClone(state),result=await fn(data);
@@ -45,5 +67,12 @@ export class CloudLibrary extends LocalLibrary {
     }
     throw new CloudError(409,'Another save is in progress. Please retry.');
   }
-  async exportBackup(){const backup=await this.read();for(const [hash,original]of Object.entries(backup.originals)){const response=await this.api.request('/storage/v1/object/fitness-private/'+original.key);if(!response.ok)throw new CloudError(503,'A backup original could not be read.');backup.originals[hash]=Buffer.from(await response.arrayBuffer()).toString('base64');}backup.exportedAt=new Date().toISOString();return backup;}
+  async exportBackup(){
+    const backup=structuredClone((await this.snapshot()).state);
+    for(const [hash,original]of Object.entries(backup.originals)){const response=await this.api.request('/storage/v1/object/fitness-private/'+original.key);if(!response.ok)throw new CloudError(503,'A backup original could not be read.');backup.originals[hash]=Buffer.from(await response.arrayBuffer()).toString('base64');}
+    const tables={};for(const table of ['activities','activity_sources','source_accounts','raw_assets','activity_source_assets','activity_segments','activity_feedback','ingestion_runs','ingestion_items','record_changes','fitness_profiles','screenshot_submissions'])tables[table]=await ownerRows(this.api,table);
+    const originals={};for(const asset of [...tables.raw_assets,...tables.screenshot_submissions]){if(originals[asset.sha256])continue;const response=await this.api.request('/storage/v1/object/fitness-private/'+asset.object_key);if(!response.ok)throw new CloudError(503,'A source original could not be exported.');const bytes=Buffer.from(await response.arrayBuffer());if(createHash('sha256').update(bytes).digest('hex')!==asset.sha256)throw new CloudError(503,'An archived original failed verification.');originals[asset.sha256]=bytes.toString('base64');}
+    return {schemaVersion:2,kind:'fitness-private-evidence-backup',ownerId:this.owner,exportedAt:new Date().toISOString(),legacy:backup,tables,originals};
+  }
+  async restore(backup,...args){if(backup?.schemaVersion===2)throw new CloudError(409,'This evidence archive needs a reviewed database restore. Your existing records are unchanged.');return super.restore(backup,...args);}
 }

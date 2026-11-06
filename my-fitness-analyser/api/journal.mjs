@@ -1,2 +1,2 @@
-import { journalDataset,syntheticMass } from '../prototypes/mass.mjs';
-export default function handler(request,response){response.setHeader('Cache-Control','no-store');if(process.env.FITNESS_CLOUD_ENABLED==='1'){response.status(503).json({error:'Body and strength imports currently run in the local app.'});return;}const window=new URL(request.url,'http://localhost').searchParams.get('window');response.status(200).json({...journalDataset(syntheticMass(),{window:['30','all'].includes(window)?window:'90',anchor:'2026-11-01',synthetic:true}),local:false});}
+import { privateHandler } from '../cloud/handler.mjs';
+export default function handler(request,response){return privateHandler(request,response,'journal');}

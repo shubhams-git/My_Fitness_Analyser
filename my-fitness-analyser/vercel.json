@@ -1,6 +1,12 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/account", "destination": "/prototypes/account.html" },
+    { "source": "/account.html", "destination": "/prototypes/account.html" },
+    { "source": "/account.css", "destination": "/prototypes/account.css" },
+    { "source": "/account.js", "destination": "/prototypes/account.js" },
+    { "source": "/session.js", "destination": "/prototypes/session.js" },
+    { "source": "/sign-in", "destination": "/prototypes/sign-in.html" },
     { "source": "/journal", "destination": "/prototypes/journal.html" },
     { "source": "/journal.html", "destination": "/prototypes/journal.html" },
     { "source": "/journal.js", "destination": "/prototypes/journal.js" },

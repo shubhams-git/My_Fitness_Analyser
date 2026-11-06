@@ -49,7 +49,7 @@ export class GarminClient {
 }
 
 export class GarminSync {
-  constructor(library,{keyReader=readGarminKey,clientFactory=key=>new GarminClient(key)}={}){this.library=library;this.keyReader=keyReader;this.clientFactory=clientFactory;this.running=false;this.progress=null;}
+  constructor(library,{keyReader=readGarminKey,clientFactory=key=>new GarminClient(key),cutoff=null}={}){this.library=library;this.keyReader=keyReader;this.clientFactory=clientFactory;this.cutoff=cutoff;this.running=false;this.progress=null;}
   async status(){return {configured:Boolean(await this.keyReader()),running:this.running,progress:this.progress,...(await this.library.read()).garminSync};}
   async run(){
     if(this.running)throw new Error('A Garmin sync is already running.');this.running=true;
@@ -60,6 +60,7 @@ export class GarminSync {
         const page=await client.json(`/activitylist-service/activities/search/activities?start=${start}&limit=20`);if(!Array.isArray(page))throw new Error('Garmin returned an unexpected activity list.');
         for(const item of page){
           const id=String(item.activityId);if(!/^[1-9]\d{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))throw new Error('Garmin returned an invalid activity identity.');if(seen.has(id))continue;seen.add(id);result.seen++;
+          if(this.cutoff&&(!/^\d{4}-\d{2}-\d{2}/.test(item.startTimeLocal||'')||item.startTimeLocal.slice(0,10)<this.cutoff)){result.skipped++;continue;}
           if(!['running','track_running','treadmill_running','indoor_running','walking'].includes(item.activityType?.typeKey)){result.skipped++;continue;}
           try{const detail=await client.json(`/activity-service/activity/${id}`),bytes=fitFromZip(await client.request(`/download-service/files/activity/${id}`,{binary:true}));const outcome=await this.library.importGarmin(bytes,id,detail);result[outcome]++;}
           catch(e){result.failed++;result.errors.push({activityId:id,message:e.message});}

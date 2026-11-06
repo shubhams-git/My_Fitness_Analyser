@@ -1,5 +1,23 @@
 # Decision register
 
+D29 — Owner-directed private member cutover, 7 November 2026. Replace hosted
+synthetic routes with authenticated reads from the populated evidence tables.
+Bind ownership to verified Supabase Auth identity plus invite-only membership;
+use one shared schema and RLS, not one physical database per athlete or a global
+environment-owner filter. Add profiles, append-only check-in revisions and private
+screenshot intake. Preserve the existing Shubham account/password and existing
+history; do not create a duplicate identity or reset credentials. Use renewable
+30-day HttpOnly refresh cookies and explicit local-device sign-out. Keep drafts
+owner-scoped and clear rendered data on logout/back-navigation. The environment
+Garmin key remains a bootstrap connection for its configured owner only; other
+members use original FIT imports until per-member secret storage is delivered.
+NRC/Strava uploads wait for reviewed publication rather than becoming invented
+activities; no personal evidence goes to the free Gemini project. Export both
+relational records and verified originals, including pending submissions; a v2
+restore requires a reviewed DB workflow. No framework/dependency replacement.
+Verification and remaining live-device/login gates: features/F07-private-members.md.
+Supersedes D28's deferred hosted read/export cutover and earlier single-owner gate.
+
 D28 — Owner-authorized screenshot population, 6 November 2026. Implement the
 reviewed NRC evidence slice of the staged v2 design using additive relational
 tables plus an owner-safe source/asset junction and private immutable originals.
