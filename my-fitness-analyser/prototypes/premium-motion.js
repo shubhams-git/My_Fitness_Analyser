@@ -43,7 +43,7 @@ export function mountPremiumMotion({records,reduced,onCursor,onPreferenceChange}
         if(trace){const length=trace.getTotalLength();gsap.fromTo(trace,{strokeDasharray:length,strokeDashoffset:length},{strokeDashoffset:0,duration:1.3,ease:'power2.out',clearProps:'strokeDasharray,strokeDashoffset'});}
         const route=document.querySelector('.fn-art .route-line');
         if(route){const length=route.getTotalLength();gsap.fromTo(route,{strokeDasharray:length,strokeDashoffset:length},{strokeDashoffset:0,duration:1.5,ease:'power2.inOut',clearProps:'strokeDasharray,strokeDashoffset'});}
-        gsap.to('.fn-art',{yPercent:4,scale:.98,ease:'none',scrollTrigger:{trigger:'.fn-hero',start:'top top',end:'bottom top',scrub:.65}});
+        if(!document.querySelector('.fn-art .geo-map'))gsap.to('.fn-art',{yPercent:4,scale:.98,ease:'none',scrollTrigger:{trigger:'.fn-hero',start:'top top',end:'bottom top',scrub:.65}});
         gsap.to('.fn-aura',{yPercent:24,ease:'none',scrollTrigger:{trigger:'.fn-hero',start:'top top',end:'bottom top',scrub:1}});
         const findingWords=splitWords('.fn-finding .observation h2');
         if(findingWords.length)gsap.from(findingWords,{yPercent:115,rotation:2,duration:.95,stagger:.055,ease:'power3.out',scrollTrigger:{trigger:'.fn-finding',start:'top 74%',once:true},clearProps:'all'});

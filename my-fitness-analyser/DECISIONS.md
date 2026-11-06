@@ -1,5 +1,18 @@
 # Decision register
 
+D31 — Real geographic maps, 7 November 2026. The owner rejects the optical GPS
+illustration and requests real streets and places with geographic zoom/pan.
+Use MapLibre GL JS 6.16.0 and free OpenFreeMap/OpenStreetMap vector cartography,
+with detailed Streets and carbon Night treatments. Keep provider attribution,
+local recorded GeoJSON overlays, gaps and screenshot-only missing-GPS states.
+Self-host the renderer/worker and disclose map-area tile requests. Inline
+cooperative gestures preserve page scrolling; a full route explorer provides
+direct map navigation and time inspection. Avoid paid Google/Mapbox dependencies,
+unlabelled route-only fallbacks, invented satellite imagery and reconstructed
+GPS from screenshots. Raster-only maps would limit thematic control and label
+clarity; a custom vector engine would duplicate mature camera/accessibility work.
+This supersedes optical-route-only presentation decisions. See F09.
+
 D30 — Owner-directed optional coaching intelligence, 7 November 2026. The owner
 explicitly authorises run-related Gemini processing and requests a first-use
 choice plus reversible account settings for each member. Implement versioned,

@@ -78,6 +78,11 @@ test('local preview serves its UI while denying credential/source paths and fore
     assert.equal((await fetch(base)).status,200);
     const data=await fetch(base+'/api/data');assert.equal(data.status,200);
     assert.match(data.headers.get('content-security-policy'),/connect-src 'self'/);
+    assert.match(data.headers.get('content-security-policy'),/worker-src 'self'/);
+    assert.match(data.headers.get('content-security-policy'),/connect-src 'self' https:\/\/tiles\.openfreemap\.org;/);
+    const worker=await fetch(base+'/assets/vendor/maplibre-gl-worker.mjs');assert.equal(worker.status,200);assert.match(worker.headers.get('content-type'),/javascript/);
+    assert.equal((await fetch(base+'/route-maps.js')).status,200);
+    assert.equal((await fetch(base+'/assets/vendor/maplibre-gl.mjs')).status,200);
     const payload=await data.json();assert.ok(payload.activities.length>=1);
     assert.ok(!JSON.stringify(payload).includes('API_KEY'));
     assert.equal((await fetch(base+'/training')).status,200);

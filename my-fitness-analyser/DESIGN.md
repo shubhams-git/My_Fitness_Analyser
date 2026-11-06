@@ -1,6 +1,6 @@
 # Field Notes: selected design direction
 
-Updated 5 November 2026. The owner selected Prototype B for all future work.
+Updated 7 November 2026. The owner selected Prototype B for all future work.
 The owner liked the premium finish but requested a stronger active fitness
 identity. Refine one Field Notes application; Trackside remains historical.
 The latest athletic treatment awaits owner visual review.
@@ -31,18 +31,24 @@ and accessibility review controls. Both use the same normalized activity model.
 
 The opening pairs an athletic activity title and distance with recorded route,
 explicit replay and a compact pace trace. A shared cursor links the trace,
-elapsed/pace readout, both route outlines and detailed chart. A keyboard-operable
+elapsed/pace readout, geographic route maps and detailed chart. A keyboard-operable
 slider supports manual inspection even with reduced motion. Mobile puts the
 essential facts before the route; check-in is reachable beside the distance.
 A compact observation introduces the evidence.
-The detail chapter pairs a sticky GPS outline with the chart and sampled time
+The detail chapter pairs a sticky geographic route map with the chart and sampled time
 blocks on desktop, then stacks them on mobile. Four unanswered check-in decisions
 follow, with the original conditional location, notes and retry semantics. A
 closing recap returns to the activity facts.
 
 Avoid generic dashboard cards, empty product destinations, invented trophies,
-false readiness claims, imitated proprietary maps or fake terrain. The optical
-route treatment is a presentation of recorded GPS geometry, not a 3D terrain map.
+false readiness claims, imitated proprietary maps or fake terrain. Real MapLibre
+street maps show OpenStreetMap roads, parks, buildings and places at each zoom.
+Streets is the detailed light treatment inside the carbon app frame; Night keeps
+the same geography with carbon roads and green parks. Orange recorded routes have
+solid contrasting casings, with labelled start/finish and kilometre markers.
+Map cameras stay stable while scrolling and inspecting data. Inline cooperative
+gestures preserve document scrolling; Explore map opens the focused, responsive
+route explorer. Missing GPS never becomes an invented route. See F09.
 
 ## Motion
 

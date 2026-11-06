@@ -40,8 +40,9 @@ const server=http.createServer(async(req,res)=>{
     if(url.pathname.startsWith('/api/')){json(409,{error:'This is a local UI review fixture. No provider or database write is available.'});return;}
     const path=({'/':'/index.html','/training':'/training.html','/journal':'/journal.html','/account':'/account.html'})[url.pathname]||url.pathname;
     const file=path==='/design/tokens.css'?fileURLToPath(new URL('../design/tokens.css',import.meta.url)):resolve(root,'.'+decodeURIComponent(path));
-    if(path!=='/design/tokens.css'&&(relative(root,file).startsWith('..')||!/^\.(html|css|js|svg|ttf|txt)$/.test(extname(file))))throw new Error('Not served');
-    const bytes=await readFile(file),type={'.html':'text/html','.css':'text/css','.js':'text/javascript','.ttf':'font/ttf','.svg':'image/svg+xml','.txt':'text/plain'}[extname(file)];res.setHeader('Content-Type',type);res.end(bytes);
+    if(extname(file)==='.mjs'&&!relative(root,file).replaceAll('\\','/').startsWith('assets/vendor/'))throw new Error('Not served');
+    if(path!=='/design/tokens.css'&&(relative(root,file).startsWith('..')||!/^\.(html|css|js|mjs|svg|ttf|txt)$/.test(extname(file))))throw new Error('Not served');
+    const bytes=await readFile(file),type={'.html':'text/html','.css':'text/css','.js':'text/javascript','.mjs':'text/javascript','.ttf':'font/ttf','.svg':'image/svg+xml','.txt':'text/plain'}[extname(file)];res.setHeader('Content-Type',type);res.end(bytes);
   }catch{res.writeHead(404).end('Not available in the UI fixture.');}
 });
 server.listen(port,'127.0.0.1',()=>console.log(`UI fixture only: http://127.0.0.1:${port} — no live authentication or writes`));

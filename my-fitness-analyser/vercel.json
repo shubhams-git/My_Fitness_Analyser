@@ -1,6 +1,11 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/route-maps.js", "destination": "/prototypes/route-maps.js" },
+    { "source": "/route-geometry.js", "destination": "/prototypes/route-geometry.js" },
+    { "source": "/map-style.js", "destination": "/prototypes/map-style.js" },
+    { "source": "/real-map.css", "destination": "/prototypes/real-map.css" },
+
     { "source": "/coaching.js", "destination": "/prototypes/coaching.js" },
     { "source": "/coaching.css", "destination": "/prototypes/coaching.css" },
     { "source": "/account", "destination": "/prototypes/account.html" },

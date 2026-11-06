@@ -1,11 +1,11 @@
-export function routeView(g,records,state,name,selected,cursor) {
+// The geographic canvas is mounted lazily by route-maps.js. No fake basemap.
+export function routeView(g,records,state,name) {
   if(!g)return '';
-  const first=g.point(g.first),last=g.point(g.last),cp=cursor?.lat!=null&&cursor?.lon!=null?g.point(cursor):null;
-  const points=name==='expanded'&&innerWidth<600?records.filter(r=>r.lat!==null&&r.lon!==null).map(g.point):[];
-  const xmin=points.length?Math.min(...points.map(p=>p.x))-35:0,ymin=points.length?Math.min(...points.map(p=>p.y))-35:0;
-  const width=points.length?Math.max(...points.map(p=>p.x))-xmin+35:640,height=points.length?Math.max(...points.map(p=>p.y))-ymin+35:360;
-  const view=points.length?`${xmin} ${ymin} ${Math.max(width,1)} ${Math.max(height,1)}`:'0 0 640 360';
-  let marks='',next=1000;
-  for(const row of records){if(row.distance==null||row.distance<next||row.lat==null||row.lon==null)continue;const p=g.point(row);marks+=`<g class="km-marker"><circle cx="${p.x}" cy="${p.y}" r="9"/><text x="${p.x}" y="${p.y+3}">${next/1000}</text></g>`;next=Math.floor(row.distance/1000)*1000+1000;if(next>1000000)break;}
-  return `<svg viewBox="${view}" role="img" aria-label="North-up GPS route. Numbered markers show recorded kilometre crossings. Select a point to inspect the session."><defs><pattern id="grid-${name}" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="currentColor" stroke-opacity=".08"/></pattern><clipPath id="clip-${name}"><rect width="640" height="360" rx="12"/></clipPath></defs><rect width="640" height="360" fill="url(#grid-${name})"/><g clip-path="url(#clip-${name})"><g data-route-layer transform="translate(${320+(state.panX||0)} ${180+(state.panY||0)}) scale(${state.zoom}) translate(-320 -180)"><path class="route-underlay" d="${g.path()}"/><path class="route-line ${selected?'route-muted':''}" d="${g.path()}"/>${selected?`<path class="route-line selected-route" d="${g.path(selected.first,selected.last)}"/>`:''}${marks}<circle class="start-halo" cx="${first.x}" cy="${first.y}" r="10"/><circle class="start-dot" cx="${first.x}" cy="${first.y}" r="4"/><text class="route-pin-label" x="${first.x+14}" y="${first.y+18}">S</text><circle class="end-halo" cx="${last.x}" cy="${last.y}" r="8"/><circle class="end-dot" cx="${last.x}" cy="${last.y}" r="3"/><text class="route-pin-label" x="${last.x+14}" y="${last.y-12}">F</text>${cp?`<circle class="cursor-halo" cx="${cp.x}" cy="${cp.y}" r="10"/><circle class="cursor-dot" cx="${cp.x}" cy="${cp.y}" r="4"/>`:''}</g></g><g class="map-scale" transform="translate(${points.length?xmin:0},${points.length?ymin-270:-230})"><path d="M32 321v7h80v-7"/><text x="32" y="312">≈ ${(g.scaleMetres/state.zoom).toFixed(g.scaleMetres/state.zoom<10?1:0)} m</text></g><g class="north-arrow" transform="translate(${points.length?xmin+width-640:-16},${points.length?ymin:38})"><path d="m601 62 7-19 7 19-7-5-7 5Z"/><text x="608" y="31" text-anchor="middle">N</text></g></svg>`;
+  return `<div class="geo-map" data-real-map="${name}">
+    <div class="geo-canvas" aria-label="Recorded route on an interactive street map"></div>
+    <div class="geo-style" role="group" aria-label="Map appearance"><button type="button" data-map-style="streets" aria-pressed="true">Streets</button><button type="button" data-map-style="night" aria-pressed="false">Night</button></div>
+    <button type="button" class="geo-fit" data-action="fit-route" aria-label="Fit full recorded route"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5M8 12h8m-4-4v8"/></svg></button>
+    <div class="geo-status" role="status"><strong>Locating your effort.</strong><span>Loading streets, parks and places…</span></div>
+    <div class="geo-recovery" hidden><strong>Street map unavailable.</strong><span>Your recorded activity is safe. Check your connection and try again.</span><button type="button" data-map-retry>Retry map</button></div>
+  </div>`;
 }

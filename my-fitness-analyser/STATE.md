@@ -1,9 +1,17 @@
 # Current state
 
 Updated: 7 November 2026 (Australia/Sydney)
-Active increment: F08 per-member AI choice and evidence-bound coaching briefings
+Active increment: F09 real geographic route exploration
 
 ## Implemented
+
+- F09: real MapLibre/OpenFreeMap street maps replace optical route illustrations.
+  Streets and Night cartography retain street/place labels, parks, buildings and
+  surrounding geography at each zoom. Pan, zoom, north reset and fit-to-route;
+  recorded start/finish/km markers; route inspection synchronises time/pace/HR
+  with charts. Cooperative inline gestures and a focused route explorer support
+  mobile use. Renderer/worker are same-origin, lazily mounted and disposed.
+  Missing GPS stays missing. No API key or paid service. See F09 for verification.
 
 - F08: reversible per-member Gemini sharing choice in Training and Account,
   consent audit, separate explicit Generate action, minimised run evidence,
@@ -82,5 +90,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Evaluate and refine coaching wording and finding relevance using versioned
-histories and owner feedback while preserving evidence checks and saved reports.
+Verify the deployed geographic map against the owner's real Garmin run, then
+collect actual iPhone Safari feedback on map gestures and label legibility.
