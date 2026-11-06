@@ -40,6 +40,17 @@ Supersede references to a future watch purchase, FR255 baseline and Strava-first
 
 ## Add a decision
 
+D26 — Proposed database v2, 6 November 2026. Owner requests a thought-through
+data/ingestion design before real population. Propose normalized owner-scoped
+records, immutable private raw evidence/stream objects, revisioned source aliases,
+durable ingestion/coverage ledger and deterministic derived projections. Current
+single-library JSONB becomes a migration bridge, not the final data architecture.
+Audit now finds 11 live Garmin activities and actual FR965 run/daily health data;
+preserve cycling/breathwork and unknown fields rather than inherit the current
+Run/Walk parser's filtering. Sixteen target tables and alternatives are documented
+in docs/DATABASE_DESIGN_V2.md. This is not owner approval or a schema migration;
+population and map development wait for the requested design discussion.
+
 D25 — Free-only credentials and maps priority, 6 November 2026. Owner confirms
 the Gemini key's project is on the Free plan; the earlier billing assumption
 does not authorize paid requests. Configure 3.8 Flash/high thinking based on the

@@ -1,9 +1,11 @@
 # Current state
 
 Updated: 5 November 2026 (Australia/Sydney)
-Active increment: credential verification and street-map preparation (docs/CREDENTIAL_STATUS.md)
+Active increment: database v2 design review before population (docs/DATABASE_DESIGN_V2.md)
 
 ## Completed
+
+- 6 November design-only audit: live Garmin inventory now has 11 activities, including a new FR965 GPS run, treadmill and indoor cycling. Newly inspected originals decode without errors. Daily summary/HR/sleep/HRV response shapes verified read-only; captures remain local/private. Proposed 16-table relational/evidence design and resumable population plan recorded in docs/DATABASE_DESIGN_V2.md. No v2 migration or personal-data insertion into Supabase performed; owner requested design discussion first. Earlier seven-record library remains intact.
 
 - 6 November live database setup: applied the tested SQL migration plus owner allowlist in the existing signed-in Supabase dashboard. Verified owner account/allowlist, RLS on all three app tables and private storage bucket; library remains empty. Anonymous library REST read denied (401/42501). APP_ORIGIN normalized and check:cloud passes. Hosted app still synthetic; private application sign-in/save verification and personal-data upload remain separate gates.
 
@@ -100,7 +102,7 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Build a street-labelled recorded-route map using a verified free basemap setup; preserve linked chart inspection and no-GPS handling.
+Review the proposed database v2 design with the owner before implementing migrations and populating personal records.
 
 ## Inputs needed at the next increment
 
