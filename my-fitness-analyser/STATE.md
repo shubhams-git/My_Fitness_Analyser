@@ -32,6 +32,9 @@ publication, stale-save rejection and cross-owner foreign keys using synthetic
 schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and
 diff whitespace checks pass. Production deployment results are recorded in F07.
+Commit ee38eb5 is pushed and the Vercel production build is Ready. Production
+root redirects to sign-in; anonymous data/training/journal/profile return 401
+without records; invalid credentials return 401 and logout clears cookies.
 
 Chrome: sign-in desktop/phone, account at 375px, empty-member training, real NRC
 projection including the long run, check-in save/reload. The latter is a loopback

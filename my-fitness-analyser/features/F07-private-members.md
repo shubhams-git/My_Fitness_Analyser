@@ -71,7 +71,16 @@ v1 restore remains. No automatic deletion or credential export.
   controls, empty-member history. Real archive projected in loopback shows 14
   runs and correct six-row long-run splits. Four-answer save/reload is memory-only.
   These are not authenticated production or physical Safari tests.
-- Production deployment verification will be appended after the master push.
+- Production commit ee38eb5 pushed to origin/master; Vercel deployment
+  CNn9vHW55okdYkKdiRNqeDAk2178 shows Ready. The existing production domain serves
+  the new sign-in page, and root redirects there without a session. Anonymous
+  activity/training/journal/profile APIs return 401 with private/no-store and no
+  records. A synthetic invalid login returns 401 (not an origin/config failure);
+  anonymous logout returns 200 and clears both cookies. No real password entered.
+- Deployed login reviewed at 1440x1000, approximately 393px phone and 852x393
+  landscape; no horizontal overflow, fields 16px/54px. Screenshots saved privately
+  under private-data/accounts-qa. Browser override reset afterward. Larger text
+  and actual OS reduced-motion/iPhone verification are not claimed this increment.
 
 Remaining: owner credential login/reload/sign-out, production signed export/sync,
 physical iPhone Safari and observed check-in timing. No unperformed checks claimed.
