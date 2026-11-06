@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { PGlite } from '@electric-sql/pglite';
 import { readFile } from 'node:fs/promises';
-import { coachingEvidence } from '../analysis/coaching-evidence.mjs';
+import { coachingEvidence,canonicalJson,evidenceHash } from '../analysis/coaching-evidence.mjs';
 import { COACH_SCHEMA,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { TrainingIntelligence,coachingRequest,extractCoaching } from '../cloud/intelligence.mjs';
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
@@ -17,6 +17,13 @@ test('schema and semantic gates reject invented numbers, missing evidence and un
  for(const mutate of [r=>r.verdict.text='You improved by 20%.',r=>r.findings[0].factIds=['history.runs'],r=>r.charts[0].type='heart_rate',r=>r.extra='unexpected']){const bad=structuredClone(good);mutate(bad);assert.throws(()=>validateCoaching(bad,pack));}
  assert.deepEqual(extractCoaching({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(good)}]}]},pack),good);assert.throws(()=>extractCoaching({status:'incomplete'},pack));
 });
+test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports remain cache hits',async()=>{
+ const api={config:{owner}},engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_MODEL:'gemini-3.6-flash'}}),context=await engine.context(),pack=context.pack;
+ const reordered=JSON.parse(canonicalJson(pack.content));assert.equal(evidenceHash(reordered),pack.hash);
+ const legacyPack={...pack,hash:pack.legacyHash,content:reordered},legacyReport=report(legacyPack);const row={id:'legacy',evidence:legacyPack,report:legacyReport,model_id:context.model,prompt_version:'direct-coach-v1',schema_version:COACH_SCHEMA,evidence_key:context.legacyKey};api.json=async()=>[structuredClone(row)];
+ assert.equal((await engine.saved(context)).evidence_key,context.key);assert.equal(engine.item(await engine.saved(context),context.key).stale,false);
+ reordered.facts[0].value=999;assert.notEqual(evidenceHash(reordered),pack.hash);
+});
 test('no consent means no library or Google access; quota errors never try another model or expose provider bodies',async()=>{
  let enabled=false,calls=0;const api={config:{owner},json:async(path,options)=>path.includes('ai_preferences')?[{enabled,disclosure_version:'gemini-run-v1',revision:1}]:path.includes('finish_')?true:[],request:async()=>Response.json('review-id')},data={read:async()=>library()};
  let status=429;const engine=new TrainingIntelligence(api,data,{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_MODEL:'gemini-3.8-flash'},fetcher:async()=>{calls++;return new Response('private provider body test-secret',{status});}});
@@ -27,6 +34,7 @@ test('PostgreSQL consent is member-scoped, revocation blocks publication, audit 
  const db=new PGlite();try{
   await db.exec(`create role authenticated;create role anon;create schema auth;create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;create table fitness_owners(owner_id uuid primary key);insert into fitness_owners values('${owner}'),('${other}');grant usage on schema auth to authenticated;`);
   await db.exec(await readFile(new URL('../supabase/migrations/20261107_training_intelligence.sql',import.meta.url),'utf8'));
+  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),roundtrip=(await db.query('select $1::jsonb as content',[JSON.stringify(pack.content)])).rows[0].content;assert.equal(evidenceHash(roundtrip),pack.hash);
   await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${owner}',false);`);
   const args=['a'.repeat(64),'gemini-3.8-flash','test-prompt','test-schema'];await assert.rejects(db.query('select begin_training_review($1,$2,$3,$4)',args),e=>e.code==='42501');
   await db.query("select set_ai_preference(true,'gemini-run-v1')");const id=(await db.query('select begin_training_review($1,$2,$3,$4) as id',args)).rows[0].id;

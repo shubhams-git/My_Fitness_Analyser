@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
-import { coachingEvidence } from '../analysis/coaching-evidence.mjs';
+import { coachingEvidence,evidenceHash } from '../analysis/coaching-evidence.mjs';
 import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,validateCoaching } from '../analysis/coaching-contract.mjs';
 const MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'];
 export async function aiPreference(api){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:DISCLOSURE,updatedAt:r?.updated_at||null};}
@@ -17,11 +17,15 @@ export function extractCoaching(result,pack){
 export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;}
  configured(){return Boolean(this.env.GEMINI_API_KEY&&this.env.GEMINI_FREE_TIER_CONFIRMED==='1'&&MODELS.includes(this.env.GEMINI_MODEL||'gemini-3.6-flash'));}
- async context(){const pack=coachingEvidence(await this.library.read()),model=this.env.GEMINI_MODEL||'gemini-3.6-flash',key=createHash('sha256').update(JSON.stringify([this.api.config.owner,pack.hash,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key};}
+ async context(){const pack=coachingEvidence(await this.library.read()),model=this.env.GEMINI_MODEL||'gemini-3.6-flash',fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
-  const exact=await this.api.json(path+`&evidence_key=eq.${context.key}&limit=1`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
-  const valid=rows.filter(r=>{try{if(r.schema_version!==COACH_SCHEMA||r.prompt_version!==COACH_PROMPT||!r.evidence||createHash('sha256').update(JSON.stringify(r.evidence.content)).digest('hex')!==r.evidence.hash)return false;validateCoaching(r.report,r.evidence);return true;}catch{return false;}});
+  const exact=await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
+  const valid=rows.filter(r=>{try{
+   if(r.schema_version!==COACH_SCHEMA||r.prompt_version!==COACH_PROMPT||!r.evidence)return false;
+   const canonical=evidenceHash(r.evidence.content),legacy=r.evidence_key===context.legacyKey&&r.evidence.hash===context.pack.legacyHash&&canonical===context.pack.hash&&r.model_id===context.model;
+   if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy)r.evidence_key=context.key;return true;
+  }catch{return false;}});
   return valid.find(r=>r.evidence_key===context.key)||valid[0]||null;
  }
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,stale:row.evidence_key!==key}:null;}
