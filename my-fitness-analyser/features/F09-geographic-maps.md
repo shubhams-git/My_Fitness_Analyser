@@ -47,7 +47,14 @@ These are desktop Chromium viewport tests, not actual iPhone Safari validation.
 A static-serving test caught general .mjs exposure; the allowlist permits only
 vendored .mjs assets, preserving server/source denial. Production checking caught the separate /app.html entry missing map CSS. Both
 entry documents now include renderer/map styles, and HTTP tests enforce this.
-Production recheck pending.
+Production recheck passed on the signed-in owner's real 6 November Garmin run
+(4.15 km): street labels including Franklin Street/North Road and Princes Highway
+Reserve, a wider Oakleigh/Huntingdale/Clayton neighbourhood after zoom-out, keyboard
+panning, fit and Night cartography. Selecting the recorded 2 km marker displayed
+16:40 / 9:04 per km / 172 bpm and moved the shared time cursor. No DB or source
+measurements were changed. Provider sprite gaps use a generic POI fallback, and
+minor-road labels appear from zoom 14 so fitted short routes retain useful names.
+7d1c474 deployed successfully; final polish deployment verification follows.
 
 References: [MapLibre installation/CSP](https://maplibre.org/maplibre-gl-js/docs/),
 [OpenFreeMap quick start](https://openfreemap.org/quick_start/),

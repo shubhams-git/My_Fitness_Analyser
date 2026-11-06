@@ -5,6 +5,11 @@ export function mapStyle(base,appearance) {
   const style=structuredClone(base);style.name='Field Notes / '+appearance;
   for(const layer of style.layers){
     const id=layer.id,p=layer.paint??={};
+    // Some OSM categories have no sprite in the provider's current atlas. Keep
+    // their real names/positions with a generic point instead of a missing icon.
+    if(id.startsWith('poi')&&layer.layout?.['icon-image'])layer.layout['icon-image']=['coalesce',['image',layer.layout['icon-image']],['image','circle_11']];
+    // Street names should already be useful when the whole short run is fitted.
+    if(id==='highway-name-minor')layer.minzoom=Math.min(layer.minzoom??15,14);
     if(id==='building-3d'){layer.layout={...layer.layout,visibility:'none'};continue;}
     if(appearance!=='night'){
       if(id==='background')p['background-color']='#f2f1ec';

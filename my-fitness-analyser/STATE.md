@@ -11,7 +11,10 @@ Active increment: F09 real geographic route exploration
   recorded start/finish/km markers; route inspection synchronises time/pace/HR
   with charts. Cooperative inline gestures and a focused route explorer support
   mobile use. Renderer/worker are same-origin, lazily mounted and disposed.
-  Missing GPS stays missing. No API key or paid service. See F09 for verification.
+  Missing GPS stays missing. No API key or paid service. 61 tests pass. Real
+  production Garmin route verified with geographic zoom/pan and 2 km inspection.
+  375px portrait, landscape, large text and reduced motion checked in Chromium;
+  actual iPhone Safari remains pending. See F09 for verification.
 
 - F08: reversible per-member Gemini sharing choice in Training and Account,
   consent audit, separate explicit Generate action, minimised run evidence,
@@ -90,5 +93,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Verify the deployed geographic map against the owner's real Garmin run, then
-collect actual iPhone Safari feedback on map gestures and label legibility.
+Collect the owner's actual iPhone Safari feedback on map gestures and label
+legibility before refining cartographic density further.
