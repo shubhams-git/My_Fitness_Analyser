@@ -5,6 +5,8 @@ Active increment: credential verification and street-map preparation (docs/CREDE
 
 ## Completed
 
+- 6 November live database setup: applied the tested SQL migration plus owner allowlist in the existing signed-in Supabase dashboard. Verified owner account/allowlist, RLS on all three app tables and private storage bucket; library remains empty. Anonymous library REST read denied (401/42501). APP_ORIGIN normalized and check:cloud passes. Hosted app still synthetic; private application sign-in/save verification and personal-data upload remain separate gates.
+
 - 6 November credential check: Gemini key authenticates model listing; Supabase URL/publishable key authenticate Auth settings, admin read finds zero Auth users, app tables absent (PGRST205). Local environment aliases mapped to existing runtime names. Owner confirms Gemini Free plan and free-products-only constraint. Added free-tier attestation gate and high-thinking 3.8 Flash configuration. One synthetic generation returned HTTP 503; no live analysis success claimed. See docs/CREDENTIAL_STATUS.md.
 
 - Added `/journal` with MASS import review, duplicate/update/deletion handling, raw source preservation, daily weight readings, trailing seven-day means, date windows, keyboard chart inspection and session history. Imported the supplied export locally: 29 weights, four active sessions (two Strength, two Cardio), one excluded session tombstone. Repeat import adds no duplicates. See features/F03-mass-journal.md.

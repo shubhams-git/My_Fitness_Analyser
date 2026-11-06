@@ -1,5 +1,14 @@
 # Credential verification — 6 November 2026
 
+Update: applied the existing migration and owner allowlist through the owner's
+signed-in Chrome SQL Editor. Read-only verification returned true for owner Auth
+account, owner allowlist, row-level security on all three tables, and private
+storage bucket. Library row count is zero. Anonymous REST read is denied
+(401/42501). Environment format check passes after normalizing APP_ORIGIN.
+The hosted /api/data endpoint remains a synthetic preview. No real records were
+uploaded, and owner application sign-in/save/reload still needs deployment testing.
+The earlier missing-schema findings below describe the preceding checks.
+
 Owner requires free products only. Gemini project's Free plan was explicitly
 confirmed by the owner. This supersedes earlier assumptions about active billing.
 
