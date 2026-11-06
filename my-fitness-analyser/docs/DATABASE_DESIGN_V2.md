@@ -1,8 +1,12 @@
 # Proposed database and ingestion design v2
 
-6 November 2026. **Design for review, not an applied migration.** No personal
-records were inserted into Supabase during this work. Read-only Garmin probes
-and FIT inspection are saved only under ignored private-data/design-audit.
+6 November 2026. **Staged design; the NRC evidence slice is now being applied.**
+The later owner request authorizes screenshot population. The additive migration
+20261106_activity_evidence.sql implements the activity/source/ingestion/asset
+slice plus an owner-safe source/asset junction. F06 and STATE.md record actual
+publication/verification status. Other proposed domains and the UI cutover remain
+unapplied. Earlier read-only Garmin probes/FIT inspection remain local under
+ignored private-data/design-audit; they are not a completed Garmin cloud backfill.
 
 ## Recommendation
 

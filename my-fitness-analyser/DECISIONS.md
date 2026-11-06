@@ -1,5 +1,18 @@
 # Decision register
 
+D28 — Owner-authorized screenshot population, 6 November 2026. Implement the
+reviewed NRC evidence slice of the staged v2 design using additive relational
+tables plus an owner-safe source/asset junction and private immutable originals.
+Keep source rounding, unknown fields, minute/date precision and provider totals
+distinct; resolve folder labels through visible evidence. Publish in one guarded
+administrative transaction after object checksum checks, with stable import IDs,
+immutable source revisions, replay safety and portable recovery. Reject direct
+JSONB-library dumping, guessed streams/dates and automatic same-date merges.
+Hosted v1 routes remain unchanged until a separate read/export cutover; this does
+not complete Garmin/MASS cloud population. Verification: F06, synthetic PostgreSQL
+tests and private live reconciliation/restore reports. No personal data in Git or
+the free Gemini API.
+
 Date: 4 November 2026. “Confirmed” means stated by the user; “proposed” means a recommendation, not consent. This register is a curated present record with supersession notes; Git preserves its history.
 
 | ID | Status | Decision and reason |

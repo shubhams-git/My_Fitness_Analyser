@@ -1,6 +1,8 @@
 # Data contract, conceptual v0.1
 
-No database schema is installed yet. Preserve these invariants when the first migration is designed.
+The private v1 schema and additive v2 activity-evidence slice are installed.
+See F06 and STATE.md for population/verification status; other domains and hosted
+UI cutover remain staged. Preserve these invariants across later migrations.
 
 ## Canonical activity
 
@@ -30,7 +32,12 @@ Store timestamped coordinates/measurements where present. Do not reconstruct a p
 
 ## Historical evidence available
 
-Six previously supplied images represent two historical workouts, not six. The October MASS export contains 29 weight readings and five session records, one deleted. More recent Garmin activities exist but no original FIT has been supplied to this foundation. Existing website pairing is not proof of API permission.
+Earlier NRC/Strava images and the new NRC overview/detail folders are preserved
+as private evidence; images are grouped into canonical workouts rather than
+counted as sessions. F06 records the import/recovery method; personal counts and
+field-level source links remain in private manifests. MASS export and Garmin
+FIT/API captures have also been inspected locally. Do not confuse local evidence
+with completed cloud population of those other domains.
 
 ## Future metrics
 

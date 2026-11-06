@@ -1,9 +1,26 @@
 # Current state
 
-Updated: 5 November 2026 (Australia/Sydney)
-Active increment: database v2 design review before population (docs/DATABASE_DESIGN_V2.md)
+Updated: 7 November 2026 (Australia/Sydney)
+Active increment: F06 reviewed NRC screenshot history and private database publication
 
 ## Completed
+
+- Owner-authorized NRC backfill: inspected every supplied detail/overview image,
+  preserved originals and a field-level extraction manifest in private Supabase
+  Storage, and published the relational activity/evidence slice. Exact comparison
+  of all nine tables passes; live replay creates no duplicates. Unknown HR, GPS,
+  UTC timestamps and overview-only detail remain absent. Reversed folder labels
+  and monthly aggregate discrepancies remain recorded in private source evidence.
+  Prior NRC prototype alias is retained. A full local archive/isolated PostgreSQL
+  restore passes; anonymous REST read is denied. See F06 and ignored private-data
+  reports for personal counts/evidence. Hosted routes still use v1: the new tables
+  do not yet appear in the hosted UI or its existing v1 export.
+
+- F06 checks: 43 application tests and foundation checks pass. New PostgreSQL
+  coverage includes atomic upload guards, standard/composite upload checksums,
+  exact replay, correction rejection, quoted source text, owner isolation and
+  cross-owner foreign keys. No personal input was sent to Gemini. No UI redesign
+  or new credential/dependency was required for this increment.
 
 - Owner scope clarification: database v2 backfill/active history starts 1 July 2026 inclusive, based on source record date rather than fetch time. Audited Garmin manifest has five eligible activities and six excluded older ones. Updated design for staged NRC/Strava screenshot review and future direct weigh-in capture. Current journal still provides MASS import/display only; no direct weight-entry form shipped. Existing local archive/UI filters have not yet been migrated to this new boundary.
 
@@ -104,11 +121,16 @@ Six prototype tests and foundation/token checks pass. Browser review covered ten
 
 ## Next action
 
-Review the proposed database v2 design with the owner before implementing migrations and populating personal records.
+Connect authenticated activity reads and export to the populated v2 evidence tables, preserving legacy NRC aliases and keeping feedback independent.
 
 ## Inputs needed at the next increment
 
-Gemini/Vercel/Supabase credentials will be supplied later; keep progressing on local product features. Billing is confirmed active and only synthetic model inputs are authorized. Later owner visual feedback, actual iPhone Safari and timed check-ins remain useful. A normal outdoor FR965 Run will validate additional device fields. Future screenshots arrive with dates. Do not request passwords or paste keys into chat.
+No further credentials are needed for the completed NRC backfill. Garmin and
+Supabase are configured; Gemini is on the owner-confirmed Free project and stays
+synthetic-only. Further detail for overview-only runs is optional enrichment;
+the supplied originals and extracted values are preserved. Actual iPhone Safari
+and timed check-ins remain separate UI checks. Do not request passwords or paste
+keys into chat.
 
 ## Open decisions
 
