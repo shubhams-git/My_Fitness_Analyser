@@ -3,6 +3,16 @@ import { trainingDataset } from '../prototypes/training-data.mjs';
 export const COACH_EVIDENCE='coaching-evidence-v1';
 export function canonicalJson(value){if(Array.isArray(value))return '['+value.map(canonicalJson).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).filter(k=>value[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+canonicalJson(value[k])).join(',')+'}';return JSON.stringify(value);}
 export const evidenceHash=content=>createHash('sha256').update(canonicalJson(content)).digest('hex');
+// Reconstruct the original v1 serialization for already-published reports.
+// JSONB preserves array order but not object key order. Never discard extra fields.
+export function legacyEvidenceHash(content){
+ const ordered=(value,keys)=>{if(!value||Object.keys(value).length!==keys.length||keys.some(k=>!Object.hasOwn(value,k)))throw new Error('Unknown legacy evidence shape.');return Object.fromEntries(keys.map(k=>[k,value[k]]));};
+ const original=ordered(content,['version','dataset','scope','runsInHistory','truncated','sessions','facts','comparisons']);
+ original.sessions=content.sessions.map(s=>ordered(s,['ref','daysAgo','source','environment','durationBasis','paceBasis','limitations','breathing','finish']));
+ original.facts=content.facts.map(f=>ordered(f,['id','label','value','unit','sessionIds']));
+ original.comparisons=content.comparisons.map(c=>ordered(c,['ref','sessionIds','direction','rule']));
+ return createHash('sha256').update(JSON.stringify(original)).digest('hex');
+}
 const median=xs=>{const s=[...xs].sort((a,b)=>a-b),m=Math.floor(s.length/2);return s.length%2?s[m]:(s[m-1]+s[m])/2;};
 export function coachingEvidence(library,{anchor=new Date().toISOString().slice(0,10)}={}){
  const activities=Object.values(library.activities).filter(a=>!a.synthetic&&a.date>='2026-07-01'),data=trainingDataset(activities,library.feedback,{window:'all',anchor}),runs=data.sessions.filter(s=>s.run),selected=runs.slice(0,60),facts=[],mapping={};
@@ -29,5 +39,5 @@ export function coachingEvidence(library,{anchor=new Date().toISOString().slice(
  }
  for(const [label,start,end]of [['recent',0,7],['previous',7,14]]){const set=runs.filter(s=>{const age=Math.round((Date.parse(anchor)-Date.parse(s.date))/86400000);return age>=start&&age<end;});add('week.'+label+'.runs',label+' seven-day imported runs',set.length,'count');add('week.'+label+'.distance',label+' seven-day imported running distance',set.reduce((n,s)=>n+(s.distanceM||0),0),'m');}
  const content={version:COACH_EVIDENCE,dataset:'personal',scope:'Imported running history from July 2026; missing imports are not proof of inactivity.',runsInHistory:runs.length,truncated:runs.length>selected.length,sessions,facts,comparisons};
- return {content,mapping,hash:evidenceHash(content),legacyHash:createHash('sha256').update(JSON.stringify(content)).digest('hex')};
+ return {content,mapping,hash:evidenceHash(content),legacyHash:legacyEvidenceHash(content)};
 }

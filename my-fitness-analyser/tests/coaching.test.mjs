@@ -22,6 +22,7 @@ test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports
  const reordered=JSON.parse(canonicalJson(pack.content));assert.equal(evidenceHash(reordered),pack.hash);
  const legacyPack={...pack,hash:pack.legacyHash,content:reordered},legacyReport=report(legacyPack);const row={id:'legacy',evidence:legacyPack,report:legacyReport,model_id:context.model,prompt_version:'direct-coach-v1',schema_version:COACH_SCHEMA,evidence_key:context.legacyKey};api.json=async()=>[structuredClone(row)];
  assert.equal((await engine.saved(context)).evidence_key,context.key);assert.equal(engine.item(await engine.saved(context),context.key).stale,false);
+ const later={...context,key:'b'.repeat(64),legacyKey:'c'.repeat(64)};assert.equal(engine.item(await engine.saved(later),later.key).stale,true);
  reordered.facts[0].value=999;assert.notEqual(evidenceHash(reordered),pack.hash);
 });
 test('no consent means no library or Google access; quota errors never try another model or expose provider bodies',async()=>{

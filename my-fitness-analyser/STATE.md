@@ -9,9 +9,13 @@ Active increment: F08 per-member AI choice and evidence-bound coaching briefings
   consent audit, separate explicit Generate action, minimised run evidence,
   request-specific structured report validation, private cache and source-backed
   chart/evidence disclosures. New consent/report SQL migration applied live.
-  56 tests pass; Gemini 3.6 high-thinking synthetic response validated after an
+  57 tests pass; Gemini 3.6 high-thinking synthetic response validated after an
   earlier response was rejected. 3.8/3.7 probes returned 503. Production checks
-  are recorded in F08. No personal provider request claimed until verified.
+  are recorded in F08. A real-history production briefing was generated, validated,
+  persisted and restored after reload. Its evidence/chart values and Account
+  opt-out/re-enable were checked live. JSONB key-order cache rejection was fixed
+  with canonical hashing and legacy compatibility. Owner's AI choice is enabled;
+  no other member has been opted in. Credentials were not extracted or entered.
 - Owner confirms production Garmin sync succeeded and both Garmin and NRC history
   are visible. This is owner-reported evidence, not an agent repeat-sync audit.
 
@@ -37,7 +41,7 @@ Active increment: F08 per-member AI choice and evidence-bound coaching briefings
 
 ## Verification and deployment
 
-51 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
+57 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
 publication, stale-save rejection and cross-owner foreign keys using synthetic
 schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and
@@ -78,5 +82,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Verify the deployed per-member consent and a validated private Gemini briefing
-against Shubham's live running record without altering source measurements.
+Evaluate and refine coaching wording and finding relevance using versioned
+histories and owner feedback while preserving evidence checks and saved reports.

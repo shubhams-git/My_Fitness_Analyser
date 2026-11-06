@@ -2,6 +2,14 @@
 
 ## Current implementation — 7 November 2026
 
+F08 adds owner-scoped AI preferences, immutable consent events and cached analysis
+reports. Explicit generation builds a minimised evidence pack and calls Gemini
+with structured JSON/high thinking; schema, fact bindings and supported charts
+are checked before publication. Consent revisions invalidate in-flight results.
+Evidence hashing is canonical across PostgreSQL JSONB serialization; stored v1
+reports remain verifiable and available as stale history when inputs change.
+No model has direct database tools or credentials. See F08 for live checks.
+
 F07 replaces hosted synthetic adapters with invite-only Supabase Auth and
 member-bound reads. One Postgres schema uses owner_id foreign keys and RLS;
 Auth manages email/password, fitness_owners grants membership, fitness_profiles

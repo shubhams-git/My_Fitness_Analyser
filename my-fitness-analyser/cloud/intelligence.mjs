@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
-import { coachingEvidence,evidenceHash } from '../analysis/coaching-evidence.mjs';
+import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/coaching-evidence.mjs';
 import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,validateCoaching } from '../analysis/coaching-contract.mjs';
 const MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'];
 export async function aiPreference(api){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:DISCLOSURE,updatedAt:r?.updated_at||null};}
@@ -23,8 +23,8 @@ export class TrainingIntelligence {
   const exact=await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
   const valid=rows.filter(r=>{try{
    if(r.schema_version!==COACH_SCHEMA||r.prompt_version!==COACH_PROMPT||!r.evidence)return false;
-   const canonical=evidenceHash(r.evidence.content),legacy=r.evidence_key===context.legacyKey&&r.evidence.hash===context.pack.legacyHash&&canonical===context.pack.hash&&r.model_id===context.model;
-   if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy)r.evidence_key=context.key;return true;
+   const canonical=evidenceHash(r.evidence.content),legacy=canonical!==r.evidence.hash&&legacyEvidenceHash(r.evidence.content)===r.evidence.hash;
+   if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy&&r.evidence_key===context.legacyKey&&canonical===context.pack.hash&&r.model_id===context.model)r.evidence_key=context.key;return true;
   }catch{return false;}});
   return valid.find(r=>r.evidence_key===context.key)||valid[0]||null;
  }

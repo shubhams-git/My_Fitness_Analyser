@@ -70,7 +70,7 @@ be recalled. Last valid reports survive errors. Export includes all three tables
 
 ## Verification
 
-56 automated tests include actual PostgreSQL migration/RLS, revocation during
+57 automated tests include actual PostgreSQL migration/RLS, revocation during
 generation, member isolation, no-consent/no-provider access, cache/persistence,
 unsupported measurements and quota errors without fallback. Foundation and
 whitespace checks pass. Browser fixture exercises decline, allow, generate,
@@ -81,8 +81,37 @@ Live provider evidence: first 3.6 synthetic result was correctly rejected for
 misclassified pacing and unavailable chart references. Dynamic schema tightening
 then passed a complete 3.6 high-thinking synthetic review. Raw proof stays ignored
 under private-data/ai-qa; source code contains no personal records or keys.
-The additive migration is applied live. Production verification is recorded after
-deployment; physical iPhone Safari and broad coaching-quality evaluation remain.
+The additive migration is applied live. Physical iPhone Safari and broader
+coaching-quality evaluation remain.
+
+## Production release verification
+
+The master release is deployed on the existing Vercel production domain. The
+model setting is verified as gemini-3.6-flash. Public requests to both AI endpoints
+return 401/no-store. Authenticated Chrome shows the first-use choice; permission
+saves and survives reload. The owner explicitly authorised this run-data sharing.
+
+The first production provider attempt failed upstream; a controlled manual retry
+completed a real-history briefing, passed validation and persisted privately.
+Verified its exact numbers in the evidence disclosure, cited run links and
+source-backed chart tables. No synthetic findings were inserted as personal data.
+Chrome's extension connection became unavailable during verification, so the
+remaining checks used native Windows Chrome with the existing signed-in profile;
+no password, API key or token was extracted or entered.
+
+Reload exposed a genuine JSONB serialization issue: object key reordering invalidated
+the stored evidence digest. Canonical hashing plus versioned legacy serialization
+now verifies JSONB round trips; regression tests also preserve stale legacy reports
+after history changes. The already-generated report reappears after reload, with
+the same generation time and an up-to-date state, without another model call.
+
+Account opt-out and re-enable both verified live. Permission was left enabled for
+the owner, restoring the same saved briefing. Other members remain unanswered
+until they choose. Browser fixture checks at 375px and 852x393 show no horizontal
+overflow; choice targets are 48px. Manual fixture choice/generation paths were
+reviewed separately from real provider results. The temporary viewport was reset.
+No physical Safari, 200% text, performance benchmark or blanket entailment claim.
+Private proof images are in private-data/ai-qa and are excluded from Git/Vercel.
 
 Official references: [structured outputs](https://ai.google.dev/gemini-api/docs/structured-output?lang=rest),
 [Interactions schema migration](https://ai.google.dev/gemini-api/docs/interactions-breaking-changes-may-2026?hl=en),
