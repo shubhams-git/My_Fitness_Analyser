@@ -76,6 +76,7 @@ test('local preview serves its UI while denying credential/source paths and fore
     });
     const base=`http://127.0.0.1:${port}`;
     assert.equal((await fetch(base)).status,200);
+    for(const path of ['/','/app.html']){const html=await fetch(base+path).then(r=>r.text());assert.match(html,/href="\/real-map.css"/);assert.match(html,/href="\/assets\/vendor\/maplibre-gl.css"/);}
     const data=await fetch(base+'/api/data');assert.equal(data.status,200);
     assert.match(data.headers.get('content-security-policy'),/connect-src 'self'/);
     assert.match(data.headers.get('content-security-policy'),/worker-src 'self'/);

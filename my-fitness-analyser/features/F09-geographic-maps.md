@@ -45,7 +45,9 @@ appear on zoom-out; Night works; keyboard time inspection shows recorded pace/HR
 NRC screenshot activity has zero map canvases and an explicit missing-GPS state.
 These are desktop Chromium viewport tests, not actual iPhone Safari validation.
 A static-serving test caught general .mjs exposure; the allowlist permits only
-vendored .mjs assets, preserving server/source denial. Production check pending.
+vendored .mjs assets, preserving server/source denial. Production checking caught the separate /app.html entry missing map CSS. Both
+entry documents now include renderer/map styles, and HTTP tests enforce this.
+Production recheck pending.
 
 References: [MapLibre installation/CSP](https://maplibre.org/maplibre-gl-js/docs/),
 [OpenFreeMap quick start](https://openfreemap.org/quick_start/),
