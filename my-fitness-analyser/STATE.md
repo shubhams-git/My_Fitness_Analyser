@@ -38,9 +38,10 @@ without records; invalid credentials return 401 and logout clears cookies.
 
 Chrome: sign-in desktop/phone, account at 375px, empty-member training, real NRC
 projection including the long run, check-in save/reload. The latter is a loopback
-memory-only fixture, not live Auth/DB writes. Existing owner password is not
-available to the agent; do not claim authenticated production verification until
-the owner signs in. Actual iPhone Safari and timing remain pending.
+memory-only fixture, not live Auth/DB writes. On 7 November the owner confirmed
+successful production sign-in and that his NRC runs appear. This is owner-reported
+verification, not an independent row-by-row UI reconciliation. Credentials were
+not shared. Reload/sign-out, actual iPhone Safari and timing remain pending.
 
 ## Existing capabilities and evidence
 
@@ -66,5 +67,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Verify Shubham's existing credentials in the deployed member flow, then reconcile
-the displayed NRC history against the live owner-scoped database.
+Verify production Garmin sync into Shubham's authenticated history, enforcing the
+July cutoff and checking repeat-sync idempotency without altering NRC evidence.

@@ -82,5 +82,8 @@ v1 restore remains. No automatic deletion or credential export.
   under private-data/accounts-qa. Browser override reset afterward. Larger text
   and actual OS reduced-motion/iPhone verification are not claimed this increment.
 
-Remaining: owner credential login/reload/sign-out, production signed export/sync,
+- Owner confirmation, 7 November: production login succeeded and his NRC runs
+  appear. No password shared; not an independent row-by-row UI reconciliation.
+
+Remaining: authenticated reload/sign-out, production signed export/sync,
 physical iPhone Safari and observed check-in timing. No unperformed checks claimed.
