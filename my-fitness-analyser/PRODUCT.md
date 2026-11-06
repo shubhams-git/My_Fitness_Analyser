@@ -11,6 +11,7 @@ Turn running, strength, body-weight and recovery records into clear answers to: 
 ## Confirmed requirements
 
 - Personal use, high professional quality, mobile-first and eventually online with private access.
+- 7 November: optional Gemini coaching with each member's explicit, reversible sharing choice in Training/Account. Direct, concise, numerical findings must cite owned evidence. Explicit generation, zero-cost configuration, no secret/GPS/free-text transmission and no automatic paid fallback.
 - 7 November: email/password sign-in, persistent browser sessions, and separate personal records for Shubham and future invited Saurav. Hosted screens show only actual owned records; empty accounts stay empty. A shared owner-scoped schema is preferred to a separate physical database per person.
 - Prototype B / Field Notes is selected for all future UI development. Retain the premium finish but express an active fitness application through athletic typography, performance visualizations, coordinated motion and gradients. The owner rejected the hotel-like royal presentation. The latest finish remains under review.
 - User owns a Garmin Forerunner 965, already paired with the phone, Garmin Connect and Strava. Those connections do not authorize this new application's access.

@@ -1,5 +1,12 @@
 # Training intelligence: evidence before interpretation
 
+Current update, 7 November: F08 adds owner-consented personal run briefings with a
+new evidence/schema/client, private reports and Account AI preferences. See
+[F08](../features/F08-coaching-intelligence.md). The synthetic-only pipeline below
+remains the local lab's historical contract; it no longer describes opted-in
+hosted member generation. Gemini 3.6 high thinking passed the current synthetic
+provider test; 3.8/3.7 returned 503. No provider billing change was made.
+
 Implemented 5 November 2026. The owner's current direction is to defer database
 setup, use the local Garmin library for UI, and use **synthetic data only for
 Gemini**. Billing was confirmed active; the Gemini key has not been added. No

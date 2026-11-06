@@ -4,6 +4,7 @@ import { authorize,requireOrigin,signIn,signOut } from './auth.mjs';
 import { GarminSync } from '../prototypes/garmin.mjs';
 import { trainingDataset } from '../prototypes/training-data.mjs';
 import { journalDataset } from '../prototypes/mass.mjs';
+import { TrainingIntelligence,aiPreference,setAiPreference } from './intelligence.mjs';
 
 export async function readBody(request,limit=3.5*1024*1024){
   if(request.body!==undefined){const bytes=Buffer.isBuffer(request.body)?request.body:Buffer.from(typeof request.body==='string'?request.body:JSON.stringify(request.body));if(bytes.length>limit)throw new CloudError(413,'Choose a file smaller than 3.5 MB.');return bytes;}
@@ -20,6 +21,13 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     const api=await auth(request,response,config),library=libraryFactory(api);
     const garminConfigured=Boolean(env.GARMIN_PERSONAL_API_KEY&&config.owner===api.config.owner);
     if(request.method==='POST')requireOrigin(request,config);
+    if(route==='ai-consent'){
+      if(request.method==='GET'){send(200,await aiPreference(api));return;}
+      if(request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await setAiPreference(api,body.enabled));return;}
+    }
+    if(route==='ai-review'&&['GET','POST'].includes(request.method)){
+      const intelligence=new TrainingIntelligence(api,library,{env});send(200,request.method==='GET'?await intelligence.status():await intelligence.generate());return;
+    }
     if(route==='password'&&request.method==='POST'){
       const body=JSON.parse((await readBody(request,4096)).toString());
       if(typeof body.password!=='string'||body.password.length<12||body.password.length>1024)throw new CloudError(400,'Use at least 12 characters for your new password.');

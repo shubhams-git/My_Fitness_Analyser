@@ -1,6 +1,8 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/coaching.js", "destination": "/prototypes/coaching.js" },
+    { "source": "/coaching.css", "destination": "/prototypes/coaching.css" },
     { "source": "/account", "destination": "/prototypes/account.html" },
     { "source": "/account.html", "destination": "/prototypes/account.html" },
     { "source": "/account.css", "destination": "/prototypes/account.css" },

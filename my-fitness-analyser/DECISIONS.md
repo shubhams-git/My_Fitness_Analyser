@@ -1,5 +1,20 @@
 # Decision register
 
+D30 — Owner-directed optional coaching intelligence, 7 November 2026. The owner
+explicitly authorises run-related Gemini processing and requests a first-use
+choice plus reversible account settings for each member. Implement versioned,
+audited owner consent, a minimised evidence pack, source-aware NRC/Garmin cohorts,
+strict fact-bound JSON reports and private cached report storage. Require explicit
+generation; never send another member's record through this permission. Retain
+zero-cost operation as configured: operator-confirmed Free project, documented
+Flash models, limited requests and no automatic paid/model fallback. The sharing
+notice explains Google's free data handling and terms; consent does not amend
+provider terms. Use 3.6 high thinking after successful live synthetic validation;
+3.8/3.7 returned 503. Reject invalid output instead of relaxing guards or inventing
+a briefing. Deferred: search grounding, scheduled generation, full stream/medical
+analysis and broad model-quality evaluation. See F08. Supersedes earlier app-wide
+synthetic-only limits for opted-in members; does not change row isolation.
+
 D29 — Owner-directed private member cutover, 7 November 2026. Replace hosted
 synthetic routes with authenticated reads from the populated evidence tables.
 Bind ownership to verified Supabase Auth identity plus invite-only membership;

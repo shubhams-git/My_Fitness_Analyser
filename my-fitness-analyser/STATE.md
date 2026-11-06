@@ -1,9 +1,19 @@
 # Current state
 
 Updated: 7 November 2026 (Australia/Sydney)
-Active increment: F07 private members and real-data hosted read cutover
+Active increment: F08 per-member AI choice and evidence-bound coaching briefings
 
 ## Implemented
+
+- F08: reversible per-member Gemini sharing choice in Training and Account,
+  consent audit, separate explicit Generate action, minimised run evidence,
+  request-specific structured report validation, private cache and source-backed
+  chart/evidence disclosures. New consent/report SQL migration applied live.
+  56 tests pass; Gemini 3.6 high-thinking synthetic response validated after an
+  earlier response was rejected. 3.8/3.7 probes returned 503. Production checks
+  are recorded in F08. No personal provider request claimed until verified.
+- Owner confirms production Garmin sync succeeded and both Garmin and NRC history
+  are visible. This is owner-reported evidence, not an agent repeat-sync audit.
 
 - Premium athletic email/password sign-in, server-verified invite membership,
   renewable 30-day HttpOnly refresh cookies, sign-out and owner-scoped drafts.
@@ -62,10 +72,11 @@ Work stays on master; no new branch for this increment.
   hosted journal stays empty until owned readings are deliberately imported.
 - NRC/Strava uploads are private intake, not automatic extraction or an operator
   review UI. Previously published NRC history is available to its owner.
-- No personal-data Gemini generation, scheduled sync, manual strength log or
-  training-plan editor. Free Gemini remains synthetic-only.
+- No scheduled sync, manual strength log, training-plan editor or search grounding.
+  Opted-in members can explicitly request a run briefing; ordinary browsing and
+  declined accounts never trigger personal Gemini calls. See F08 for exact tests.
 
 ## Next action
 
-Verify production Garmin sync into Shubham's authenticated history, enforcing the
-July cutoff and checking repeat-sync idempotency without altering NRC evidence.
+Verify the deployed per-member consent and a validated private Gemini briefing
+against Shubham's live running record without altering source measurements.
