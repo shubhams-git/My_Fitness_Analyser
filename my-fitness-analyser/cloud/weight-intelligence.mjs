@@ -10,7 +10,7 @@ export function weightRequest(pack,model){return {model,store:false,system_instr
 export function extractWeight(result,pack){
  const outputs=result.steps?.filter(s=>s.type==='model_output')||[];
  if(result.status!=='completed'||outputs.length!==1||!outputs[0].content?.length||outputs[0].content.some(c=>c.type!=='text'))throw new CloudError(502,'Gemini did not return a complete weight insight.');
- try{return validateWeightReport(JSON.parse(outputs[0].content.map(c=>c.text).join('')),pack);}catch{throw new CloudError(502,'The weight insight did not pass its evidence checks. Your readings are unchanged.');}
+ try{return validateWeightReport(JSON.parse(outputs[0].content.map(c=>c.text).join('')),pack);}catch(e){console.warn('Weight insight rejected:',e.weightCode||'format');throw new CloudError(502,'The weight insight did not pass its evidence checks. Your readings are unchanged.');}
 }
 export class WeightIntelligence {
  constructor(api,{env=process.env,fetcher=fetch,journal=new CloudJournal(api)}={}){this.api=api;this.env=env;this.fetcher=fetcher;this.journal=journal;}

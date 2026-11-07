@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { weightTrend } from '../prototypes/weight-trend.js';
 import { weightEvidence } from '../analysis/weight-evidence.mjs';
-import { validateWeightReport,WEIGHT_SCHEMA } from '../analysis/weight-contract.mjs';
+import { validateWeightReport,WEIGHT_SCHEMA,WEIGHT_PROMPT } from '../analysis/weight-contract.mjs';
 import { WeightIntelligence,weightRequest } from '../cloud/weight-intelligence.mjs';
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 const data={anchor:'2026-11-08',today:'2026-11-08',points:Array.from({length:12},(_,i)=>({date:new Date(Date.UTC(2026,8,1+i*3)).toISOString().slice(0,10),kg:80-i*.1+Math.sin(i)*.2,readings:1})),note:'secret note',viewer:{id:owner,email:'private@example.test'}};
@@ -23,12 +23,15 @@ test('weight evidence excludes identities, notes and dates; schema rejects inven
  const p=weightEvidence(data),payload=JSON.stringify(weightRequest(p,'gemini-3.6-flash'));
  for(const value of [owner,'private@example.test','secret note','2026-09-01'])assert.ok(!payload.includes(value));
  assert.ok(p.content.facts.some(f=>f.id==='recent.weeklyRate'));assert.equal(p.content.observations.length,12);validateWeightReport(report(p),p);
+ // Legitimate count and magnitude citations must not require redundant facts.
+ validateWeightReport({...report(p),focus:'coverage',explanation:'Across {history.readings}, the trend changed. The latest reading is {latest.age} old.',factIds:['period.span','latest.age','period.trendDifference','history.readings']},p);
+ validateWeightReport({...report(p),focus:'trend',factIds:['period.trendDifference','history.days','latest.age']},p);
  for(const v of [{headline:'You lost 3 kg.'},{headline:'Your fat loss is ideal.'},{factIds:['latest.scale']},{supportingFactIds:['invented']},{nextStep:'eat-less'},{extra:1}])assert.throws(()=>validateWeightReport({...report(p),...v},p));
  assert.equal(weightRequest(p,'gemini-3.6-flash').generation_config.thinking_level,'high');assert.equal(weightRequest(p,'gemini-3.6-flash').store,false);
 });
 test('weight AI is explicit and consent-scoped, caches valid reports and never retries quota on a paid fallback',async()=>{
  let enabled=false,calls=0,reads=0,saved=null,status=200;
- const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:'weight-coach-v1',finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async()=>Response.json('saved')};
+ const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async()=>Response.json('saved')};
  const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{calls++;return status===200?Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report((await engine.context()).pack))}]}]}):new Response('private body test-secret',{status});}});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
  enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);
