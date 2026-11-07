@@ -1,7 +1,7 @@
 # Current state
 
 Updated: 8 November 2026 (Australia/Sydney)
-Active increment: F11 journal chart refinement and strength recording
+Completed increment: F11 journal chart refinement and strength recording
 
 ## Implemented
 
@@ -15,7 +15,10 @@ Active increment: F11 journal chart refinement and strength recording
   membership-checked mutation function. Live catalog: RLS enabled, anonymous
   execute denied, zero test sessions, existing 29 weights/four MASS sessions intact.
   Synthetic phone/desktop save/reload/edit/remove/restore, validation, duplicate
-  warning and rotation tested; 71 automated tests pass. Final deployment pending.
+  warning and rotation tested; 71 automated tests pass. Code 8287fe0 is pushed;
+  Vercel reports success. Live chart/blank session form, 200% zoom reflow and
+  complete export verified; zero live test sessions, zero journal sliders and
+  no captured console errors. All source hashes and original MASS bytes match.
   See F11 and docs/REMAINING_ROADMAP.md (five major remaining workstreams).
 
 - F10: cloud body journal and explicit kg/date/note weigh-in capture, immutable
@@ -77,7 +80,7 @@ Active increment: F11 journal chart refinement and strength recording
 
 ## Verification and deployment
 
-67 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
+71 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
 publication, stale-save rejection and cross-owner foreign keys using synthetic
 schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and

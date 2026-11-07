@@ -114,3 +114,10 @@ time axis, fit the extent to recorded dates, break gaps and label the
 historical mean's anchor date. No progress score or weight-loss judgement. Data
 windows persist in the URL. Import review and backup preparation expose status;
 no process-memory token or silent cross-source merge is assumed. See F10.
+
+F11 adds a responsive strength-entry sheet with a stable save action, explicit
+focus/date/optional duration, and optional four-answer check-in. Use labelled
+choices rather than sliders; selected choices have a border and inset underline
+as well as colour. Discomfort reveals a location field. Preserve new-entry drafts
+and keep the sheet open across rotation. Source conflicts require a deliberate
+separate-workout acknowledgement. See F11 for implementation and verification.

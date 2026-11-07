@@ -43,3 +43,30 @@ responsive and reduced-motion behaviour; authenticated source-labelled strength
 history with optional complete check-in, recoverable removal, concurrency/retry
 protection, and export inclusion. Synthetic UI/SQL QA never creates owner workouts.
 Production migration, deployment and final checks are recorded below when complete.
+
+Verified release: 036cc94 plus axis-style cleanup 8287fe0 pushed to master;
+Vercel reports success for both. Migration applied through the authenticated SQL
+editor; catalog confirms RLS on strength_entries, anonymous execute denied and
+zero live manual strength rows. Existing 29 weights and four active MASS sessions
+remain intact. No real owner session/check-in was invented for testing.
+
+71 automated tests pass, including curve extrema/gaps, source date extent, strict
+check-in validation, owner/anonymous isolation, immutable edit/remove/restore,
+receipt replay, stale saves and acknowledgement in either source-import order.
+HTTP checks include both new modules. Foundation checks and diff whitespace pass.
+
+Synthetic loopback PostgreSQL UI: desktop/phone save/reload/edit/remove/restore,
+missing focus, incomplete discomfort location, same-day duplicate warning, retained
+new-entry drafts and portrait/landscape reflow. Rotation initially closed the sheet;
+the breakpoint handler now keeps open entry sheets mounted. Production blank entry
+opens correctly; at 200% Chrome zoom the sheet remains open and both document and
+dialog have no horizontal overflow. Restored original 75% zoom and reset the IAB
+viewport. No captured console errors and zero sliders on the deployed journal.
+Actual iPhone Safari and owner completion timing remain unverified.
+
+Final live backup includes strength_entries (empty), correct owner rows, all 29
+weights, four active MASS sessions, matching original hashes and byte-identical
+MASS source. Private proof: private-data/journal-qa/f11-reconciliation.json,
+f11-live-export.json and refined-chart-production.png. Temporary SQL/QA tabs and
+the loopback server were closed after verification. Five remaining workstreams
+are documented in docs/REMAINING_ROADMAP.md; screenshot publication is next.
