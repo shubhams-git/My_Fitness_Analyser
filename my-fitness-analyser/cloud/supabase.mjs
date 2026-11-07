@@ -3,6 +3,11 @@ import { createHash } from 'node:crypto';
 import { activityEvidence,ownerRows } from './activities.mjs';
 
 export const emptyLibrary=()=>({schemaVersion:1,activities:{},feedback:{},originals:{}});
+async function parallelRead(items,read,limit=4){
+ let next=0,failure;
+ await Promise.all(Array.from({length:Math.min(limit,items.length)},async()=>{while(!failure&&next<items.length){const item=items[next++];try{await read(item);}catch(error){failure??=error;}}}));
+ if(failure)throw failure;
+}
 export class CloudError extends Error { constructor(status,message){super(message);this.status=status;} }
 export function cloudConfig(env=process.env){
   const {SUPABASE_URL:url,SUPABASE_ANON_KEY:key,FITNESS_OWNER_ID:owner,APP_ORIGIN:origin}=env;
@@ -69,10 +74,13 @@ export class CloudLibrary extends LocalLibrary {
   }
   async exportBackup(){
     const backup=structuredClone((await this.snapshot()).state);
+    const before=await ownerRows(this.api,'journal_heads');
     for(const [hash,original]of Object.entries(backup.originals)){const response=await this.api.request('/storage/v1/object/fitness-private/'+original.key);if(!response.ok)throw new CloudError(503,'A backup original could not be read.');backup.originals[hash]=Buffer.from(await response.arrayBuffer()).toString('base64');}
-    const tables={};for(const table of ['activities','activity_sources','source_accounts','raw_assets','activity_source_assets','activity_segments','activity_feedback','ingestion_runs','ingestion_items','record_changes','fitness_profiles','screenshot_submissions','ai_preferences','ai_consent_events','analysis_reports'])tables[table]=await ownerRows(this.api,table);
-    for(const table of ['body_measurements','journal_sessions','journal_imports','journal_heads','journal_mutations'])tables[table]=await ownerRows(this.api,table);
-    const originals={};for(const asset of [...tables.raw_assets,...tables.screenshot_submissions,...tables.journal_imports]){if(originals[asset.sha256])continue;const response=await this.api.request('/storage/v1/object/fitness-private/'+asset.object_key);if(!response.ok)throw new CloudError(503,'A source original could not be exported.');const bytes=Buffer.from(await response.arrayBuffer());if(createHash('sha256').update(bytes).digest('hex')!==asset.sha256)throw new CloudError(503,'An archived original failed verification.');originals[asset.sha256]=bytes.toString('base64');}
+    const tables={};await parallelRead(['activities','activity_sources','source_accounts','raw_assets','activity_source_assets','activity_segments','activity_feedback','ingestion_runs','ingestion_items','record_changes','fitness_profiles','screenshot_submissions','ai_preferences','ai_consent_events','analysis_reports','body_measurements','journal_sessions','journal_imports','journal_heads','journal_mutations'],async table=>{tables[table]=await ownerRows(this.api,table);});
+    const assets=[...new Map([...tables.raw_assets,...tables.screenshot_submissions,...tables.journal_imports].map(asset=>[asset.sha256,asset])).values()];
+    const originals={};await parallelRead(assets,async asset=>{const response=await this.api.request('/storage/v1/object/fitness-private/'+asset.object_key);if(!response.ok)throw new CloudError(503,'A source original could not be exported.');const bytes=Buffer.from(await response.arrayBuffer());if(createHash('sha256').update(bytes).digest('hex')!==asset.sha256)throw new CloudError(503,'An archived original failed verification.');originals[asset.sha256]=bytes.toString('base64');});
+    const after=await ownerRows(this.api,'journal_heads'),revision=rows=>String(rows[0]?.revision||0);
+    if(revision(before)!==revision(after)||revision(tables.journal_heads)!==revision(after))throw new CloudError(409,'Your journal changed while preparing the backup. Please export again.');
     return {schemaVersion:2,kind:'fitness-private-evidence-backup',ownerId:this.owner,exportedAt:new Date().toISOString(),legacy:backup,tables,originals};
   }
   async restore(backup,...args){if(backup?.schemaVersion===2)throw new CloudError(409,'This evidence archive needs a reviewed database restore. Your existing records are unchanged.');return super.restore(backup,...args);}

@@ -5,11 +5,17 @@ Active increment: F10 cloud body journal and quick weigh-ins
 
 ## Implemented
 
-- F10 is being verified for release: private relational body journal, explicit
-  manual weigh-ins, source-preserving MASS imports, edit/remove/restore, request
-  receipts and stale-save guards. The additive live migration is installed;
-  all five tables have row security and anonymous function execution is denied.
-  Real MASS cloud population and final deployment verification are pending.
+- F10: cloud body journal and explicit kg/date/note weigh-in capture, immutable
+  edits, reversible removal, owner-scoped browser drafts, request receipts and
+  stale-save protection. MASS review/import preserves source identities, t/dateKey,
+  update/deletion markers and exact original bytes. Same-day sources stay separate
+  and require acknowledgement before daily averaging. The additive live schema
+  has owner RLS and restricted mutation functions. Owner's 29 MASS weights and
+  four active sessions are populated, with the source tombstone retained. A real
+  v2 export was field/hash reconciled; no live manual test reading was fabricated.
+  67 tests pass. Phone/landscape, input validation, save/edit/remove/restore,
+  repeat import and two-tab conflict handling checked with a loopback synthetic
+  PostgreSQL fixture; real MASS population/reload/export checked live. See F10.
 
 - F09: real MapLibre/OpenFreeMap street maps replace optical route illustrations.
   Streets and Night cartography retain street/place labels, parks, buildings and
@@ -58,7 +64,7 @@ Active increment: F10 cloud body journal and quick weigh-ins
 
 ## Verification and deployment
 
-61 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
+67 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
 publication, stale-save rejection and cross-owner foreign keys using synthetic
 schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and
@@ -90,8 +96,8 @@ Work stays on master; no new branch for this increment.
   membership support a second athlete now. No self-service public signup.
 - The server Garmin key is available only to its configured owner. Other members
   use manual FIT until encrypted per-member connections are delivered.
-- Hosted MASS population/import and direct weigh-in capture are not delivered;
-  hosted journal stays empty until owned readings are deliberately imported.
+- Actual owner manual weigh-in capture and physical iPhone Safari still need
+  user/device observation; synthetic SQL/UI tests do not claim those checks.
 - NRC/Strava uploads are private intake, not automatic extraction or an operator
   review UI. Previously published NRC history is available to its owner.
 - No scheduled sync, manual strength log, training-plan editor or search grounding.
@@ -100,5 +106,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Collect the owner's actual iPhone Safari feedback on map gestures and label
-legibility before refining cartographic density further.
+Build manual strength-session recording and its distinct quick check-in, keeping
+Garmin runs and MASS imported sessions source-labelled and preventing double counts.

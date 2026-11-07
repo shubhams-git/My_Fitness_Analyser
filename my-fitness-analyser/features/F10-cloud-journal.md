@@ -31,7 +31,7 @@ states, retained unsaved values and reduced-motion support matter more than
 decorative motion. No weight-loss judgement, inferred body composition, invented
 readings or automatic Gemini transmission. Manual strength capture remains next.
 
-Verification: 66 automated tests pass, including owner/anonymous boundaries,
+Verification: 67 automated tests pass, including owner/anonymous boundaries,
 idempotent writes, same-day acknowledgement, source conflict rollback, tombstone
 resurrection prevention, exact original bytes and independent database restore.
 Live SQL confirms row security on all five tables and no anonymous execute on the
@@ -46,4 +46,19 @@ across two tabs. The losing tab retains its unsaved value. 375px portrait and
 852px landscape show no horizontal overflow. Phone entry is compact; the chart
 uses a smaller coordinate viewport with readable axis labels. This is Chromium
 viewport testing, not physical iPhone Safari. Real owner weigh-ins were not
-invented for testing. Production deployment/import verification is pending.
+invented for testing. Code release 29bd2ea deployed to master/Vercel. The owner-signed-in production
+journal imported the supplied MASS original: 29 weight rows, four active sessions,
+one source tombstone, one import and zero manual test rows. SQL catalog and row
+reconciliation agree. All-history UI shows 29 readings; a complete v2 export was
+downloaded and every original's hash verified. All weight/session source fields,
+including t/dateKey/update/deletion values, match the supplied file. Its original
+6,604 bytes match exactly. Private reconciliation/backup evidence is under
+private-data/journal-qa. No source health values, files or credentials enter Git.
+
+The first full export took more than 45 seconds. Final polish bounds independent
+reads to four, verifies the journal head before/after, and exposes preparation
+feedback through a short-lived download link. A concurrent journal mutation now
+rejects the archive rather than silently mixing revisions. Selected history
+windows persist in the URL; historical mean/last-reading dates remain explicit.
+Final polish deployment/re-import checks are pending. Actual owner manual entry
+and physical iPhone Safari are still separate from synthetic SQL/UI verification.

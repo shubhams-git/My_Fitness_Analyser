@@ -96,3 +96,19 @@ Core Web Vitals or frame-rate targets.
 See [research and art direction](docs/DESIGN_RESEARCH_2026-11.md), the latest
 [QA report](docs/QA_REPORT.md), and the active feature. Work directly on master,
 pulling GitHub master before new work, unless a new branch is genuinely needed.
+
+## Body journal
+
+F10 places recorded weight history beside an explicit quick-entry panel. On a
+phone, kg/date and the save action take priority. Keep the decimal keyboard,
+blank initial measurement, explicit reuse of a dated previous value, optional
+note, inline errors and a persistent owner-scoped draft. Save feedback means a
+confirmed server write. Imported MASS records keep their source and are corrected
+by re-import; manual edits append revisions and removed entries remain recoverable.
+
+Daily chart values are labelled averages; original readings stay separate. Solid
+recorded/dashed mean lines, a keyboard slider and reading buttons provide multiple
+ways to inspect. Use actual dates on the time axis, break gaps and label the
+historical mean's anchor date. No progress score or weight-loss judgement. Data
+windows persist in the URL. Import review and backup preparation expose status;
+no process-memory token or silent cross-source merge is assumed. See F10.

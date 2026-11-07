@@ -4,6 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
 import { createHash } from 'node:crypto';
 import { CloudJournal,journalProjection,localDay,validateWeighIn } from '../cloud/journal.mjs';
+import { CloudLibrary,emptyLibrary } from '../cloud/supabase.mjs';
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222',id='33333333-3333-4333-8333-333333333333',op='44444444-4444-4444-8444-444444444444';
 const input={id,operationId:op,head:0,revision:0,dateKey:'2026-08-12',kg:80.25,note:'',deleted:false,confirmSameDay:false};
 test('journal dates follow the member timezone and manual input never coerces blanks or impossible dates',()=>{
@@ -77,4 +78,11 @@ test('MASS publication archives the exact original formatting and checks the rev
  const journal=new CloudJournal(api),hash=createHash('sha256').update(raw).digest('hex');
  await assert.rejects(journal.commit(raw,{head:0,hash:'f'.repeat(64)}),/same MASS file/);assert.equal(stored,undefined);
  await journal.commit(raw,{head:0,hash});assert.ok(stored.equals(raw));assert.equal(publication.source_hash,hash);assert.equal(publication.byte_length,raw.length);
+});
+test('complete exports bound concurrent reads and reject a changing journal instead of emitting an inconsistent archive',async()=>{
+ const files=Array.from({length:9},(_,i)=>Buffer.from('synthetic evidence '+i)),assets=files.map((b,i)=>({owner_id:owner,sha256:createHash('sha256').update(b).digest('hex'),object_key:owner+'/test/'+i}));
+ let active=0,peak=0,heads=0,changing=false;
+ const api={config:{owner},json:async path=>{if(path.includes('/fitness_libraries?'))return [{revision:1,state:emptyLibrary()}];if(path.includes('/journal_heads?')){heads++;return [{owner_id:owner,revision:changing&&heads>=3?2:1}];}if(path.includes('/raw_assets?'))return assets;return [];},request:async path=>{active++;peak=Math.max(peak,active);await new Promise(r=>setTimeout(r,3));active--;return new Response(files[Number(path.split('/').at(-1))]);}};
+ const library=new CloudLibrary(api),exported=await library.exportBackup();assert.equal(Object.keys(exported.originals).length,9);assert.ok(peak>1&&peak<=4);assert.equal(active,0);
+ changing=true;heads=0;await assert.rejects(library.exportBackup(),e=>e.status===409);assert.equal(active,0);
 });

@@ -75,7 +75,9 @@ export async function privateHandler(request,response,route,{configReader=cloudC
       const data=await library.exportBackup(),key=`${api.config.owner}/exports/${randomUUID()}.json`;
       const upload=await api.request('/storage/v1/object/fitness-private/'+key,{method:'POST',body:JSON.stringify(data),headers:{'Content-Type':'application/json','x-upsert':'false'}});if(!upload.ok)throw new CloudError(503,'The private backup could not be prepared.');
       const signed=await api.json('/storage/v1/object/sign/fitness-private/'+key,{method:'POST',body:{expiresIn:60}});if(!signed.signedURL?.startsWith('/object/sign/'))throw new CloudError(503,'The backup link could not be prepared.');
-      response.statusCode=302;response.setHeader('Location',config.url+'/storage/v1'+signed.signedURL+'&download=fitness-library.json');response.end();return;
+      const url=config.url+'/storage/v1'+signed.signedURL+'&download=fitness-library.json';
+      if(new URL(request.url,'http://localhost').searchParams.get('prepare')==='1'){send(200,{url});return;}
+      response.statusCode=302;response.setHeader('Location',url);response.end();return;
     }
     throw new CloudError(405,'This action is not available.');
   }catch(error){send(error instanceof CloudError?error.status:500,{error:error instanceof CloudError?error.message:'The private request could not complete. Your saved data is preserved.'});}

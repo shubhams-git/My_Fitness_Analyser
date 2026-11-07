@@ -5,7 +5,8 @@ const root=document.querySelector('#journal-root'),escape=v=>String(v??'').repla
 const nf=new Intl.NumberFormat('en-AU',{maximumFractionDigits:2}),kg=v=>Number.isFinite(v)?nf.format(v):'—',signed=v=>Number.isFinite(v)?(v>0?'+':'')+nf.format(v):'—';
 const day=value=>new Date(value+'T12:00:00Z').toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'}),dateMs=d=>Date.parse(d+'T12:00:00Z');
 const arrow='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>',logo='<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 25 11 7h5L8 25m9 0 8-18h4l-8 18"/></svg>';
-let data,windowChoice='90',selection=0,chart,preview,busy=false,animation,motion=true,shown=12,writingWeight=false;
+const journalParams=new URLSearchParams(location.search);
+let data,windowChoice=['30','all'].includes(journalParams.get('window'))?journalParams.get('window'):'90',selection=0,chart,preview,busy=false,animation,motion=true,shown=12,writingWeight=false;
 try{motion=localStorage.getItem('mfa-visual-motion')!=='off';}catch{}
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 async function api(url,options){const response=await fetch(url,{cache:'no-store',...options});if(response.status===401){location.replace('/sign-in.html');throw new Error('Sign in to open your journal.');}let value;try{value=await response.json();}catch{throw new Error('The service could not respond. Try again.');}if(!response.ok)throw new Error(value.error||'The request could not finish.');return value;}
@@ -22,7 +23,7 @@ function render(animateView=true){
  root.innerHTML=journalView({data,windowChoice,graph,entry:entryMarkup(data),kg,signed,day,escape,arrow,logo,motion:motion&&!reduced.matches,shown});
  bind();if(animateView)animate();
 }
-async function load(window='90',animateView=true){const next=await api('/api/journal?window='+window);data=next;windowChoice=window;selection=Math.max(0,data.points.length-1);render(animateView);}
+async function load(window=windowChoice,animateView=true){const next=await api('/api/journal?window='+window);data=next;windowChoice=window;journalParams.set('window',window);history.replaceState(null,'',location.pathname+'?'+journalParams+location.hash);selection=Math.max(0,data.points.length-1);render(animateView);}
 function error(message){document.querySelector('#import-error').textContent=message;}
 function notice(message){const node=document.querySelector('#journal-status');node.textContent=message;node.tabIndex=-1;node.focus({preventScroll:true});}
 function setBusy(value){writingWeight=value;document.querySelectorAll('[data-window],#choose-file,#more-readings').forEach(b=>b.disabled=value);}
@@ -31,6 +32,8 @@ function bind(){
  document.querySelectorAll('[data-date]').forEach(b=>b.addEventListener('click',()=>{selection=data.points.findIndex(p=>p.date===b.dataset.date);updateCursor();document.querySelector('#reading-cursor')?.focus({preventScroll:true});}));
  document.querySelectorAll('[data-window]').forEach(b=>b.addEventListener('click',async()=>{if(writingWeight||b.getAttribute('aria-pressed')==='true')return;document.querySelectorAll('[data-window]').forEach(x=>x.disabled=true);try{await load(b.dataset.window,false);document.querySelector(`[data-window="${windowChoice}"]`).focus({preventScroll:true});}catch(e){setBusy(false);error(e.message);}}));
  document.querySelector('#choose-file')?.addEventListener('click',()=>document.querySelector('#mass-file').click());document.querySelector('#mass-file')?.addEventListener('change',previewFile);
+ const exportLink=document.querySelector('a[href="/api/export"]');let exporting=false;
+ exportLink?.addEventListener('click',async e=>{if(!data.cloud)return;e.preventDefault();if(exporting)return;exporting=true;const html=exportLink.innerHTML,status=document.querySelector('#import-status');exportLink.setAttribute('aria-disabled','true');exportLink.textContent='Preparing verified backup…';status.textContent='Checking your original files. The download starts when your backup is ready.';try{const result=await api('/api/export?prepare=1');location.assign(result.url);status.textContent='Backup ready. Your browser will download it.';}catch(error){status.textContent=error.message;}finally{exporting=false;exportLink.removeAttribute('aria-disabled');exportLink.innerHTML=html;}});
  document.querySelector('#close-review').addEventListener('click',closeReview);document.querySelector('#mass-review').addEventListener('cancel',e=>{if(busy)e.preventDefault();else closeReview();});
  document.querySelector('#motion').addEventListener('click',()=>{motion=!motion;try{localStorage.setItem('mfa-visual-motion',motion?'on':'off');}catch{}animation?.revert();setMotion();});
  document.querySelector('#more-readings')?.addEventListener('click',()=>{shown+=20;render(false);document.querySelector('#more-readings')?.focus({preventScroll:true});});
