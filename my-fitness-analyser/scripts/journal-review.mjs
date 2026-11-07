@@ -4,6 +4,7 @@ import { readFile,mkdir,writeFile } from 'node:fs/promises';
 import { resolve,relative,extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PGlite } from '@electric-sql/pglite';
+import { WeightIntelligence } from '../cloud/weight-intelligence.mjs';
 import { CloudJournal } from '../cloud/journal.mjs';
 import { syntheticMass } from '../prototypes/mass.mjs';
 const root=fileURLToPath(new URL('../prototypes/',import.meta.url)),port=4176,owner='11111111-1111-4111-8111-111111111111';
@@ -11,25 +12,35 @@ const db=new PGlite(),storage=new Map();
 await db.exec(`create role authenticated;create role anon;create schema auth;create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;create table fitness_owners(owner_id uuid primary key);create table fitness_profiles(owner_id uuid primary key,timezone text);insert into fitness_owners values('${owner}');insert into fitness_profiles values('${owner}','Australia/Sydney');grant select on fitness_profiles to authenticated;`);
 await db.exec(await readFile(new URL('../supabase/migrations/20261107_body_journal.sql',import.meta.url),'utf8'));
 await db.exec(await readFile(new URL('../supabase/migrations/20261108_strength_journal.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../supabase/migrations/20261108_weight_intelligence.sql',import.meta.url),'utf8'));
 await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${owner}',false);`);
-const api={config:{owner},async request(path,options={}){
+const api={config:{owner},async json(path,options){const r=await this.request(path,options);const v=await r.json();if(!r.ok)throw new Error(v.message);return v;},async request(path,options={}){
+ if(path.startsWith('/rest/v1/weight_ai_preferences?'))return Response.json((await db.query('select * from weight_ai_preferences')).rows);
+ if(path.startsWith('/rest/v1/weight_analysis_reports?'))return Response.json((await db.query("select * from weight_analysis_reports where status='complete' order by created_at desc limit 5")).rows);
  if(path.includes('/storage/')){if(options.method==='POST'){if(storage.has(path))return new Response('{}',{status:409});storage.set(path,Buffer.from(options.body));return Response.json({});}return storage.has(path)?new Response(storage.get(path)):new Response('{}',{status:404});}
- const functions={journal_snapshot:[],save_strength_entry:['target_id','expected_revision','expected_head','operation_id','new_value'],save_body_measurement:['target_id','expected_revision','expected_head','operation_id','new_value'],commit_mass_journal:['expected_head','source_hash','object_key','byte_length','exported_at','incoming','confirm_same_day']},name=path.split('/').at(-1),args=functions[name];
+ const functions={set_weight_ai_preference:['allow_analysis','disclosure'],begin_weight_review:['evidence_key','model_id','prompt_version','schema_version'],finish_weight_review:['target_id','result_status','result_report','result_evidence'],journal_snapshot:[],save_strength_entry:['target_id','expected_revision','expected_head','operation_id','new_value'],save_body_measurement:['target_id','expected_revision','expected_head','operation_id','new_value'],commit_mass_journal:['expected_head','source_hash','object_key','byte_length','exported_at','incoming','confirm_same_day']},name=path.split('/').at(-1),args=functions[name];
  if(!args)return new Response('{}',{status:404});
  try{const value=(await db.query(`select public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) as value`,args.map(k=>options.body[k]))).rows[0].value;return Response.json(value);}
  catch(e){return Response.json({message:e.message},{status:e.code==='PT409'?409:400});}
 }};
 const journal=new CloudJournal(api),raw=Object.values(syntheticMass().imports)[0].raw;
 if(!process.argv.includes('--empty')){const preview=await journal.preview(Buffer.from(raw));await journal.commit(Buffer.from(raw),{head:preview.headRevision,hash:preview.hash});}
+const weightAI=new WeightIntelligence(api,{journal,env:{GEMINI_API_KEY:'synthetic-only',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async(_,options)=>{
+ const p=JSON.parse(JSON.parse(options.body).input),report={schemaVersion:p.schemaVersion,evidenceHash:p.evidenceHash,headline:'Your recorded trend moved by {period.trendDifference}.',explanation:'Across {history.days} recorded days, the smoothed trend moved. The latest reading is {latest.age} old.',factIds:['period.trendChange','period.trendDifference','history.days','latest.age'],focus:'trend',nextStep:p.rules.stale?'refresh-readings':'keep-recording',supportingFactIds:['period.trendChange','history.days']};
+ return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report)}]}]});
+}});
 const qa=new URL('../private-data/journal-qa/',import.meta.url);await mkdir(qa,{recursive:true});await writeFile(new URL('synthetic-export.json',qa),raw);
 const server=http.createServer(async(req,res)=>{
  if(req.headers.host!=='127.0.0.1:'+port){res.writeHead(403).end();return;}res.setHeader('Cache-Control','no-store');const url=new URL(req.url,'http://localhost');
  const json=(status,value)=>res.writeHead(status,{'Content-Type':'application/json'}).end(JSON.stringify(value));
  try{
   if(url.pathname==='/api/journal'){json(200,{...await journal.dataset({window:url.searchParams.get('window')||'90'}),cloud:true,local:false,dataset:'synthetic',scope:'Synthetic loopback SQL fixture; no live account or database writes.',viewer:{id:owner,email:'review@example.test'}});return;}
+  if(url.searchParams.get('route')==='weight-ai'&&req.method==='GET'){json(200,await weightAI.status());return;}
   if(req.method==='POST'){
    if(req.headers.origin!=='http://127.0.0.1:'+port){json(403,{error:'Fixture origin mismatch'});return;}
    let body='';for await(const c of req)body+=c;
+   if(url.searchParams.get('route')==='weight-ai-consent'){json(200,await weightAI.setPreference(JSON.parse(body).enabled));return;}
+   if(url.searchParams.get('route')==='weight-ai'){json(200,await weightAI.generate());return;}
    if(url.searchParams.get('route')==='strength-entry'){json(200,await journal.saveStrength(JSON.parse(body)));return;}
    if(url.searchParams.get('route')==='weigh-in'){json(200,await journal.save(JSON.parse(body)));return;}
    if(url.pathname==='/api/mass/preview'){json(200,await journal.preview(Buffer.from(body)));return;}

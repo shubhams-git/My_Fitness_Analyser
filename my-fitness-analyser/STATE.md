@@ -1,9 +1,17 @@
 # Current state
 
 Updated: 8 November 2026 (Australia/Sydney)
-Completed increment: F11 journal chart refinement and strength recording
+Active increment: F12 continuous weight trend and scoped Gemini insight
 
 ## Implemented
+
+- F12 candidate: continuous calendar-aware smoothed weight trend with quiet actual
+  dots/deviation stems, interpolated missing days and a labelled flat dashed held
+  tail. Original readings remain intact. Weight-specific Gemini consent, audit and
+  private reports; explicit generation from deterministic trend/rate/coverage facts,
+  bounded schema and quantities resolved from evidence. No new body-composition
+  claims or paid fallback. New SQL migration applied; production verification and
+  deployment are in progress. Tests/UI evidence are recorded in F12.
 
 - F11: body chart uses bounded smooth joins through real readings, recorded date
   extent and direct tap/hover/keyboard/button inspection; no range input. New

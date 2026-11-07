@@ -1,6 +1,8 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/weight-insight.js", "destination": "/prototypes/weight-insight.js" },
+    { "source": "/weight-trend.js", "destination": "/prototypes/weight-trend.js" },
     { "source": "/strength-entry.js", "destination": "/prototypes/strength-entry.js" },
     { "source": "/journal-chart.js", "destination": "/prototypes/journal-chart.js" },
     { "source": "/journal-entry.js", "destination": "/prototypes/journal-entry.js" },

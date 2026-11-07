@@ -5,8 +5,8 @@ not a claim that the application can never grow beyond five tasks.
 
 1. Reviewed NRC/Strava screenshot publication: member review of extracted fields,
    source evidence, date/precision checks and canonical duplicate resolution.
-2. Longitudinal coaching: comparable run trends plus deliberate strength/body
-   context, evidence-linked visualizations and separately reviewed AI input scope.
+2. Longitudinal coaching: combine running and strength context with the standalone
+   F12 weight insight; evidence-linked comparisons and separately reviewed AI scope.
 3. Second-member onboarding and provider connections: invite Saurav when his email
    is supplied; encrypted per-member Garmin authorization rather than owner's key.
 4. Sync reliability: resumable scheduled sync, freshness/failure states and bounded

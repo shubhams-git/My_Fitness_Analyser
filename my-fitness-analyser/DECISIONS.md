@@ -1,5 +1,16 @@
 # Decision register
 
+D34 — Continuous weight trend and scoped intelligence, 8 November 2026. Owner
+supplies MASS reference and rejects remaining abrupt curves. Make a smoothed
+calendar EMA the primary line, connect interpolated missing days and hold the
+last estimate flat/dashed through today. Raw readings remain dots and null on
+unrecorded days; no extra database rows or slope extrapolation. This supersedes
+F11's gap-breaking weight presentation, not geographic GPS gap rules. Add explicit
+weight-specific Gemini sharing, minimized evidence, deterministic rates/coverage,
+strict fact-linked schema and concise insight card. No body-composition inference,
+automatic generation, paid fallback or new key. Existing run consent is unchanged.
+See F12 for design, provider documentation and verification.
+
 D33 — Journal refinement and strength entry, 8 November 2026. Owner rejects the
 abrupt chart and range control and requests continued development. Replace the
 range with direct/keyboard/button inspection and bounded smooth joins, retaining

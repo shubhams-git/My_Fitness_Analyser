@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { weightTrend } from '../prototypes/weight-trend.js';
 import { CloudError } from './supabase.mjs';
 import { parseMass,emptyMass,mergeMass,importPreview,journalDataset } from '../prototypes/mass.mjs';
 
@@ -38,7 +39,7 @@ export function journalProjection(snapshot,{window='90',now=new Date()}={}){
   const all=journalDataset(state,{window:'all',anchor:today});
   const recent=(a,b)=>b.dateKey.localeCompare(a.dateKey)||(Date.parse(b.recordedAt||0)||0)-(Date.parse(a.recordedAt||0)||0)||b.id.localeCompare(a.id);
   view.entries.sort(recent);all.entries.sort(recent);
-  return {...view,revision:Number(snapshot.revision),today,timezone:snapshot.timezone,canLog:true,canLogStrength:Array.isArray(snapshot.manualSessions),canImport:true,importLimitMB:3.5,latestReading:all.entries[0]||null,daySessions:all.sessions.map(({entryKey,source,dateKey,focus})=>({entryKey,source,dateKey,focus})),removedSessions:(snapshot.manualSessions||[]).filter(r=>r.deleted).map(r=>({...r.data,entryKey:r.id,revision:Number(r.revision),source:'manual'})),dayReadings:all.entries.map(({entryKey,source,revision,dateKey,kg})=>({entryKey,source,revision,dateKey,kg})),removed:snapshot.weights.filter(r=>r.source==='manual'&&r.deleted).map(r=>({...r.data,entryKey:r.entry_key,revision:Number(r.revision),source:'manual'})),scope:'Your private MASS history, weigh-ins and recorded strength sessions. Missing days are left open.'};
+  return {...view,trend:weightTrend(all.points,{window,anchor:today}),revision:Number(snapshot.revision),today,timezone:snapshot.timezone,canLog:true,canLogStrength:Array.isArray(snapshot.manualSessions),canImport:true,importLimitMB:3.5,latestReading:all.entries[0]||null,daySessions:all.sessions.map(({entryKey,source,dateKey,focus})=>({entryKey,source,dateKey,focus})),removedSessions:(snapshot.manualSessions||[]).filter(r=>r.deleted).map(r=>({...r.data,entryKey:r.id,revision:Number(r.revision),source:'manual'})),dayReadings:all.entries.map(({entryKey,source,revision,dateKey,kg})=>({entryKey,source,revision,dateKey,kg})),removed:snapshot.weights.filter(r=>r.source==='manual'&&r.deleted).map(r=>({...r.data,entryKey:r.entry_key,revision:Number(r.revision),source:'manual'})),scope:'Your private MASS history, weigh-ins and recorded strength sessions. Missing days are left open.'};
 }
 export class CloudJournal {
   constructor(api){this.api=api;}

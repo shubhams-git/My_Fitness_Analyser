@@ -106,12 +106,15 @@ note, inline errors and a persistent owner-scoped draft. Save feedback means a
 confirmed server write. Imported MASS records keep their source and are corrected
 by re-import; manual edits append revisions and removed entries remain recoverable.
 
-Daily chart values are labelled averages; original readings stay separate. Solid
-recorded/dashed mean lines, direct chart inspection, keyboard arrows and labelled
-previous/next buttons provide multiple ways to inspect. Shape-preserving curves
-pass through the recorded points without false extrema. Use actual dates on the
-time axis, fit the extent to recorded dates, break gaps and label the
-historical mean's anchor date. No progress score or weight-loss judgement. Data
+F12 uses a continuous white smoothed weight trend, a restrained area fill and
+muted actual-reading dots/deviation stems, following the owner's MASS reference.
+Interpolate missing days between observations; hold the latest estimate flat and
+dashed afterwards, with its last-observed date. Never store those display estimates
+as weigh-ins. Seed the calendar-aware seven-day half-life EMA from all available
+history before windowing. Direct chart inspection, keyboard arrows and previous/
+next day buttons expose the same dated trend and actual/missing reading. No progress
+score or weight-loss judgement. A separate Gemini insight card interprets calculated
+weight evidence after explicit scoped opt-in/generation. Data
 windows persist in the URL. Import review and backup preparation expose status;
 no process-memory token or silent cross-source merge is assumed. See F10.
 

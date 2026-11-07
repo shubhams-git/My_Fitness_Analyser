@@ -4,6 +4,7 @@ import { authorize,requireOrigin,signIn,signOut } from './auth.mjs';
 import { GarminSync } from '../prototypes/garmin.mjs';
 import { trainingDataset } from '../prototypes/training-data.mjs';
 import { CloudJournal } from './journal.mjs';
+import { WeightIntelligence } from './weight-intelligence.mjs';
 import { TrainingIntelligence,aiPreference,setAiPreference } from './intelligence.mjs';
 
 export async function readBody(request,limit=3.5*1024*1024){
@@ -21,6 +22,8 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     const api=await auth(request,response,config),library=libraryFactory(api);
     const garminConfigured=Boolean(env.GARMIN_PERSONAL_API_KEY&&config.owner===api.config.owner);
     if(request.method==='POST')requireOrigin(request,config);
+    if(route==='weight-ai'&&['GET','POST'].includes(request.method)){const engine=new WeightIntelligence(api,{env});send(200,request.method==='GET'?await engine.status():await engine.generate());return;}
+    if(route==='weight-ai-consent'&&request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await new WeightIntelligence(api,{env}).setPreference(body.enabled));return;}
     if(route==='ai-consent'){
       if(request.method==='GET'){send(200,await aiPreference(api));return;}
       if(request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await setAiPreference(api,body.enabled));return;}

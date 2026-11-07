@@ -13,9 +13,9 @@ test('journal curves preserve observations, extrema and missing-data boundaries'
  assert.equal(curvePath([],'kg',x,y),'');assert.match(curvePath([p[0]],'kg',x,y),/^M[^C]+$/);
 });
 
-test('journal inspection needs no range control and uses the recorded date extent',()=>{
+test('journal inspection needs no range control and labels an interpolated/held calendar extent',()=>{
  const data={anchor:'2026-11-08',points:[{date:'2026-10-01',kg:80,mean7:null,readings:1},{date:'2026-10-03',kg:81,mean7:null,readings:1}]};
  const {markup,geometry}=chartMarkup({data,selection:1,kg:String,day:String,width:500});
- assert.doesNotMatch(markup,/type="range"|reading-cursor|8 Nov/);assert.match(markup,/Previous reading/);assert.match(markup,/Next reading/);assert.match(markup,/tabindex="0"/);assert.match(markup,/3 Oct/);
- assert.equal(geometry.x(data.points[0]),60);assert.equal(geometry.x(data.points[1]),476);
+ assert.doesNotMatch(markup,/type="range"|reading-cursor/);assert.match(markup,/Previous day/);assert.match(markup,/Next day/);assert.match(markup,/tabindex="0"/);assert.match(markup,/8 Nov/);assert.match(markup,/jr-held-line/);
+ assert.equal(geometry.x(data.points[0]),58);assert.equal(geometry.x(data.points[1])<478,true);
 });
