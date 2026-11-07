@@ -1,9 +1,22 @@
 # Current state
 
 Updated: 8 November 2026 (Australia/Sydney)
-Completed increment: F10 cloud body journal and quick weigh-ins
+Active increment: F11 journal chart refinement and strength recording
 
 ## Implemented
+
+- F11: body chart uses bounded smooth joins through real readings, recorded date
+  extent and direct tap/hover/keyboard/button inspection; no range input. New
+  manual strength sheet records focus/date/optional duration and note, with an
+  optional explicit four-answer check-in and discomfort location. Edits/removal/
+  restore are immutable and retry/stale-save protected. Overlapping manual/MASS
+  sessions require separate-workout acknowledgement in either import order.
+  New strength_entries table has owner RLS, read-only grants and a restricted
+  membership-checked mutation function. Live catalog: RLS enabled, anonymous
+  execute denied, zero test sessions, existing 29 weights/four MASS sessions intact.
+  Synthetic phone/desktop save/reload/edit/remove/restore, validation, duplicate
+  warning and rotation tested; 71 automated tests pass. Final deployment pending.
+  See F11 and docs/REMAINING_ROADMAP.md (five major remaining workstreams).
 
 - F10: cloud body journal and explicit kg/date/note weigh-in capture, immutable
   edits, reversible removal, owner-scoped browser drafts, request receipts and
@@ -106,11 +119,11 @@ Work stays on master; no new branch for this increment.
   user/device observation; synthetic SQL/UI tests do not claim those checks.
 - NRC/Strava uploads are private intake, not automatic extraction or an operator
   review UI. Previously published NRC history is available to its owner.
-- No scheduled sync, manual strength log, training-plan editor or search grounding.
+- No scheduled sync, training-plan editor or search grounding.
   Opted-in members can explicitly request a run briefing; ordinary browsing and
   declined accounts never trigger personal Gemini calls. See F08 for exact tests.
 
 ## Next action
 
-Build manual strength-session recording and its distinct quick check-in, keeping
-Garmin runs and MASS imported sessions source-labelled and preventing double counts.
+Build member-reviewed NRC/Strava screenshot publication with evidence, field
+corrections and canonical duplicate resolution before adding entries to history.

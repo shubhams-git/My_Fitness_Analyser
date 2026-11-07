@@ -107,8 +107,10 @@ confirmed server write. Imported MASS records keep their source and are correcte
 by re-import; manual edits append revisions and removed entries remain recoverable.
 
 Daily chart values are labelled averages; original readings stay separate. Solid
-recorded/dashed mean lines, a keyboard slider and reading buttons provide multiple
-ways to inspect. Use actual dates on the time axis, break gaps and label the
+recorded/dashed mean lines, direct chart inspection, keyboard arrows and labelled
+previous/next buttons provide multiple ways to inspect. Shape-preserving curves
+pass through the recorded points without false extrema. Use actual dates on the
+time axis, fit the extent to recorded dates, break gaps and label the
 historical mean's anchor date. No progress score or weight-loss judgement. Data
 windows persist in the URL. Import review and backup preparation expose status;
 no process-memory token or silent cross-source merge is assumed. See F10.

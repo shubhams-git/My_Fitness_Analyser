@@ -10,10 +10,11 @@ const root=fileURLToPath(new URL('../prototypes/',import.meta.url)),port=4176,ow
 const db=new PGlite(),storage=new Map();
 await db.exec(`create role authenticated;create role anon;create schema auth;create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;create table fitness_owners(owner_id uuid primary key);create table fitness_profiles(owner_id uuid primary key,timezone text);insert into fitness_owners values('${owner}');insert into fitness_profiles values('${owner}','Australia/Sydney');grant select on fitness_profiles to authenticated;`);
 await db.exec(await readFile(new URL('../supabase/migrations/20261107_body_journal.sql',import.meta.url),'utf8'));
+await db.exec(await readFile(new URL('../supabase/migrations/20261108_strength_journal.sql',import.meta.url),'utf8'));
 await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${owner}',false);`);
 const api={config:{owner},async request(path,options={}){
  if(path.includes('/storage/')){if(options.method==='POST'){if(storage.has(path))return new Response('{}',{status:409});storage.set(path,Buffer.from(options.body));return Response.json({});}return storage.has(path)?new Response(storage.get(path)):new Response('{}',{status:404});}
- const functions={journal_snapshot:[],save_body_measurement:['target_id','expected_revision','expected_head','operation_id','new_value'],commit_mass_journal:['expected_head','source_hash','object_key','byte_length','exported_at','incoming','confirm_same_day']},name=path.split('/').at(-1),args=functions[name];
+ const functions={journal_snapshot:[],save_strength_entry:['target_id','expected_revision','expected_head','operation_id','new_value'],save_body_measurement:['target_id','expected_revision','expected_head','operation_id','new_value'],commit_mass_journal:['expected_head','source_hash','object_key','byte_length','exported_at','incoming','confirm_same_day']},name=path.split('/').at(-1),args=functions[name];
  if(!args)return new Response('{}',{status:404});
  try{const value=(await db.query(`select public.${name}(${args.map((_,i)=>'$'+(i+1)).join(',')}) as value`,args.map(k=>options.body[k]))).rows[0].value;return Response.json(value);}
  catch(e){return Response.json({message:e.message},{status:e.code==='PT409'?409:400});}
@@ -29,6 +30,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.method==='POST'){
    if(req.headers.origin!=='http://127.0.0.1:'+port){json(403,{error:'Fixture origin mismatch'});return;}
    let body='';for await(const c of req)body+=c;
+   if(url.searchParams.get('route')==='strength-entry'){json(200,await journal.saveStrength(JSON.parse(body)));return;}
    if(url.searchParams.get('route')==='weigh-in'){json(200,await journal.save(JSON.parse(body)));return;}
    if(url.pathname==='/api/mass/preview'){json(200,await journal.preview(Buffer.from(body)));return;}
    if(url.pathname==='/api/mass/commit'){json(200,await journal.commit(Buffer.from(body),{head:Number(req.headers['x-journal-revision']),hash:req.headers['x-import-hash'],confirmSameDay:req.headers['x-confirm-same-day']==='1'}));return;}

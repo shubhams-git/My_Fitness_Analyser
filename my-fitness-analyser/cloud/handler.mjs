@@ -55,6 +55,7 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     }
     if(route==='journal'&&request.method==='GET'){send(200,{...await new CloudJournal(api).dataset({window:new URL(request.url,'http://localhost').searchParams.get('window')||'90'}),local:false,cloud:true,viewer:api.user});return;}
     if(route==='weigh-in'&&request.method==='POST'){send(200,await new CloudJournal(api).save(JSON.parse((await readBody(request,8192)).toString())));return;}
+    if(route==='strength-entry'&&request.method==='POST'){send(200,await new CloudJournal(api).saveStrength(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='mass-preview'&&request.method==='POST'){send(200,await new CloudJournal(api).preview(await readBody(request)));return;}
     if(route==='mass-commit'&&request.method==='POST'){send(200,await new CloudJournal(api).commit(await readBody(request),{head:Number(request.headers['x-journal-revision']),hash:request.headers['x-import-hash'],confirmSameDay:request.headers['x-confirm-same-day']==='1'}));return;}
     if(route==='training'&&request.method==='GET'){const data=await library.read();send(200,{...trainingDataset(Object.values(data.activities),data.feedback,{window:new URL(request.url,'http://localhost').searchParams.get('window')==='all'?'all':'90'}),lastSync:data.garminSync?.lastSuccessAt||null,local:false,cloud:true,viewer:api.user,garminConfigured});return;}

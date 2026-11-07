@@ -1,5 +1,15 @@
 # Decision register
 
+D33 — Journal refinement and strength entry, 8 November 2026. Owner rejects the
+abrupt chart and range control and requests continued development. Replace the
+range with direct/keyboard/button inspection and bounded smooth joins, retaining
+actual values, missing-data gaps and the existing daily/7-day calculations. Fit
+time extent to actual records. Add narrow, immutable per-member strength sessions
+with optional explicit four-answer check-ins and separate-workout acknowledgement
+for overlapping source dates. Keep manual sessions separate from MASS evidence,
+source-labelled in one journal, and included in complete exports. No new model
+data, dependency or paid service. See F11 and docs/REMAINING_ROADMAP.md.
+
 D32 — Cloud body journal, November 2026. Continue the agreed recording roadmap
 after geographic maps. Keep MASS imports and add explicit manual weigh-ins with
 append-only source revisions, idempotent operation receipts, member-scoped RLS
