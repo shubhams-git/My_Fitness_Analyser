@@ -1,17 +1,25 @@
 # Current state
 
 Updated: 8 November 2026 (Australia/Sydney)
-Active increment: F12 continuous weight trend and scoped Gemini insight
+Completed increment: F12 continuous weight trend and scoped Gemini insight
 
 ## Implemented
 
-- F12 candidate: continuous calendar-aware smoothed weight trend with quiet actual
+- F12: continuous calendar-aware smoothed weight trend with quiet actual
   dots/deviation stems, interpolated missing days and a labelled flat dashed held
   tail. Original readings remain intact. Weight-specific Gemini consent, audit and
   private reports; explicit generation from deterministic trend/rate/coverage facts,
   bounded schema and quantities resolved from evidence. No new body-composition
-  claims or paid fallback. New SQL migration applied; production verification and
-  deployment are in progress. Tests/UI evidence are recorded in F12.
+  claims or paid fallback. Three-table scoped migration applied with owner RLS and
+  anonymous generation denied. Real Gemini 3.6/high-thinking weight report generated,
+  validated, persisted, restored after reload and exported with canonical evidence.
+  First request returned 503; a valid reading-count citation exposed an overly
+  narrow validation rule, now corrected and regression checked. Prompt v2 leads
+  with the numeric pattern. All 29 weight rows and original bytes remain intact.
+  Phone/landscape and 200% Chrome zoom checked; physical Safari remains unverified.
+  76 tests pass. App code 4b0ce8f is pushed and Vercel reports success. Final page
+  has no captured console errors and no range sliders; source/insight backup and
+  screenshot evidence are recorded in F12. Original zoom/viewport restored.
 
 - F11: body chart uses bounded smooth joins through real readings, recorded date
   extent and direct tap/hover/keyboard/button inspection; no range input. New
@@ -88,7 +96,7 @@ Active increment: F12 continuous weight trend and scoped Gemini insight
 
 ## Verification and deployment
 
-71 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
+76 automated tests pass. PostgreSQL tests execute owner/storage isolation, source
 publication, stale-save rejection and cross-owner foreign keys using synthetic
 schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and
@@ -133,6 +141,8 @@ Work stays on master; no new branch for this increment.
 - No scheduled sync, training-plan editor or search grounding.
   Opted-in members can explicitly request a run briefing; ordinary browsing and
   declined accounts never trigger personal Gemini calls. See F08 for exact tests.
+- Standalone weight insight has its own sharing choice and explicit Generate/Update
+  action. Cross-domain running/strength/body coaching remains a later workstream.
 
 ## Next action
 

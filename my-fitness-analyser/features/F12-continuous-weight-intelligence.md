@@ -58,6 +58,51 @@ including thinking. The flag records operator confirmation, not a universal cost
 cap if their project tier changes. Free-service terms and human-review/data-use
 disclosure remain linked in the member sharing choice.
 
-Verification in progress: 75 automated tests pass. Synthetic PostgreSQL UI tests
+Verification completed: 76 automated tests pass. Synthetic PostgreSQL UI tests
 exercise opt-out/generation/reload and responsive chart inspection. Production
 migration/deployment/model output and final evidence are recorded below when done.
+
+Production: bc37543 and citation refinement ef10668 deployed successfully; d474716
+keeps generation feedback consistent across journal reflows. The three new tables
+have RLS enabled and anonymous generation denied. Owner's explicit request was
+used to enable his separate weight sharing choice; no other member was opted in.
+
+The first real request returned 503. A second returned an insight rejected by an
+overly narrow focus-citation rule. A bounded manual diagnostic request against the
+same configured free model preserved its response privately and showed a valid
+reading-count citation, where the validator had demanded recorded-day count.
+Equivalent relevant count/magnitude facts are now accepted; all cited quantities,
+length, identity/schema, unsupported-claim and freshness gates remain. A regression
+case covers that exact citation distinction. Prompt v2 prioritizes a numerical
+pattern over a historical-review title. Rejection categories are logged without
+provider content, health values or secrets. No model or paid fallback was used.
+
+Synthetic preview: phone 375/390px and landscape show no horizontal overflow;
+Home/End/day inspection, actual vs held labels, consent decline/re-enable,
+generation, cached reload and opt-out hiding were exercised. IAB override reset
+and preview tab closed after checks. Physical iPhone Safari remains unverified.
+
+Expanded production backup downloaded successfully. All three weight-AI tables
+are included; original MASS bytes and every source hash verify, all 29 body rows
+match the preceding release, and no test session was added. Evidence is ignored
+under private-data/journal-qa/f12-backup-check.json and f12-backup.json. The supplied
+MASS screenshot's displayed current weight/goal were not imported as new records.
+
+Final live verification: the corrected production request generated one validated
+Gemini 3.6 Flash/high-thinking insight, persisted with prompt weight-coach-v2. It
+survives reload without a new model call. Headline quantities match calculated
+trend change and span; the explanation cites the last-reading age. Rendering
+polishes unit phrasing without changing numerical content. The final expanded
+backup includes that complete report, validates its schema and canonical evidence
+after a JSONB round-trip, verifies every original hash, and retains unchanged body
+rows. Private evidence: f12-final-backup.json. No credential or private data in Git.
+
+At 200% native Chrome zoom, document width equals scroll width (419 CSS pixels);
+the actual insight remains readable. Restored the original 75% zoom. The chart
+uses clean half/whole/two-kilogram axis steps rather than arbitrary fractions.
+76 full-suite tests, targeted chart/contract regression checks and foundation checks
+pass. Final app release 4b0ce8f is pushed to master and Vercel reports success.
+Screenshot: private-data/journal-qa/f12-trend-and-insight.png. Final page has zero
+range sliders and no captured console errors. Temporary preview/SQL tabs are
+closed, viewport override reset, Chrome zoom restored to 75%, and the verified
+production journal tab is retained. The loopback fixture is stopped at handover.
