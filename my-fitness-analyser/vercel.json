@@ -1,6 +1,11 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/journal-entry.js", "destination": "/prototypes/journal-entry.js" },
+    { "source": "/journal-view.js", "destination": "/prototypes/journal-view.js" },
+    { "source": "/journal-capture.css", "destination": "/prototypes/journal-capture.css" },
+    { "source": "/api/mass/preview", "destination": "/api/private?route=mass-preview" },
+    { "source": "/api/mass/commit", "destination": "/api/private?route=mass-commit" },
     { "source": "/route-maps.js", "destination": "/prototypes/route-maps.js" },
     { "source": "/route-geometry.js", "destination": "/prototypes/route-geometry.js" },
     { "source": "/map-style.js", "destination": "/prototypes/map-style.js" },

@@ -88,6 +88,8 @@ test('local preview serves its UI while denying credential/source paths and fore
     assert.ok(!JSON.stringify(payload).includes('API_KEY'));
     assert.equal((await fetch(base+'/training')).status,200);
     assert.equal((await fetch(base+'/training.js')).status,200);
+    assert.match(await fetch(base+'/journal').then(r=>r.text()),/href="\/journal-capture.css"/);
+    for(const path of ['/journal-entry.js','/journal-view.js','/journal-capture.css'])assert.equal((await fetch(base+path)).status,200);
     const training=await fetch(base+'/api/training?window=all').then(r=>r.json());assert.equal(training.dataset,'personal');assert.equal(training.window,'all');assert.ok(training.sessions.every(s=>!s.synthetic));
     const analysis=await fetch(base+'/api/analysis/status').then(r=>r.json());assert.equal(analysis.dataMode,'synthetic-only');assert.equal(analysis.evidence.dataset,'synthetic');assert.ok(!JSON.stringify(analysis).includes('GEMINI_API_KEY'));
     assert.equal((await fetch(base+'/api/analysis/demo',{method:'POST',headers:{Origin:'https://foreign.invalid','Content-Type':'application/json'},body:JSON.stringify({dataset:'synthetic'})})).status,403);

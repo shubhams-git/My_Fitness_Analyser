@@ -1,9 +1,15 @@
 # Current state
 
 Updated: 7 November 2026 (Australia/Sydney)
-Active increment: F09 real geographic route exploration
+Active increment: F10 cloud body journal and quick weigh-ins
 
 ## Implemented
+
+- F10 is being verified for release: private relational body journal, explicit
+  manual weigh-ins, source-preserving MASS imports, edit/remove/restore, request
+  receipts and stale-save guards. The additive live migration is installed;
+  all five tables have row security and anonymous function execution is denied.
+  Real MASS cloud population and final deployment verification are pending.
 
 - F09: real MapLibre/OpenFreeMap street maps replace optical route illustrations.
   Streets and Night cartography retain street/place labels, parks, buildings and

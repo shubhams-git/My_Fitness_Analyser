@@ -1,5 +1,19 @@
 # Decision register
 
+D32 — Cloud body journal, November 2026. Continue the agreed recording roadmap
+after geographic maps. Keep MASS imports and add explicit manual weigh-ins with
+append-only source revisions, idempotent operation receipts, member-scoped RLS
+and stale-preview/save checks. Narrow SQL mutation functions derive auth.uid();
+new tables do not expand access to another member. Archive and verify original
+bytes before transactional import; resubmit the file/hash/revision rather than
+use process-memory preview tokens on Vercel. Confirm overlapping MASS/manual days
+without merging their identities. A daily-average chart is an explicit display
+calculation, not a canonical-source merge. Preserve tombstones, dateKey and source
+timestamps, cutoff corrections, all edit revisions and removed-entry recovery.
+No body data is newly sent to Gemini. Retain Barlow/Manrope and Field Notes tokens;
+prioritise numeric entry and source-backed trends over an introductory hero.
+See F10. Detailed strength logging and body-context AI remain separate increments.
+
 D31 — Real geographic maps, 7 November 2026. The owner rejects the optical GPS
 illustration and requests real streets and places with geographic zoom/pan.
 Use MapLibre GL JS 6.16.0 and free OpenFreeMap/OpenStreetMap vector cartography,
