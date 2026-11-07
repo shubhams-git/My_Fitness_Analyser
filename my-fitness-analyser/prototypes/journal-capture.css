@@ -12,8 +12,7 @@
 .jr-chart-heading .tr-window button{font-size:12px;min-height:40px;padding:8px 14px}
 .jr-v2 .jr-selected-value strong{font:750 72px/1 var(--font-editorial);letter-spacing:-.02em}
 .jr-v2 .jr-chart-top p{font-size:12px;line-height:1.7}.jr-v2 .jr-chart-frame{margin:14px -4px 0;cursor:crosshair}
-.jr-v2 .jr-chart-frame{height:auto;min-height:0}.jr-v2 .jr-chart-frame svg{width:100%;height:auto}.jr-v2 
-.jr-v2 .jr-chart-frame text{font-size:var(--jr-axis,20px)}
+.jr-v2 .jr-chart-frame{height:auto;min-height:0}.jr-v2 .jr-chart-frame svg{width:100%;height:auto}.jr-v2 .jr-chart-frame text{font-size:var(--jr-axis,20px)}
 
 .jr-v2 .jr-chart-note{font-size:12px;line-height:1.7;color:var(--color-muted)}
 .jr-v2 .jr-facts{margin:0;gap:24px;padding:28px 4px 0;border:0}.jr-v2 .jr-facts>div{min-width:0}
