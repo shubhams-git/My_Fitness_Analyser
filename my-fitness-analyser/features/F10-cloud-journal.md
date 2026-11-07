@@ -1,6 +1,6 @@
 # F10 — private body journal and quick weigh-ins
 
-Active, 7 November 2026. Continue the agreed daily-recording roadmap after maps.
+Completed, 8 November 2026. Continue the agreed daily-recording roadmap after maps.
 Preserve MASS as a supported source; add deliberate manual entry alongside it.
 
 Acceptance: authenticated per-member cloud history; preview/repeat-safe MASS
@@ -60,5 +60,18 @@ reads to four, verifies the journal head before/after, and exposes preparation
 feedback through a short-lived download link. A concurrent journal mutation now
 rejects the archive rather than silently mixing revisions. Selected history
 windows persist in the URL; historical mean/last-reading dates remain explicit.
-Final polish deployment/re-import checks are pending. Actual owner manual entry
-and physical iPhone Safari are still separate from synthetic SQL/UI verification.
+Final polish release b98e002 is pushed and its Vercel production deployment is
+Ready. Repeating the real MASS import reports already up to date: 29 unchanged
+weights and five unchanged source session rows, still one import and journal head
+revision 1. The final 4,696,178-byte backup completed in 17 seconds in this observed
+run; every source field and the exact original reconcile again. This is an observed
+export duration, not a general performance guarantee. Private final evidence is
+private-data/journal-qa/live-reconciliation.json and real-library-export-final.json.
+
+Production journal was visually checked at 200% Chrome zoom with a 419px CSS
+viewport and equal document/viewport widths; content reflows and controls remain
+readable. No console errors were captured on the final page. Restored the original
+75% browser zoom, reset the temporary IAB viewport and closed agent-created QA/SQL
+tabs. The retained production journal tab shows all-history real data. Screenshot:
+private-data/journal-qa/production-journal.png. Actual owner manual entry and
+physical iPhone Safari remain separate from synthetic SQL/UI verification.

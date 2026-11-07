@@ -1,7 +1,7 @@
 # Current state
 
-Updated: 7 November 2026 (Australia/Sydney)
-Active increment: F10 cloud body journal and quick weigh-ins
+Updated: 8 November 2026 (Australia/Sydney)
+Completed increment: F10 cloud body journal and quick weigh-ins
 
 ## Implemented
 
@@ -70,6 +70,12 @@ schemas. HTTP tests cover fail-closed hosting, refresh, wrong-owner Garmin,
 idempotent screenshot intake and corrupt exports. Foundation/config-format and
 diff whitespace checks pass. Production deployment results are recorded in F07.
 Map code release 481ce29 is pushed and its Vercel production build is Ready.
+Journal code release b98e002 is pushed and its Vercel production build is Ready.
+Repeat live MASS import leaves one import and journal revision 1, with no duplicate
+rows. The final 4.7 MB backup completed in 17 seconds in this observed run; all
+source fields and original bytes reconcile. Production journal shows 29 readings,
+no captured console errors and no horizontal overflow at 200% Chrome zoom. Browser
+zoom was restored to 75% and temporary viewport overrides were reset. See F10.
 Live geographic route/inspection evidence is recorded in F09. Production
 root redirects to sign-in; anonymous data/training/journal/profile return 401
 without records; invalid credentials return 401 and logout clears cookies.
