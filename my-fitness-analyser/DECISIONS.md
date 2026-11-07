@@ -1,5 +1,16 @@
 # Decision register
 
+D35 — Interface and free training instruments, 8 November 2026. Owner requests
+Impeccable and premium active-app refinement, plus subscription-style analytics.
+Install the official standalone Codex skill; preserve Field Notes rather than
+replace the design system. Add original, versioned cumulative/calendar/GPS-effort
+and recorded-distribution instruments using existing owner-scoped APIs. Reject
+fake proprietary scores, screenshot-derived streams and simulated community
+features. Defer zones/load/terrain models until settings and coverage justify
+them. No new runtime dependency, paid provider, branch or database migration.
+Verification: F13, UI_AUDIT_2026-11-08.md and STRAVA_CAPABILITY_RESEARCH.md. This
+records implementation direction; the owner still reviews the visual finish.
+
 D34 — Continuous weight trend and scoped intelligence, 8 November 2026. Owner
 supplies MASS reference and rejects remaining abrupt curves. Make a smoothed
 calendar EMA the primary line, connect interpolated missing days and hold the

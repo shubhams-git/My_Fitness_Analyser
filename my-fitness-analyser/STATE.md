@@ -1,9 +1,18 @@
 # Current state
 
 Updated: 8 November 2026 (Australia/Sydney)
-Completed increment: F12 continuous weight trend and scoped Gemini insight
+Completed increment: F13 interface refinement and recorded training progress
 
 ## Implemented
+
+- F13: Impeccable 4.8.0 installed and applied to a rendered/source interface pass.
+  Common mobile/desktop navigation, compact athletic hierarchy, readable account
+  text, correct saved-check-in copy and visible HR scale. New Progress calendar,
+  monthly distance/time comparisons and GPS-derived best-effort curve/rankings.
+  Activity pace/HR distributions and disclosed focused/full pace scaling.
+  Six new analytical regressions; 82 tests pass. No SQL or account data changes.
+  Official Strava capability inventory and remaining boundaries are recorded in
+  docs/STRAVA_CAPABILITY_RESEARCH.md; audit evidence in features/F13_INTERFACE_AND_PROGRESS.md.
 
 - F12: continuous calendar-aware smoothed weight trend with quiet actual
   dots/deviation stems, interpolated missing days and a labelled flat dashed held
@@ -146,5 +155,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Build member-reviewed NRC/Strava screenshot publication with evidence, field
-corrections and canonical duplicate resolution before adding entries to history.
+Add member-reviewed training-zone settings with effective dates and source-aware
+zone distributions before introducing personalised training-load curves.

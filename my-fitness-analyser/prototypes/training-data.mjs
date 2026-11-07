@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { demonstration,timeBlocks,observation,ANALYSIS_VERSION } from './data.mjs';
+import { bestEfforts, PROGRESS_VERSION } from './progress-model.js';
 
 export const TRAINING_VERSION='training-evidence-v1';
 const number=x=>Number.isFinite(x)?x:null;
@@ -26,7 +27,7 @@ export function trainingDataset(activities,feedback={}, {window='90',anchor=new 
     if(a.sourceFile==='Owner-supplied screenshots')flags.push('screenshot_summary');
     const comparable=run&&environment==='outdoor'&&a.sport==='Run'&&!/track/.test(kind)&&pace!==null&&a.distance>=1000&&duration>=600&&basis==='timer'&&(movingFraction===null||movingFraction>=.8);
     const spark=a.records.filter(r=>Number.isFinite(r.hr));const stride=Math.max(1,Math.ceil(spark.length/48));
-    sessions.push({id:a.id,title:a.title,date:a.date,sport:a.sport,source:a.source,sourceKind:a.provider?'garmin':a.sourceFile==='Owner-supplied screenshots'?'screenshot':'fit',environment,run,distanceM:number(a.distance),durationS:duration,durationBasis:basis,paceSPerKm:pace,paceBasis:a.displayedPace!=null?'displayed':basis,hrBpm:number(a.hr),gpsSamples:gps,recordCount:a.records.length,movingFraction,comparable,flags,checkinComplete:feedback[a.id]?.complete===true,sparkline:spark.filter((_,i)=>i%stride===0).map(r=>({t:r.t,value:r.hr}))});
+    sessions.push({id:a.id,title:a.title,date:a.date,sport:a.sport,source:a.source,sourceKind:a.provider?'garmin':a.sourceFile==='Owner-supplied screenshots'?'screenshot':'fit',environment,run,distanceM:number(a.distance),durationS:duration,durationBasis:basis,paceSPerKm:pace,paceBasis:a.displayedPace!=null?'displayed':basis,hrBpm:number(a.hr),gpsSamples:gps,recordCount:a.records.length,movingFraction,comparable,flags,bestEfforts:bestEfforts(a),checkinComplete:feedback[a.id]?.complete===true,sparkline:spark.filter((_,i)=>i%stride===0).map(r=>({t:r.t,value:r.hr}))});
   }
   const weeks=Array.from({length:8},(_,i)=>{const start=monday(dateMs(anchor)-(7-i)*7*day);return {start,distanceM:0,sessions:0,garminM:0,historicalM:0};});
   for(const s of sessions){const week=weeks.find(w=>w.start===monday(dateMs(s.date)));if(week){week.distanceM+=s.distanceM??0;week.sessions++;week[s.sourceKind==='screenshot'?'historicalM':'garminM']+=s.distanceM??0;}}
@@ -35,7 +36,7 @@ export function trainingDataset(activities,feedback={}, {window='90',anchor=new 
   if(sessions.some(s=>s.flags.includes('insufficient_distance')))measured.push({kind:'quality',title:'Some distance recordings cannot support pace.',body:'Heart rate and recorded time remain available. Distance-based conclusions are withheld for these sessions.',sessionIds:sessions.filter(s=>s.flags.includes('insufficient_distance')).map(s=>s.id)});
   if(metrics.comparableSessions<3)measured.push({kind:'coverage',title:'A fitness trend would be premature.',body:'The imported history does not yet contain enough comparable outdoor runs. Indoor sessions, short recordings and differing time bases stay separate.',sessionIds:sessions.filter(s=>s.run).map(s=>s.id)});
   if(sessions.some(s=>s.flags.includes('screenshot_summary')))measured.push({kind:'source',title:'Historical summaries are part of your record.',body:'Their displayed distance and pace are preserved. GPS and heart-rate streams are not reconstructed from screenshots.',sessionIds:sessions.filter(s=>s.sourceKind==='screenshot').map(s=>s.id)});
-  return {version:TRAINING_VERSION,dataset:synthetic?'synthetic':'personal',window,anchor,metrics,weeks,sessions,measured,scope:'Imported activities only; missing weeks are not proof of no training.'};
+  return {version:TRAINING_VERSION,progressVersion:PROGRESS_VERSION,dataset:synthetic?'synthetic':'personal',window,anchor,metrics,weeks,sessions,measured,scope:'Imported activities only; missing weeks are not proof of no training.'};
 }
 
 export function syntheticHistory(){return Array.from({length:10},(_,i)=>{

@@ -1,6 +1,11 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/effort-distribution.js", "destination": "/prototypes/effort-distribution.js" },
+    { "source": "/progress.js", "destination": "/prototypes/progress.js" },
+    { "source": "/progress-model.js", "destination": "/prototypes/progress-model.js" },
+    { "source": "/progress.css", "destination": "/prototypes/progress.css" },
+    { "source": "/interface.css", "destination": "/prototypes/interface.css" },
     { "source": "/weight-insight.js", "destination": "/prototypes/weight-insight.js" },
     { "source": "/weight-trend.js", "destination": "/prototypes/weight-trend.js" },
     { "source": "/strength-entry.js", "destination": "/prototypes/strength-entry.js" },
