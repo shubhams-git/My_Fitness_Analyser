@@ -83,3 +83,17 @@ no literal template output. Native Chrome arrow-left moved calendar selection
 and focus from day 8 to day 7. At 200% zoom the progress view reflowed without
 horizontal overflow; the original 75% zoom was restored. Temporary viewport
 settings were reset and local audit tabs closed before production verification.
+
+## Production verification
+
+Application release 89cf59a is pushed to origin/master; Vercel reports success.
+Signed-in production renders 19 real activities and one eligible GPS running
+recording. Selecting 20 October opens the NRC entry with its original figures.
+The 2 km best-effort selector returns the actual run, with elapsed timing and
+source link. Coaching remains the existing saved report, explicitly marked stale;
+this verification made no new Gemini generation or account-data writes.
+All four new static instruments/styles return 200 with expected content types;
+anonymous /api/training still returns 401. No captured browser errors or horizontal
+overflow. Live screenshots are private-data/interface-qa/f13-live-progress.png
+and f13-live-best-efforts.png. Agent-created local tabs are closed; audit servers
+on 4189 and 4194 are stopped. Production tab is retained as the deliverable.

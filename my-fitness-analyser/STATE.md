@@ -11,6 +11,9 @@ Completed increment: F13 interface refinement and recorded training progress
   monthly distance/time comparisons and GPS-derived best-effort curve/rankings.
   Activity pace/HR distributions and disclosed focused/full pace scaling.
   Six new analytical regressions; 82 tests pass. No SQL or account data changes.
+  App release 89cf59a is on master and Vercel reports success. Production real
+  history, month/calendar selection and GPS effort ranking are verified; no
+  captured console errors or horizontal overflow. Local audit servers stopped.
   Official Strava capability inventory and remaining boundaries are recorded in
   docs/STRAVA_CAPABILITY_RESEARCH.md; audit evidence in features/F13_INTERFACE_AND_PROGRESS.md.
 
