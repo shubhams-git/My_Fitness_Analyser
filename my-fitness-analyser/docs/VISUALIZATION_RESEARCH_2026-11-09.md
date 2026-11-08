@@ -45,3 +45,14 @@ NRC screenshot-only activities retain their summaries and split bars. HR, cadenc
 power and continuous stream plots appear only with the underlying recordings.
 Full-period comparisons, shared member settings and fictional trophies are not
 manufactured to fill an attractive layout.
+
+## Real-record acquisition edge case
+
+The live 5 km run exposed a useful distinction: GPS coordinates start after the
+watch has already recorded a short distance/time prefix. The GPS-only span is
+34 cm under 5 km, despite a full continuous recorded-distance series covering the
+benchmark. V4 retains a measured initial prefix of at most fifteen seconds and
+fifty metres. This recovers the 32:43 benchmark without rounding distance upward,
+inventing positions or relaxing later missing-GPS/gap rules. Delayed fixes and
+mid-run losses have separate regression cases. Route rendering still leaves
+missing positions missing.

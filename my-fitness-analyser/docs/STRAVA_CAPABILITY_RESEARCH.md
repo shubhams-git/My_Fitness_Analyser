@@ -126,7 +126,7 @@ running power with terrain context and exact distance/time inspection. Pace/HR
 bands are visible for the selected metric; personal zones remain next. True
 kilometre split bars, per-run best-effort results and distance-specific historical
 Analysis/Top 10 extend the original instruments. Ten benchmark distances now
-include half a mile. Methods are versioned recorded-progress-v3 and
+include half a mile. Methods are versioned recorded-progress-v4 and
 activity-instruments-v1. The six remaining workstreams, including intelligence,
 personal settings and advanced terrain/load analytics, are reviewed in
 REMAINING_WORK_2026-11-09.md. No Strava API or paid subscription service is added.

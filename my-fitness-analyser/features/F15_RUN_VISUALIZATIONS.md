@@ -23,7 +23,7 @@ migration, paid service or model request. Work directly on master.
 - Best-effort Analysis and Top 10 views. Exact result selector, previous/next,
   elapsed-time history, daily-best guide line, actual improvements over earlier
   dates and source run links. Same-day order is not inferred. Ten benchmarks
-  include the newly supported half mile. Calculation version recorded-progress-v3;
+  include the newly supported half mile. Calculation version recorded-progress-v4;
   visualization/split version activity-instruments-v1.
 - Phone metric navigation stays in one scrollable row. The check-in dock steps
   aside while session details are being inspected, preserving chart visibility.
@@ -40,7 +40,7 @@ were silently adopted as this member's settings or inserted as duplicate runs.
 
 ## Verification
 
-98 tests pass, including six new cases covering split interpolation/partial
+99 tests pass, including seven new cases covering split interpolation/partial
 distance, paused timing, gaps/resets, metric and distance selection, focused/full
 range, zero power, device summaries and same-day comparison ordering. Foundation
 checks and whitespace checks pass. Read-only owned-data loopback view and labelled
@@ -55,7 +55,20 @@ repeating-stripes. No new detector rule was introduced by the instrument modules
 The scan follows existing shared styles; it is not reported as a clean run.
 No new heuristic score or injected overlay is claimed.
 
-Production deployment and live data verification: pending release.
+Initial release de14224 was deployed successfully. New assets return 200;
+anonymous training stays 401. Live owner 5 km data supplies all five charts,
+HR distribution and kilometre splits, with no captured console errors.
+
+Live verification identified a real edge case: the watch recorded distance/time
+before the first GPS fix; the remaining GPS-only distance was 4999.66 m. Retain
+only a brief measured initial prefix (at most 15 s / 50 m), leaving subsequent
+missing positions/gaps ineligible. This recovers the observed 5 km window at
+1962.811 s (32:43), matching the supplied reference, without adding coordinates
+or rounding 4999.66 up to 5000. Regression checks cover delayed initial fixes and
+mid-run losses. A fresh private export was read solely for this check; no account
+row or activity was changed. Final v4 deployment verification pending.
+
+Local servers stopped and temporary viewport overrides reset.
 
 ## Next
 

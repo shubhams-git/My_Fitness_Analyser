@@ -1,5 +1,5 @@
 // Original, deterministic analytics. No Strava scores or inferred sensor samples.
-export const PROGRESS_VERSION = 'recorded-progress-v3';
+export const PROGRESS_VERSION = 'recorded-progress-v4';
 export const BENCHMARKS = [400, 804.672, 1000, 1609.344, 2000, 3218.688, 5000, 10000, 21097.5, 42195];
 const finite = Number.isFinite;
 const dayMs = 86400000;
@@ -11,9 +11,14 @@ export function niceAxis(value){const target=Math.max(1,value)/3,power=10**Math.
 // A reset, missing distance or >15 s recording gap splits the usable stream.
 export function bestEfforts(activity) {
   if (!['Run', 'Track run', 'Track Run'].includes(activity.sport) || activity.distance < 400) return [];
+  const source=activity.records||[],firstFix=source.findIndex(r=>finite(r.lat)&&finite(r.lon));
+  // A watch can record distance/time just before its first GPS fix. Keep that
+  // brief measured prefix (<=15 s and <=50 m), without inventing a location.
+  // Missing positions later in the run still split eligible windows.
+  const initialFix=firstFix>0&&finite(source[0].t)&&finite(source[0].distance)&&finite(source[firstFix].distance)&&source[firstFix].t-source[0].t<=15&&source[firstFix].distance-source[0].distance<=50;
   const chunks = []; let chunk = [];
-  for (const r of activity.records || []) {
-    if (!finite(r.t) || !finite(r.distance) || !finite(r.lat) || !finite(r.lon)) { if (chunk.length > 1) chunks.push(chunk); chunk = []; continue; }
+  for (let index=0;index<source.length;index++) {const r=source[index];
+    if (!finite(r.t) || !finite(r.distance) || (!(finite(r.lat)&&finite(r.lon))&&!(initialFix&&index<firstFix))) { if (chunk.length > 1) chunks.push(chunk); chunk = []; continue; }
     const last = chunk.at(-1);
     if (last && (r.t <= last.t || r.t - last.t > 15 || r.distance < last.distance || (r.distance-last.distance)/(r.t-last.t) > 12)) {
       if (chunk.length > 1) chunks.push(chunk); chunk = [];

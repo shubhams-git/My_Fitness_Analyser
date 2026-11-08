@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { kilometreSplits,seriesChart,metricValue,metricHeadline,benchmarkHistory } from '../prototypes/activity-analysis.js';
+import { bestEfforts } from '../prototypes/progress-model.js';
 const recording=()=>({distance:2200,records:Array.from({length:56},(_,i)=>({t:i*10,distance:i*40,speed:4,hr:140+i,elevation:60+i*.2,cadence:160,lat:-37.9,lon:145.1}))});
 test('kilometre splits interpolate boundaries and distinguish the final partial split',()=>{
  const a=recording(),before=JSON.stringify(a),rows=kilometreSplits(a);assert.equal(rows.length,3);assert.deepEqual(rows.map(r=>r.distanceM),[1000,1000,200]);assert.deepEqual(rows.map(r=>r.elapsedS),[250,250,50]);assert.deepEqual(rows.map(r=>r.paceSPerKm),[250,250,250]);assert.ok(Math.abs(rows[0].elevationChangeM-5)<1e-9);assert.equal(JSON.stringify(a),before);
@@ -27,4 +28,10 @@ test('best-effort improvements compare earlier dates without guessing same-day o
 test('headline values retain device summaries and time-weight real zero power without bridging gaps',()=>{
  const activity={distance:5000,timer:1800,hr:171,records:[{t:0,power:0,hr:140},{t:5,power:100,hr:150},{t:10,power:200,hr:160},{t:50,power:100,hr:170}]};
  assert.equal(metricHeadline(activity,'pace').value,360);assert.equal(metricHeadline(activity,'heart').value,171);assert.equal(metricHeadline(activity,'power').value,50);assert.equal(metricHeadline({...activity,records:[]},'power').value,null);
+});
+test('brief initial GPS acquisition retains recorded distance but delayed fixes and mid-run losses remain excluded',()=>{
+ const activity={sport:'Run',distance:5000,records:Array.from({length:2001},(_,i)=>({t:i,distance:i*2.5,lat:i<13?null:-37.9,lon:i<13?null:145.1}))};
+ const result=bestEfforts(activity).find(e=>e.distanceM===5000);assert.equal(result.elapsedS,2000);assert.equal(activity.records[0].lat,null);
+ const delayed=structuredClone(activity);for(let i=0;i<30;i++)delayed.records[i].lat=null;assert.equal(bestEfforts(delayed).some(e=>e.distanceM===5000),false);
+ const loss=structuredClone(activity);loss.records[1000].lat=null;assert.equal(bestEfforts(loss).some(e=>e.distanceM===5000),false);
 });

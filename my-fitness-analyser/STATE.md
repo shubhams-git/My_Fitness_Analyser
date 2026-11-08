@@ -8,9 +8,11 @@ Active increment: F15 recorded run visualizations
 - F15: large filled pace/HR/cadence/elevation/power explorer with real terrain
   context and distance/time inspection linked to maps. Visible metric-specific
   distributions, true kilometre splits, per-run results and chronological best
-  efforts/Top 10. Half mile added; recorded-progress-v3 and activity-instruments-v1.
-  Mobile analysis hides the obstructing check-in dock. 98 tests and foundation
-  checks pass; release verification pending. No database/model call or billing
+  efforts/Top 10. Half mile added; recorded-progress-v4 and activity-instruments-v1.
+  Mobile analysis hides the obstructing check-in dock. 99 tests and foundation
+  checks pass. Initial release de14224 is deployed; live owner charts and splits
+  verified. A measured pre-GPS acquisition prefix edge case is corrected in v4,
+  recovering the real 5 km 32:43 result; final v4 deployment verification pending. No database/model call or billing
   change. See F15 and docs/REMAINING_WORK_2026-11-09.md for six remaining workstreams.
 
 - F14: two independent Impeccable assessments; daily Training separated from
