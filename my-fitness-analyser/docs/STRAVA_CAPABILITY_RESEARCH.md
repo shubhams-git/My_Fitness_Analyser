@@ -1,6 +1,6 @@
 # Free training instruments: reference and delivery map
 
-Reviewed 8 November 2026 against Strava's official Help Center. These are
+Reviewed 9 November 2026 against Strava's official Help Center. These are
 original features using the member's own imports, not access to Strava's paid
 service or copies of its private algorithms. No Strava API or new paid service
 is introduced. Existing Garmin/Gemini free-tier availability remains subject to
@@ -23,7 +23,7 @@ The table maps that inventory rather than suggesting every item is a chart.
 | Custom HR / pace zones | Next analytics increment: owner-supplied boundaries with effective dates | Needs member-reviewed zone settings; do not use age-derived defaults or infer thresholds from these short runs |
 | Relative Effort | Planned original duration × session-RPE load with a named, versioned method | Needs complete explicit effort answers and duration coverage; not labelled Strava Relative Effort |
 | Fitness/Freshness | Deferred until representative load history exists | An impulse-response calculation is not measured fitness/readiness; display model assumptions and coverage, never invented physiology |
-| Matched activities | Planned conservative GPS route matching + compatible-basis pace history | Must compare shape, direction, endpoints and distance; screenshots' similar thumbnails do not establish a GPS match |
+| Matched activities | Delivered F14: conservative own-GPS route matching + timer-pace history | Must compare shape, direction, endpoints and distance; screenshots' similar thumbnails do not establish a GPS match |
 | Grade Adjusted Pace | Deferred: transparent terrain adjustment estimate after elevation-quality checks | Requires distance/elevation streams and validated smoothing/grade method; no claim of Strava GAP equivalence |
 | Power curve / weighted power / FTP zones | Deferred, sport-specific | Requires measured power and reviewed FTP; running/weight data alone do not justify manufacturing cycling watts |
 | Custom goals | Planned member-owned weekly/monthly distance/time goal | Requires saved goals/revisions, not a preset target chosen by the UI |
@@ -76,7 +76,7 @@ The table maps that inventory rather than suggesting every item is a chart.
 
 ## Calculation and presentation rules
 
-`recorded-progress-v1` operates on already canonical owner-scoped activities.
+`recorded-progress-v2` operates on already canonical owner-scoped activities.
 All fields remain in their source units; aggregation does not rewrite records.
 Best-effort results are approximate interpolated windows in elapsed samples,
 and stationary time inside a window counts. A reset, missing position/distance,
@@ -95,3 +95,25 @@ unclassified duration visible. Fixed bands do not imply personalised zones.
 Focused pace scaling only activates when extreme tails dominate a sufficiently
 large recording. It reveals its omitted sample count; full range is one action
 away. Selection still reports original values and does not move the map camera.
+
+## 9 November deepening
+
+F14 adds four-week session-RPE load: recorded running minutes × the member's
+explicit effort rating. Rated/total coverage accompanies every week; unrated runs
+are not assumed easy. This is our transparent load measure, not a reproduction of
+Strava Relative Effort. It appears within Progress, not as another competing home
+panel. Member-specific zones and Fitness/Freshness curves remain unimplemented.
+
+Own matched-route history now compares eligible GPS shape, direction, endpoints
+and distance. Conservative thresholds reject recording gaps, reversals, parallel
+streets and materially different lengths. At least two eligible runs are required.
+Similar screenshot thumbnails do not become GPS matches. Pace uses the same timer
+basis. Exact run links are available below the curve. Method version:
+`personal-route-match-v1`; tests cover false matches as well as successful matches.
+
+Additional primary reference: [Training zones](https://support.strava.com/en-us/articles/15401569-training-zones-on-strava).
+Personal zone analysis requires reviewed settings and historical effective dates;
+changing thresholds must not silently reclassify an old report. GAP needs a
+quality-checked elevation/distance stream. Power curves require real power.
+Private heatmaps need repeated GPS coverage. Offline maps and community leaderboards
+require different infrastructure/data and are not described as delivered here.

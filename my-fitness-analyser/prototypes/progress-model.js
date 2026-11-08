@@ -1,9 +1,10 @@
 // Original, deterministic analytics. No Strava scores or inferred sensor samples.
-export const PROGRESS_VERSION = 'recorded-progress-v1';
+export const PROGRESS_VERSION = 'recorded-progress-v2';
 export const BENCHMARKS = [400, 1000, 1609.344, 2000, 3218.688, 5000, 10000, 21097.5, 42195];
 const finite = Number.isFinite;
 const dayMs = 86400000;
 export const monthKey = date => date.slice(0, 7);
+export function niceAxis(value){const target=Math.max(1,value)/3,power=10**Math.floor(Math.log10(target)),scaled=target/power,step=([1,2,5,10].find(v=>v>=scaled)||10)*power,max=Math.max(step,Math.ceil(value/step)*step);return {max,ticks:Array.from({length:Math.round(max/step)+1},(_,i)=>i*step)};}
 
 // Fastest elapsed-time window in a piecewise-linear distance/time stream. The
 // optimum starts or ends at a source sample. Test both, never just lap boundaries.
@@ -60,5 +61,7 @@ export function progressModel(sessions, anchor, sport='run') {
   const activeDays=new Set(selected.map(s=>s.date)).size;
   const dates=selected.map(s=>s.date).sort();
   const span=dates.length?Math.floor((Date.parse(anchor+'T12:00Z')-Date.parse(dates[0]+'T12:00Z'))/dayMs)+1:0;
-  return {version:PROGRESS_VERSION,monthly,efforts,activeDays,span,sessions:selected};
+  const start=new Date(anchor+'T12:00Z');start.setUTCDate(start.getUTCDate()-(start.getUTCDay()+6)%7);
+  const effortWeeks=Array.from({length:4},(_,i)=>{const from=new Date(start.getTime()-(3-i)*7*dayMs).toISOString().slice(0,10),until=new Date(start.getTime()-(2-i)*7*dayMs).toISOString().slice(0,10),runs=selected.filter(s=>s.run&&s.date>=from&&s.date<until),rated=runs.filter(s=>finite(s.effortRating)&&s.effortRating>=1&&s.effortRating<=10&&finite(s.durationS)&&s.durationS>0);return {start:from,total:runs.length,rated:rated.length,load:rated.reduce((sum,s)=>sum+s.durationS/60*s.effortRating,0)};});
+  return {version:PROGRESS_VERSION,monthly,efforts,effortWeeks,activeDays,span,sessions:selected};
 }

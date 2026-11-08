@@ -4,8 +4,8 @@ import { CloudJournal } from './journal.mjs';
 import { weightEvidence } from '../analysis/weight-evidence.mjs';
 import { evidenceHash } from '../analysis/coaching-evidence.mjs';
 import { WEIGHT_SCHEMA,WEIGHT_PROMPT,WEIGHT_DISCLOSURE,WEIGHT_SYSTEM,weightSchema,validateWeightReport } from '../analysis/weight-contract.mjs';
+import { providerSchema } from '../analysis/gemini-schema.mjs';
 const MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'];
-function providerSchema(v){if(Array.isArray(v))return v.map(providerSchema);if(v&&typeof v==='object')return Object.fromEntries(Object.entries(v).filter(([k])=>!['minLength','maxLength','uniqueItems'].includes(k)).map(([k,x])=>[k,providerSchema(x)]));return v;}
 export function weightRequest(pack,model){return {model,store:false,system_instruction:WEIGHT_SYSTEM,input:JSON.stringify({schemaVersion:WEIGHT_SCHEMA,evidenceHash:pack.hash,...pack.content}),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(weightSchema(pack))},generation_config:{thinking_level:'high',max_output_tokens:16384}};}
 export function extractWeight(result,pack){
  const outputs=result.steps?.filter(s=>s.type==='model_output')||[];
@@ -20,7 +20,7 @@ export class WeightIntelligence {
  async context(){const pack=weightEvidence(await this.journal.dataset({window:'all'})),model=this.env.GEMINI_MODEL||'gemini-3.6-flash';return {pack,model,key:createHash('sha256').update(JSON.stringify([this.api.config.owner,pack.hash,model,WEIGHT_PROMPT,WEIGHT_SCHEMA])).digest('hex')};}
  async saved(context){const rows=await this.api.json(`/rest/v1/weight_analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc&limit=5`);return rows.filter(r=>{try{if(r.schema_version!==WEIGHT_SCHEMA||r.prompt_version!==WEIGHT_PROMPT||evidenceHash(r.evidence.content)!==r.evidence.hash)return false;validateWeightReport(r.report,r.evidence);return true;}catch{return false;}}).sort((a,b)=>(b.evidence_key===context.key)-(a.evidence_key===context.key))[0]||null;}
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,generatedAt:row.finished_at,model:row.model_id,stale:row.evidence_key!==key}:null;}
- async status(){const consent=await this.preference(),base={consent,configured:this.configured()};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,recordedDays:context.pack.content.observations.length,review:this.item(await this.saved(context),context.key)};}
+ async status(){const consent=await this.preference(),base={consent,configured:this.configured()};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,eligible:context.pack.content.observations.length>=4&&(context.pack.content.facts.find(f=>f.id==='period.span')?.value||0)>=14,recordedDays:context.pack.content.observations.length,review:this.item(await this.saved(context),context.key)};}
  async generate(){
   if((await this.preference()).enabled!==true)throw new CloudError(403,'Allow weight analysis before generating an insight.');
   if(!this.configured())throw new CloudError(409,'Gemini needs a supported Flash model and a confirmed Free-tier project.');

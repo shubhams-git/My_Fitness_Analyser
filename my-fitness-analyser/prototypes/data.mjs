@@ -31,8 +31,8 @@ export function observation(activity) {
   const eligible = block => block && block.duration >= 50 && block.pace >= 180 && block.pace <= 1200;
   if (blocks.length >= 2 && eligible(first) && eligible(last)) {
     const difference = Math.round(Math.abs(last.pace - first.pace));
-    const label=first.duration>=110?'block':'minute';
-    return { title: difference < 2 ? `Your opening and closing ${label}s were almost even.` : `Your closing ${label} was ${difference} sec/km ${last.pace < first.pace ? 'quicker' : 'slower'}.`, evidence: `Compared with your opening ${label}, using recorded distance and time.`, method: `Sample-aligned ${Math.round(first.duration)} s and ${Math.round(last.duration)} s blocks. Pace = elapsed sample time ÷ recorded distance. This describes this session; it does not establish a fitness trend.` };
+    const label=first.duration>=110?'block':'minute',delta= difference>=60?Math.floor(difference/60)+':'+String(difference%60).padStart(2,'0')+' /km':difference+' sec/km';
+    return { title: difference < 2 ? `Your opening and closing ${label}s were almost even.` : `Your closing ${label} was ${delta} ${last.pace < first.pace ? 'quicker' : 'slower'}.`, evidence: `Compared with your opening ${label}, using recorded distance and time.`, method: `Sample-aligned ${Math.round(first.duration)} s and ${Math.round(last.duration)} s blocks. Pace = elapsed sample time ÷ recorded distance. This describes this session; it does not establish a fitness trend.` };
   }
   if(activity.moving!=null && activity.timer-activity.moving>60){const time=s=>`${Math.floor(Math.round(s)/60)}:${String(Math.round(s)%60).padStart(2,'0')}`;return {title:`Your moving time was ${time(activity.moving)} of ${time(activity.timer)}.`,evidence:'Moving time and timer time are different measurements.',method:'These are separate Garmin summary fields. Their difference is not treated as proof of a pause or walking.'};}
   return { title: 'A short session, with the details intact.', evidence: 'Inspect the recorded time, distance and available measurements.', method: 'Source summary only. No physiological or progress claim is inferred.' };

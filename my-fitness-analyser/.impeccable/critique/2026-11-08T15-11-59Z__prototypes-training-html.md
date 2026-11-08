@@ -1,0 +1,70 @@
+---
+target: Runner-first Training and deeper coaching review; score is baseline before fixes
+total_score: 23
+max_score: 40
+na_heuristics: 
+p0_count: 0
+p1_count: 4
+target_identity: "file:D:\\Projects\\My_Fitness_Analyser\\my-fitness-analyser\\prototypes\\training.html"
+target_fingerprint: "sha256:d9446a9e0100dd04c98ff086ef8b3c0551490c796da604510d152ed391ecf8ab"
+target_path: "D:\\Projects\\My_Fitness_Analyser\\my-fitness-analyser\\prototypes\\training.html"
+timestamp: 2026-11-08T15-11-59Z
+slug: prototypes-training-html
+---
+# Runner-first interface review — 9 November 2026
+
+Dual-agent review: independent design assessment A and technical/browser assessment B, followed by parent synthesis, implementation and verification. Baseline master `47238fe`. Impeccable 4.8.0; Operate mode. Target: `prototypes/training.html`, with Progress, Journal, Account and activity continuation.
+
+## Verdict
+
+Keep Field Notes' athletic identity. Replace the feature exhibition with a useful daily decision. The carbon palette, condensed type and geographic maps are product-specific; the long sequence of equally important analytics was making the runner perform the coach's synthesis. Activation here means an invited member reaching a real run, recording how it felt and finding the next action. It does not mean adding public marketing funnels to a private app.
+
+## Baseline heuristic assessment
+
+These are independent assessment A's baseline scores, not a fabricated post-change score. Assessment B's technical score was 13/20, provisional: accessibility 3, performance 3, theming 3, responsive 3, integrity 1. Not an accessibility certification.
+
+| Heuristic | /4 | Main finding |
+|---|---:|---|
+| System status | 2 | Stale AI prose still appeared authoritative |
+| Real-world language | 2 | Timing jargon and engineering explanations interrupted reading |
+| Control and freedom | 3 | Explicit sharing, source links and recovery patterns were present |
+| Consistency | 3 | Shared identity; Progress behaved differently from other destinations |
+| Error prevention | 3 | Validated entries and unanswered required check-in choices |
+| Recognition | 2 | Users had to remember where a long page held each feature |
+| Efficiency | 2 | Common logging and session access required too much navigation |
+| Minimalism | 1 | Overview, analytics, coach, coverage and library competed |
+| Error recovery | 3 | Specific errors, retries and retained drafts in source |
+| Help | 2 | Plenty of methodology, often in the primary reading path |
+| **Total** | **23/40** | **Substantial simplification needed** |
+
+## Priority findings and implemented fixes
+
+1. **P1: The home screen postpones the useful answer.** Live baseline at 1139 × 899 CSS px: document 6315 px tall; coaching started at 2098 px and sessions at 3992 px. Training now leads with one coach verdict, the latest run/check-in, the last seven days and four recent sessions. Sessions and Progress have dedicated URL views. Use distill/layout, not more decorative effects.
+2. **P1: Stale advice contradicts current records.** A fresh weigh-in could coexist with an old claim about the last reading being sixteen days ago. Stale prose is now removed from the main card; Update is the action and the dated previous insight is collapsed. Run and weight report versions change with the new contracts; an edit during generation prevents publication against superseded evidence. Use harden/clarify.
+3. **P1: The coach has too little evidence and too much canned language.** The evidence now includes complete available kilometre splits, best efforts and structured check-ins. Prompts ask for a ranked conclusion and action. Weight advice is generated rather than selected from canned next-step prose. Evidence, dates and methods sit under disclosures. Use clarify.
+4. **P1: Claim direction is insufficiently checked.** A synthetic slowdown could previously be labelled faster. Every main claim now names a measured signal and direction; semantic validation checks the sign and direction language. Negative changes render as a magnitude when the sentence already says down/faster. Exact fact references still bind every reported quantity. Use harden.
+5. **P2: Daily dates and navigation do not match the runner's day.** Training used UTC while Journal used the member's timezone. Both now use the profile timezone, with Sydney fallback. Progress month/day/sport/measure/benchmark persist in the URL; arrows/Home/End remain available. Journal names weight and gym sessions explicitly. Use adapt/clarify.
+
+## Cognitive load and emotional journey
+
+Baseline failed four of seven cognitive-load checks: feature competition, repeated caveats, jargon and locating actions. A coach verdict followed by one action now gives the initial reading a clear end. The full explanation remains inspectable; it no longer competes with the decision. The interface retains the user's atmospheric athletic treatment without introducing a new visual world.
+
+Strengths preserved: real source-linked geography; authentic rather than fabricated measurements; explicit per-member controls and recoverable entry workflows. The biggest remaining UX opportunity is member-reviewed goals/zones that make later comparisons personally relevant.
+
+## Persona walkthrough
+
+- **Jordan, first visit:** Baseline requires learning many section names before finding a run. Empty Training now links to adding an activity; fewer than two runs leads to Add a run rather than an ineligible AI request. No public signup or simulated account history was introduced.
+- **Alex, frequent analysis:** Baseline mixes anchors and separate pages and loses Progress context. Dedicated Progress plus URL filters and calendar keyboard navigation make returning to a chosen comparison possible.
+- **Casey, distracted phone use:** Baseline puts sessions well below several charts. Latest-run check-in and weight logging now have direct entry points. Small SVG route dots are informational; exact run links are in a native disclosure with normal touch-sized rows, rather than overlapping tiny hit targets.
+
+## Deterministic scan and manual follow-up
+
+One final source scan covered Training, Progress, coach, weight insight, Journal, activity composition and Account. Seven findings: gradient text 2, dark glow 2, grid background 2, repeating stripes 1. Locations: Training HTML four, Account HTML three, line 0 from linked stylesheets. The scanner traverses shared legacy CSS. `.fn-distance`, `.tr-hero` gradient titles and `.fn-course-grid` do not render in the revised Training/Account DOM; weekly repeating lines belonged to the removed legacy volume chart. Source findings are retained as shared-CSS maintenance debt, not called a zero-warning pass. No hidden detector overlay is claimed.
+
+Manual responsive review also caught an icon-size selector shrinking new SVG charts. Icon rules now target `aria-hidden` icons only. Headings use the correct levels and axes use rounded intervals. Repeated-route dots deliberately use an accessible image plus exact run-list links because nine independent 44 px targets cannot fit across a 320 px viewport without overlap.
+
+## Verification scope
+
+91 automated tests pass, including owner isolation, consent/caching, data-change races, calendar/DST, claim direction, route reversals/parallel streets/gaps, RPE coverage and chart axes. Foundation checks pass 38 declared text contrast pairs. Rendered local checks cover desktop, 320/390 px and landscape; calendar arrow navigation and URL state exercised. Owned-data loopback fixture is read-only and older than the production account; synthetic route/RPE fixtures are labelled. Live release checks are recorded in F14. Physical iPhone Safari, assistive technology and instrumented performance profiling remain separate checks.
+
+Questions skipped: the user already supplied the priority, desired voice, visual identity and authorization for major changes. No redundant design approval is required before executing those directions.

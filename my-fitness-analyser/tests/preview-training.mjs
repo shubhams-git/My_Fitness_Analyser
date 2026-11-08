@@ -12,7 +12,7 @@ const report=validateReview({schemaVersion:REVIEW_VERSION,evidenceHash:pack.hash
 const item={report,requestedModel:'mock-ui-fixture',returnedModel:'mock-ui-fixture · no Gemini request',generatedAt:'2026-11-05T00:00:00Z',evidenceHash:pack.hash,validated:true,cached:false};
 http.createServer(async(req,res)=>{const url=new URL(req.url,`http://127.0.0.1:${port}`),json=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
  if(!['127.0.0.1:'+port,'localhost:'+port].includes(req.headers.host)){json(403,{});return;}
- if(url.pathname==='/api/training'){json(200,{...trainingDataset(mode==='empty'?[]:syntheticHistory(),{}, {window:url.searchParams.get('window')==='all'?'all':'90',anchor:'2026-11-01',synthetic:true}),local:false});return;}
+ if(url.pathname==='/api/training'){json(200,{...trainingDataset(mode==='empty'?[]:syntheticHistory(),Object.fromEntries(syntheticHistory().filter((a,i)=>i%2===0).map(a=>[a.id,{answers:{effort:5}}])), {window:url.searchParams.get('window')==='all'?'all':'90',anchor:'2026-11-01',synthetic:true}),local:false});return;}
  if(url.pathname==='/api/analysis/status'){json(200,{configured:true,model:'UI test fixture · no API call',dataMode:'synthetic-only',review:null,evidence:pack.content,evidenceHash:pack.hash});return;}
  if(url.pathname==='/api/analysis/demo'){json(mode==='invalid'?400:200,mode==='invalid'?{error:'UI test fixture: the response did not match the review schema.'}:item);return;}
  if(url.pathname.startsWith('/api/')){json(404,{});return;}

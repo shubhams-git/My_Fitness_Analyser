@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { PGlite } from '@electric-sql/pglite';
 import { readFile } from 'node:fs/promises';
 import { coachingEvidence,canonicalJson,evidenceHash } from '../analysis/coaching-evidence.mjs';
-import { COACH_SCHEMA,validateCoaching } from '../analysis/coaching-contract.mjs';
+import { COACH_SCHEMA,COACH_PROMPT,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { TrainingIntelligence,coachingRequest,extractCoaching } from '../cloud/intelligence.mjs';
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 function library(){return {feedback:{},activities:Object.fromEntries(Array.from({length:8},(_,i)=>['a'+i,{id:'a'+i,title:'PRIVATE title DO NOT SEND',date:'2026-10-'+String(10+i).padStart(2,'0'),sport:'Run',source:'Nike Run Club',sourceFile:'Owner-supplied screenshots',distance:2200,running:900+i*10,timer:null,moving:null,elapsed:920+i*10,displayedPace:400+i*4,hr:null,cadence:160,elevationGain:10,records:[],splits:[{distanceM:1000,paceSecondsPerKm:400},{distanceM:1000,paceSecondsPerKm:410}],sourceNote:'private note',synthetic:false}]))};}
-function report(pack){const id='comparison.s01.paceChange';return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your recorded pace changed by {'+id+'}.',factIds:[id]},findings:[{kind:'pace',headline:'Your latest pace was slower by {'+id+'}.',explanation:'Compared with earlier similar-distance runs from the same source.',assessment:'measured',factIds:[id],nextAction:'Record effort on your next similar run.'}],charts:[{type:'pace',sessionIds:['s01','s02']}]};}
+function report(pack){const id='comparison.s01.paceChange';return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your recorded pace changed by {'+id+'}.',factIds:[id],signal:{factId:id,direction:'slower'}},findings:[{kind:'pace',headline:'Your latest pace was slower by {'+id+'}.',explanation:'Compared with earlier similar-distance runs from the same source.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'slower'},nextAction:'Record effort on your next similar run.'}],charts:[{type:'pace',sessionIds:['s01','s02']}]};}
 test('coaching evidence includes screenshot comparisons and full splits without transmitting identities, notes or raw streams',()=>{
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'});assert.equal(pack.content.sessions.length,8);assert.ok(pack.content.comparisons.length);assert.ok(pack.content.facts.some(f=>f.id==='s01.splitChange'&&f.value===10));
  const payload=JSON.stringify(coachingRequest(pack,'gemini-3.8-flash'));for(const forbidden of ['PRIVATE','private note','2026-10-17','"a7"','"lat"','"longitude"'])assert.equal(payload.includes(forbidden),false,forbidden);assert.equal(JSON.stringify(pack.content).includes('"a7"'),false);assert.equal(pack.mapping.s01,'a7');assert.equal(coachingRequest(pack,'gemini-3.8-flash').store,false);
@@ -18,9 +18,9 @@ test('schema and semantic gates reject invented numbers, missing evidence and un
  assert.deepEqual(extractCoaching({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(good)}]}]},pack),good);assert.throws(()=>extractCoaching({status:'incomplete'},pack));
 });
 test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports remain cache hits',async()=>{
- const api={config:{owner}},engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_MODEL:'gemini-3.6-flash'}}),context=await engine.context(),pack=context.pack;
+ const api={config:{owner},json:async()=>[]},engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_MODEL:'gemini-3.6-flash'}}),context=await engine.context(),pack=context.pack;
  const reordered=JSON.parse(canonicalJson(pack.content));assert.equal(evidenceHash(reordered),pack.hash);
- const legacyPack={...pack,hash:pack.legacyHash,content:reordered},legacyReport=report(legacyPack);const row={id:'legacy',evidence:legacyPack,report:legacyReport,model_id:context.model,prompt_version:'direct-coach-v1',schema_version:COACH_SCHEMA,evidence_key:context.legacyKey};api.json=async()=>[structuredClone(row)];
+ const legacyPack={...pack,hash:pack.legacyHash,content:reordered},legacyReport=report(legacyPack);const row={id:'legacy',evidence:legacyPack,report:legacyReport,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA,evidence_key:context.legacyKey};api.json=async()=>[structuredClone(row)];
  assert.equal((await engine.saved(context)).evidence_key,context.key);assert.equal(engine.item(await engine.saved(context),context.key).stale,false);
  const later={...context,key:'b'.repeat(64),legacyKey:'c'.repeat(64)};assert.equal(engine.item(await engine.saved(later),later.key).stale,true);
  reordered.facts[0].value=999;assert.notEqual(evidenceHash(reordered),pack.hash);
@@ -49,9 +49,33 @@ test('a validated response is persisted once and reused; opting out hides it wit
  let enabled=true,saved=null,providerCalls=0,pack;
  const api={config:{owner},json:async(path,options)=>{
   if(path.includes('ai_preferences'))return [{enabled,disclosure_version:'gemini-run-v1',revision:1}];
-  if(path.includes('finish_training_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.8-flash',schema_version:COACH_SCHEMA,prompt_version:'direct-coach-v1',finished_at:new Date().toISOString()};return true;}
+  if(path.includes('finish_training_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:COACH_SCHEMA,prompt_version:COACH_PROMPT,finished_at:new Date().toISOString()};return true;}
   return saved?[saved]:[];
  },request:async()=>Response.json('saved')};
  const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{providerCalls++;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]});}});
  pack=(await engine.context()).pack;assert.equal((await engine.generate()).id,'saved');await engine.generate();assert.equal(providerCalls,1);assert.ok(saved.evidence.mapping.s01);enabled=false;assert.equal((await engine.status()).review,null);assert.ok(saved.report);
+});
+
+ test('pace claims cannot reverse direction and optional weak findings are omitted without weakening the main claim',()=>{
+  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),good=report(pack),bad=structuredClone(good);
+  bad.verdict.text='You ran faster by {comparison.s01.paceChange}.';
+  assert.throws(()=>validateCoaching(bad,pack),/revers/i);
+  bad.verdict.signal.direction='faster';assert.throws(()=>validateCoaching(bad,pack),/revers|measurement/i);
+  const partial=structuredClone(good);partial.findings.push({...good.findings[0],factIds:['s01.effort'],headline:'Invented conclusion'});
+  const parsed=extractCoaching({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(partial)}]}]},pack);
+  assert.equal(parsed.findings.length,1);validateCoaching(parsed,pack);
+ });
+
+test('a training edit during generation prevents publishing advice for the superseded record',async()=>{
+ const data=library();let pack,completed=false;
+ const api={config:{owner},json:async(path,options)=>{
+  if(path.includes('ai_preferences'))return [{enabled:true,disclosure_version:'gemini-run-v1',revision:1}];
+  if(path.includes('finish_training_review')){completed=options.body.result_status==='complete';return true;}
+  return [];
+ },request:async()=>Response.json('pending')};
+ const engine=new TrainingIntelligence(api,{read:async()=>structuredClone(data)},{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{
+  const response=report(pack);data.feedback.a7={answers:{effort:9}};
+  return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(response)}]}]});
+ }});
+ pack=(await engine.context()).pack;await assert.rejects(engine.generate(),/training changed during analysis/);assert.equal(completed,false);
 });

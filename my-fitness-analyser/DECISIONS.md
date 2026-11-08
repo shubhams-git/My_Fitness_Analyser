@@ -1,5 +1,18 @@
 # Decision register
 
+D36 — Runner-first coaching, 9 November 2026. Owner requests deep Impeccable
+review, firm concise advice and major simplification. Independent assessments
+identify overload, stale prose, UTC/profile day mismatch and unchecked claim
+direction. Keep Field Notes; separate daily Training, Sessions and deeper
+Progress. Expand evidence rather than prescribe a canned conclusion. Use real
+high thinking, bounded JSON and locally checked facts/directions; move methods
+out of the primary reading path. Permit ordinary likely fluctuation explanations
+without claiming measured fat/muscle change; this clarifies D34's blanket wording.
+Add conservative own-route matching and session-RPE weekly load, not proprietary
+Relative Effort or a fitness prediction. Reject raw-location prompt dumps,
+paid fallback and redundant multi-call orchestration. No schema migration,
+new key, dependency or branch. Evidence: F14 and 9 November audit/engineering docs.
+
 D35 — Interface and free training instruments, 8 November 2026. Owner requests
 Impeccable and premium active-app refinement, plus subscription-style analytics.
 Install the official standalone Codex skill; preserve Field Notes rather than

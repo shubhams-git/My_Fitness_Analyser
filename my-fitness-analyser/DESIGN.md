@@ -1,6 +1,6 @@
 # Field Notes: selected design direction
 
-Updated 7 November 2026. The owner selected Prototype B for all future work.
+Updated 9 November 2026. The owner selected Prototype B for all future work.
 The owner liked the premium finish but requested a stronger active fitness
 identity. Refine one Field Notes application; Trackside remains historical.
 The latest athletic treatment awaits owner visual review.
@@ -124,3 +124,17 @@ choices rather than sliders; selected choices have a border and inset underline
 as well as colour. Discomfort reveals a location field. Preserve new-entry drafts
 and keep the sheet open across rotation. Source conflicts require a deliberate
 separate-workout acknowledgement. See F11 for implementation and verification.
+
+## Daily decisions and deeper inspection
+
+Training leads with one current coaching conclusion, the latest run and a direct
+check-in, then a seven-day summary and four recent sessions. Progress is a
+dedicated view. Dates and filters persist in its URL. Keep exact values, provenance
+and methods available through disclosures; do not place repeated qualifications
+between a runner and the next action. Journal names weight and gym sessions.
+
+Insight voice: address you/your, lead with the decisive pattern and measured
+numbers, finish with a practical action. Reason extensively and display briefly.
+Reasonable likely explanations are welcome; do not turn uncertainty into repetitive
+boilerplate. Measurements, direction and report freshness remain enforced in code.
+Stale prose belongs in a collapsed dated previous report, never the primary claim.

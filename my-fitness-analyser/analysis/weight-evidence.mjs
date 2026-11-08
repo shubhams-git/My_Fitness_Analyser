@@ -1,6 +1,6 @@
 import { evidenceHash } from './coaching-evidence.mjs';
 import { weightTrend,WEIGHT_TREND_VERSION } from '../prototypes/weight-trend.js';
-export const WEIGHT_EVIDENCE='weight-evidence-v1';
+export const WEIGHT_EVIDENCE='weight-evidence-v2';
 const day=d=>Date.parse(d+'T12:00Z')/86400000,round=n=>Math.round(n*100)/100;
 const median=v=>{const a=v.toSorted((x,y)=>x-y),m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2;};
 export function weightEvidence(dataset){
@@ -14,6 +14,8 @@ export function weightEvidence(dataset){
   add('period.span','Recorded period length',end-day(first.date),'days');
   add('latest.age','Days since the last recorded weigh-in',Math.max(0,day(dataset.today||dataset.anchor)-end),'days');
   add('latest.scale','Latest daily scale value',latest.kg,'kg');add('latest.trend','Latest smoothed trend',lastLevel,'kg');
+  add('latest.vsTrend','Latest scale reading minus smoothed trend',latest.kg-lastLevel,'kg');
+  const previous=history.at(-2);if(previous){add('latest.change','Latest scale reading minus previous recorded day',latest.kg-previous.kg,'kg');add('latest.gap','Days between the two latest recorded days',end-day(previous.date),'days');}
   add('period.trendChange','Signed trend change across recorded period',lastLevel-firstLevel,'kg');
   add('period.trendDifference','Absolute trend change across recorded period',Math.abs(lastLevel-firstLevel),'kg');
   const recent=selected.filter(p=>day(p.date)>=end-27),span=end-day(recent[0].date);
@@ -23,6 +25,6 @@ export function weightEvidence(dataset){
   const residuals=recent.map(p=>Math.abs(p.kg-levels.get(p.date)));add('recent.deviation','Median absolute scale-to-trend difference',median(residuals),'kg');
   add('recent.range','Observed daily scale range',Math.max(...recent.map(p=>p.kg))-Math.min(...recent.map(p=>p.kg)),'kg');
  }
- const content={version:WEIGHT_EVIDENCE,trendMethod:WEIGHT_TREND_VERSION,scope:'Up to 90 calendar days ending at the latest recorded weigh-in; not necessarily today. No goal or weight-loss intention supplied.',facts,observations:selected.map(p=>({daysBeforeLatest:end-day(p.date),scaleKg:round(p.kg),trendKg:round(levels.get(p.date)),readings:p.readings})),rules:{interpolatedDaysAreNotObservations:true,weeklyRate:'Median of observed daily-value pair slopes at least seven days apart; requires four recorded days spanning fourteen days.',trendDirection:latest?Math.abs(levels.get(latest.date)-levels.get(selected[0].date))<.1?'level':levels.get(latest.date)<levels.get(selected[0].date)?'falling':'rising':'unavailable',stale:latest?day(dataset.today||dataset.anchor)-end>14:true}};
+ const content={version:WEIGHT_EVIDENCE,trendMethod:WEIGHT_TREND_VERSION,scope:'Daily scale observations, smoothed trend and recent changes. No weight goal supplied.',facts,observations:selected.map(p=>({daysBeforeLatest:end-day(p.date),scaleKg:round(p.kg),trendKg:round(levels.get(p.date)),readings:p.readings})),rules:{interpolatedDaysAreNotObservations:true,weeklyRate:'Median of observed daily-value pair slopes at least seven days apart; requires four recorded days spanning fourteen days.',trendDirection:latest?Math.abs(levels.get(latest.date)-levels.get(selected[0].date))<.1?'level':levels.get(latest.date)<levels.get(selected[0].date)?'falling':'rising':'unavailable',stale:latest?day(dataset.today||dataset.anchor)-end>14:true}};
  return {hash:evidenceHash(content),content};
 }

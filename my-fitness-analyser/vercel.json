@@ -1,6 +1,10 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/insight-format.js", "destination": "/prototypes/insight-format.js" },
+    { "source": "/progress-patterns.js", "destination": "/prototypes/progress-patterns.js" },
+    { "source": "/calendar-day.js", "destination": "/prototypes/calendar-day.js" },
+    { "source": "/training-focus.css", "destination": "/prototypes/training-focus.css" },
     { "source": "/effort-distribution.js", "destination": "/prototypes/effort-distribution.js" },
     { "source": "/progress.js", "destination": "/prototypes/progress.js" },
     { "source": "/progress-model.js", "destination": "/prototypes/progress-model.js" },

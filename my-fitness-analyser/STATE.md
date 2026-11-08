@@ -1,9 +1,20 @@
 # Current state
 
-Updated: 8 November 2026 (Australia/Sydney)
-Completed increment: F13 interface refinement and recorded training progress
+Updated: 9 November 2026 (Australia/Sydney)
+Active increment: F14 runner-first experience and deeper coaching
 
 ## Implemented
+
+- F14: two independent Impeccable assessments; daily Training separated from
+  Sessions and Progress. Current coach, latest run/check-in and seven-day summary
+  lead. Stale run/weight prose is demoted. Profile-timezone calendar, persisted
+  Progress context and readable axes. Full split/best-effort/check-in evidence,
+  v2 structured reports, generated weight advice, semantic direction checks and
+  data-edit publication guard. Personal GPS route matching and rated session-RPE
+  load added without new services or SQL. 91 tests and foundation checks pass.
+  Real high-thinking synthetic Gemini run/weight probes validate the engineering;
+  personal production refresh and deployment verification pending. See F14.
+
 
 - F13: Impeccable 4.8.0 installed and applied to a rendered/source interface pass.
   Common mobile/desktop navigation, compact athletic hierarchy, readable account

@@ -2,11 +2,11 @@ import { createHash } from 'node:crypto';
 import { weightTrend } from '../prototypes/weight-trend.js';
 import { CloudError } from './supabase.mjs';
 import { parseMass,emptyMass,mergeMass,importPreview,journalDataset } from '../prototypes/mass.mjs';
+import { calendarDay } from '../prototypes/calendar-day.js';
 
 export const HISTORY_FROM='2026-07-01',JOURNAL_LIMIT=3.5*1024*1024;
 export function localDay(timezone='Australia/Sydney',instant=new Date()){
-  try{const p=new Intl.DateTimeFormat('en-CA',{timeZone:timezone,year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(instant);return ['year','month','day'].map(k=>p.find(x=>x.type===k).value).join('-');}
-  catch{return localDay('Australia/Sydney',instant);}
+  return calendarDay(timezone,instant);
 }
 const date=value=>typeof value==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(value)&&Number.isFinite(Date.parse(value+'T12:00Z'))&&new Date(value+'T12:00Z').toISOString().slice(0,10)===value;
 const uuid=value=>typeof value==='string'&&/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value);

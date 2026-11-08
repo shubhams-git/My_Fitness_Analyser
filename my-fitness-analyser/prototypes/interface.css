@@ -31,3 +31,4 @@
 @media(max-width:740px){.fn-app .sign-in-story h1{font-size:4.5rem}}
 
 .tr-readings:empty{display:none}
+.wi-previous{border-top:1px solid var(--color-divider);padding-top:8px;margin-top:18px}.wi-previous summary{min-height:44px;align-content:center;cursor:pointer;font-size:.8125rem}.wi-previous p{font-size:.8125rem;margin-top:12px;color:var(--color-muted)}.wi-panel .wi-next{border:0;padding:0;font-size:1rem;color:var(--color-text);font-weight:550;line-height:1.65}.wi-status:empty,.wi-error:empty,.wi-actions:empty{display:none}.wi-panel .wi-method,.wi-panel .wi-sharing{font-size:.8125rem}.wi-heading h2{font-size:1rem}.wi-panel{border-radius:16px}.td-coach .ai-header h2{font-size:1.125rem}.td-coach .ai-header .ai-status{font-size:.75rem}.td-coach .ai-next{padding:18px 0 0;border-top:1px solid var(--color-divider);margin-top:20px}

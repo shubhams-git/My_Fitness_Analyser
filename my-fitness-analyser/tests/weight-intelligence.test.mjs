@@ -8,7 +8,7 @@ import { validateWeightReport,WEIGHT_SCHEMA,WEIGHT_PROMPT } from '../analysis/we
 import { WeightIntelligence,weightRequest } from '../cloud/weight-intelligence.mjs';
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 const data={anchor:'2026-11-08',today:'2026-11-08',points:Array.from({length:12},(_,i)=>({date:new Date(Date.UTC(2026,8,1+i*3)).toISOString().slice(0,10),kg:80-i*.1+Math.sin(i)*.2,readings:1})),note:'secret note',viewer:{id:owner,email:'private@example.test'}};
-function report(p){return {schemaVersion:WEIGHT_SCHEMA,evidenceHash:p.hash,headline:'Your recorded trend moved by {period.trendDifference}.',explanation:'Across {history.days} recorded days, the trend changed. Your latest reading is {latest.age} old.',factIds:['period.trendChange','period.trendDifference','history.days','latest.age'],focus:'trend',nextStep:'refresh-readings',supportingFactIds:['period.trendChange','history.days']};}
+function report(p){return {schemaVersion:WEIGHT_SCHEMA,evidenceHash:p.hash,headline:'Your recorded trend moved by {period.trendDifference}.',explanation:'Across {history.days} recorded days, the trend changed. Your latest reading is {latest.age} old.',advice:'Keep your usual routine and compare the next few readings.',signal:{factId:'period.trendChange',direction:'down'},factIds:['period.trendChange','period.trendDifference','history.days','latest.age'],focus:'trend',nextStep:'refresh-readings',supportingFactIds:['period.trendChange','history.days']};}
 test('weight trend spans missing calendar days without inventing readings or changing its seed by viewport',()=>{
  const a=[{date:'2026-08-01',kg:100,readings:1},{date:'2026-08-15',kg:96,readings:1}],t=weightTrend(a);
  assert.equal(t.points.length,15);assert.equal(t.observed.length,2);assert.equal(t.latest.trendKg,97);
@@ -24,8 +24,8 @@ test('weight evidence excludes identities, notes and dates; schema rejects inven
  for(const value of [owner,'private@example.test','secret note','2026-09-01'])assert.ok(!payload.includes(value));
  assert.ok(p.content.facts.some(f=>f.id==='recent.weeklyRate'));assert.equal(p.content.observations.length,12);validateWeightReport(report(p),p);
  // Legitimate count and magnitude citations must not require redundant facts.
- validateWeightReport({...report(p),focus:'coverage',explanation:'Across {history.readings}, the trend changed. The latest reading is {latest.age} old.',factIds:['period.span','latest.age','period.trendDifference','history.readings']},p);
- validateWeightReport({...report(p),focus:'trend',factIds:['period.trendDifference','history.days','latest.age']},p);
+ validateWeightReport({...report(p),focus:'coverage',signal:{factId:'period.span',direction:'none'},explanation:'Across {history.readings}, the trend changed. The latest reading is {latest.age} old.',factIds:['period.span','latest.age','period.trendDifference','history.readings']},p);
+ validateWeightReport({...report(p),focus:'trend',signal:{factId:'period.trendDifference',direction:'none'},factIds:['period.trendDifference','history.days','latest.age']},p);
  for(const v of [{headline:'You lost 3 kg.'},{headline:'Your fat loss is ideal.'},{factIds:['latest.scale']},{supportingFactIds:['invented']},{nextStep:'eat-less'},{extra:1}])assert.throws(()=>validateWeightReport({...report(p),...v},p));
  assert.equal(weightRequest(p,'gemini-3.6-flash').generation_config.thinking_level,'high');assert.equal(weightRequest(p,'gemini-3.6-flash').store,false);
 });
@@ -62,3 +62,10 @@ test('weight changes during a provider request prevent publication against old e
  engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:{GEMINI_API_KEY:'synthetic',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(p))}]}]});}});
  await assert.rejects(engine.generate(),e=>e.status===409);assert.equal(published,false);assert.equal(failed,true);
 });
+
+ test('weight advice can explain ordinary fluctuation without forcing a historical disclaimer or a canned action',()=>{
+  const p=weightEvidence(data),r=report(p);r.explanation='A single jump is usually water or food weight, not an instant reversal of your trend.';r.advice='Keep your usual routine. Compare the next few readings before making changes.';r.factIds=['period.trendChange','period.trendDifference','history.days'];
+  validateWeightReport(r,p);
+  assert.throws(()=>validateWeightReport({...r,signal:{factId:'period.trendChange',direction:'up'}},p),/direction/);
+  assert.throws(()=>validateWeightReport({...r,headline:'You have gained fat.'},p),/unsupported/);
+ });
