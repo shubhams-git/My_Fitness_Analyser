@@ -2,7 +2,7 @@
 target: Runner-first Training and deeper coaching review; score is baseline before fixes
 total_score: 23
 max_score: 40
-na_heuristics: 
+na_heuristics: ""
 p0_count: 0
 p1_count: 4
 target_identity: "file:D:\\Projects\\My_Fitness_Analyser\\my-fitness-analyser\\prototypes\\training.html"

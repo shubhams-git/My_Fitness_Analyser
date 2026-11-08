@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import { assertFactDirections } from '../prototypes/insight-format.js';
-export const COACH_SCHEMA='coaching-review-v2',COACH_PROMPT='runner-coach-v2',DISCLOSURE='gemini-run-v1';
+export const COACH_SCHEMA='coaching-review-v3',COACH_PROMPT='runner-coach-v3',DISCLOSURE='gemini-run-v1';
 const object=properties=>({type:'object',properties,required:Object.keys(properties),additionalProperties:false});
 const text=maxLength=>({type:'string',minLength:1,maxLength});
 export function coachingSchema(pack){
@@ -8,7 +8,7 @@ export function coachingSchema(pack){
  const signal=()=>object({factId:{type:'string',enum:facts},direction:{type:'string',enum:['faster','slower','up','down','steady','none']}});
  const kinds=['consistency','recording','duration',...(facts.some(id=>id.endsWith('.effort'))?['effort']:[]),...(facts.some(id=>/\.best\d+$/.test(id))?['best_effort']:[]),...(pack.content.comparisons.length?['pace']:[]),...(facts.some(id=>id.endsWith('.splitChange'))?['pacing']:[])];
  const charts=Object.entries({pace:'paceSPerKm',distance:'distanceM',heart_rate:'hrBpm'}).flatMap(([type,suffix])=>{const available=sessions.filter(ref=>facts.includes(ref+'.'+suffix));return available.length>=2?[object({type:{type:'string',enum:[type]},sessionIds:{type:'array',minItems:2,maxItems:8,uniqueItems:true,items:{type:'string',enum:available}}})]:[];});
- return object({schemaVersion:{type:'string',enum:[COACH_SCHEMA]},evidenceHash:{type:'string',enum:[pack.hash]},verdict:object({text:text(220),factIds:refs(),signal:signal()}),findings:{type:'array',maxItems:3,items:object({kind:{type:'string',enum:kinds},headline:text(160),explanation:text(320),assessment:{type:'string',enum:['measured','interpretation']},factIds:refs(),signal:signal(),nextAction:text(180)})},charts:{type:'array',maxItems:charts.length?1:0,items:charts.length?{anyOf:charts}:object({})}});
+ return object({schemaVersion:{type:'string',enum:[COACH_SCHEMA]},evidenceHash:{type:'string',enum:[pack.hash]},verdict:object({text:text(220),explanation:text(320),nextAction:text(180),factIds:refs(),signal:signal()}),findings:{type:'array',maxItems:3,items:object({kind:{type:'string',enum:kinds},headline:text(160),explanation:text(320),assessment:{type:'string',enum:['measured','interpretation']},factIds:refs(),signal:signal(),nextAction:text(180)})},charts:{type:'array',maxItems:charts.length?1:0,items:charts.length?{anyOf:charts}:object({})}});
 }
 export function signalDirection(id,value){if(/\.(paceChange|splitChange)$/.test(id))return value>0?'slower':value<0?'faster':'steady';if(id==='week.distanceChange'||id==='week.distanceChangePercent')return value>0?'up':value<0?'down':'steady';return 'none';}
 export function validateCoaching(report,pack){
@@ -20,7 +20,7 @@ export function validateCoaching(report,pack){
   if(direction==='slower'&&/\b(faster|quicker)\b/i.test(prose)||direction==='faster'&&/\bslower\b/i.test(prose))throw new Error('The headline reverses its pace comparison.');
   if(direction==='none'&&/\b(faster|quicker|slower)\b/i.test(prose))throw new Error('A comparative headline needs a measured comparison.');
  };
- validateText(report.verdict.text,report.verdict.factIds);words(report.verdict.text,24);claim(report.verdict,report.verdict.text);
+ for(const [key,max]of [['text',24],['explanation',35],['nextAction',22]]){validateText(report.verdict[key],report.verdict.factIds);words(report.verdict[key],max);}claim(report.verdict,report.verdict.text);
  for(const f of report.findings){for(const key of ['headline','explanation','nextAction'])validateText(f[key],f.factIds);claim(f,f.headline);
   if(f.kind==='pace'&&!f.factIds.some(id=>id.startsWith('comparison.')))throw new Error('A pace finding needs a comparison.');
   if(f.kind==='pacing'&&!f.factIds.some(id=>id.endsWith('.splitChange')))throw new Error('A pacing finding needs split measurements.');
@@ -38,7 +38,7 @@ Write to one person using 'you' and 'your'. Lead with the conclusion, then the d
 
 Avoid boilerplate: no 'based on historical data', 'imported record', generic caveats, model commentary or motivational filler. Do not name a run 'session 2.19 km'. Use natural descriptions such as 'your latest short run' or 'your opening kilometre'. Do not repeat totals when a pacing or effort pattern matters more. Missing information belongs in the explanation only when it changes the action.
 
-The verdict is the main conclusion (24 words maximum). Up to three findings, ordered by importance: headline 14 words, explanation 35 words, nextAction 22 words. The first finding develops the verdict; others must add a different useful point. Empty findings are allowed if there is no useful pattern.
+The verdict is a complete, coherent coaching message: text is the main conclusion (24 words), explanation develops that same conclusion (35 words), nextAction tells the runner what to do about that conclusion (22 words). Its facts must support all three fields. Never switch to an unrelated older run in its explanation. Up to three additional findings, ordered by importance: headline 14 words, explanation 35 words, nextAction 22 words. These appear behind a disclosure; each must add a different useful point. Empty findings are allowed.
 
 Every measured quantity uses an exact {fact.id} placeholder cited in factIds. The app inserts values and units. This rule keeps arithmetic accurate; it does not constrain your interpretation or advice. Do not invent numerical targets. Each verdict/finding includes signal.factId and direction. paceChange or splitChange above zero = slower, below zero = faster, zero = steady. week distanceChange above zero = up, below zero = down. Other facts use none. A pace finding must cite a comparison.* fact and use its paceChange as the signal. A pacing finding must cite splitChange. An effort finding must cite a reported effort. For natural prose cite paceDifference or other absolute facts alongside the signed signal.
 

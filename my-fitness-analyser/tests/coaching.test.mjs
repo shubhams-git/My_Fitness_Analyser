@@ -7,7 +7,7 @@ import { COACH_SCHEMA,COACH_PROMPT,validateCoaching } from '../analysis/coaching
 import { TrainingIntelligence,coachingRequest,extractCoaching } from '../cloud/intelligence.mjs';
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 function library(){return {feedback:{},activities:Object.fromEntries(Array.from({length:8},(_,i)=>['a'+i,{id:'a'+i,title:'PRIVATE title DO NOT SEND',date:'2026-10-'+String(10+i).padStart(2,'0'),sport:'Run',source:'Nike Run Club',sourceFile:'Owner-supplied screenshots',distance:2200,running:900+i*10,timer:null,moving:null,elapsed:920+i*10,displayedPace:400+i*4,hr:null,cadence:160,elevationGain:10,records:[],splits:[{distanceM:1000,paceSecondsPerKm:400},{distanceM:1000,paceSecondsPerKm:410}],sourceNote:'private note',synthetic:false}]))};}
-function report(pack){const id='comparison.s01.paceChange';return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your recorded pace changed by {'+id+'}.',factIds:[id],signal:{factId:id,direction:'slower'}},findings:[{kind:'pace',headline:'Your latest pace was slower by {'+id+'}.',explanation:'Compared with earlier similar-distance runs from the same source.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'slower'},nextAction:'Record effort on your next similar run.'}],charts:[{type:'pace',sessionIds:['s01','s02']}]};}
+function report(pack){const id='comparison.s01.paceChange';return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your recorded pace changed by {'+id+'}.',explanation:'Your latest short run was slower than earlier similar-distance runs.',nextAction:'Start your next short run at a conversational effort.',factIds:[id],signal:{factId:id,direction:'slower'}},findings:[{kind:'pace',headline:'Your latest pace was slower by {'+id+'}.',explanation:'Compared with earlier similar-distance runs from the same source.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'slower'},nextAction:'Record effort on your next similar run.'}],charts:[{type:'pace',sessionIds:['s01','s02']}]};}
 test('coaching evidence includes screenshot comparisons and full splits without transmitting identities, notes or raw streams',()=>{
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'});assert.equal(pack.content.sessions.length,8);assert.ok(pack.content.comparisons.length);assert.ok(pack.content.facts.some(f=>f.id==='s01.splitChange'&&f.value===10));
  const payload=JSON.stringify(coachingRequest(pack,'gemini-3.8-flash'));for(const forbidden of ['PRIVATE','private note','2026-10-17','"a7"','"lat"','"longitude"'])assert.equal(payload.includes(forbidden),false,forbidden);assert.equal(JSON.stringify(pack.content).includes('"a7"'),false);assert.equal(pack.mapping.s01,'a7');assert.equal(coachingRequest(pack,'gemini-3.8-flash').store,false);
@@ -78,4 +78,10 @@ test('a training edit during generation prevents publishing advice for the super
   return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(response)}]}]});
  }});
  pack=(await engine.context()).pack;await assert.rejects(engine.generate(),/training changed during analysis/);assert.equal(completed,false);
+});
+
+test('a main verdict must carry its own explanation and actionable advice even with no optional findings',()=>{
+ const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),good=report(pack);good.findings=[];validateCoaching(good,pack);
+ for(const key of ['explanation','nextAction']){const bad=structuredClone(good);delete bad.verdict[key];assert.throws(()=>validateCoaching(bad,pack));}
+ const bad=structuredClone(good);bad.verdict.explanation='You improved by 25 percent.';assert.throws(()=>validateCoaching(bad,pack));
 });

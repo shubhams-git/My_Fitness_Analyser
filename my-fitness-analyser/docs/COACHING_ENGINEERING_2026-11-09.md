@@ -20,7 +20,7 @@ Reject sending every raw sample merely to make the prompt large: it duplicates a
 
 ## A strict display contract, not a canned opinion
 
-Run schema v2: a verdict up to 24 words; at most three findings with 14-word headline, 35-word explanation and 22-word next action; at most one supported comparison chart. Weight schema v2: headline 16 words, explanation 38 and generated advice 22. A UI action category is separate from the prose, so the recommendation is no longer forced into a canned sentence.
+Run schema v3: a complete primary message with 24-word verdict, 35-word explanation and 22-word action; at most three findings with 14-word headline, 35-word explanation and 22-word next action; at most one supported comparison chart. Weight schema v2: headline 16 words, explanation 38 and generated advice 22. A UI action category is separate from the prose, so the recommendation is no longer forced into a canned sentence.
 
 The prompt asks for second-person, direct, numerical language. It explicitly removes "based on historical data", imported-record commentary, generic cautions and motivational filler. It permits training advice and ordinary likely explanations. For abrupt weight movement, explaining likely fluid/food/timing and advising against changing a routine over one reading is useful; pretending the scale measured fat is not. [Cleveland Clinic's explanation of daily fluctuations](https://health.clevelandclinic.org/weight-fluctuations) supports that distinction. No goal or preferred weight direction is silently assumed.
 
@@ -40,3 +40,13 @@ This follows the useful engineering principle in [Anthropic's workflow research]
 | 3.6 Flash, synthetic downward weight trend plus isolated jump | HTTP 200, 15.2 s; 2,619 thinking tokens, 208 output tokens; valid direct explanation and maintain-routine advice |
 
 Synthetic weight output chose the desired behavior without being supplied that answer: it contrasted the latest jump with the downward trend, suggested likely fluid/food volume and said not to change the routine over one weigh-in. These experiments did not write production records. Live owner generation and saved reload are documented separately in F14, so synthetic evaluation is never presented as personal coaching.
+
+## Live coherence correction
+
+The first owner v2 run report passed its numerical checks, but the UI combined a
+verdict about the latest longer run with a first finding about an older short
+run. Live review caught this mismatch. V3 gives the main verdict its own required
+explanation and action; all optional findings remain additional observations.
+The UI no longer borrows one finding to explain a different conclusion. Tests
+require a complete primary message even when no optional finding survives.
+The existing report is retained in the database and v3 gets a fresh evidence key.

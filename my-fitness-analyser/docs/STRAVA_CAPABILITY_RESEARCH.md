@@ -21,7 +21,7 @@ The table maps that inventory rather than suggesting every item is a chart.
 | Workout/lap analysis | Existing source kilometre splits, recorded laps and linked time-block inspection | Provider splits and elapsed sample blocks retain separate bases |
 | Heart-rate analysis | Existing HR trace; delivered time-weighted HR distribution | Fixed numerical bands, explicitly not personalised training zones |
 | Custom HR / pace zones | Next analytics increment: owner-supplied boundaries with effective dates | Needs member-reviewed zone settings; do not use age-derived defaults or infer thresholds from these short runs |
-| Relative Effort | Planned original duration × session-RPE load with a named, versioned method | Needs complete explicit effort answers and duration coverage; not labelled Strava Relative Effort |
+| Relative Effort | Delivered F14: original duration × session-RPE weekly load with rating coverage | Needs complete explicit effort answers and duration coverage; not labelled Strava Relative Effort |
 | Fitness/Freshness | Deferred until representative load history exists | An impulse-response calculation is not measured fitness/readiness; display model assumptions and coverage, never invented physiology |
 | Matched activities | Delivered F14: conservative own-GPS route matching + timer-pace history | Must compare shape, direction, endpoints and distance; screenshots' similar thumbnails do not establish a GPS match |
 | Grade Adjusted Pace | Deferred: transparent terrain adjustment estimate after elevation-quality checks | Requires distance/elevation streams and validated smoothing/grade method; no claim of Strava GAP equivalence |
