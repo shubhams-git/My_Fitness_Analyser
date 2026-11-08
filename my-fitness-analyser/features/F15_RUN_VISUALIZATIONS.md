@@ -66,7 +66,12 @@ missing positions/gaps ineligible. This recovers the observed 5 km window at
 1962.811 s (32:43), matching the supplied reference, without adding coordinates
 or rounding 4999.66 up to 5000. Regression checks cover delayed initial fixes and
 mid-run losses. A fresh private export was read solely for this check; no account
-row or activity was changed. Final v4 deployment verification pending.
+row or activity was changed. V4 release ba2e853 is deployed successfully. Live results now show all six
+covered benchmarks, including the 5 km 32:43. Its result link preserves the run
+and benchmark in Progress. The real 1 km history displays the two eligible runs
+and a measured 1:56 improvement. Desktop live chart inspection links to the map;
+no captured console errors. A View analysis shortcut is added beside the latest
+run's check-in so the new figures are reachable directly from Training.
 
 Local servers stopped and temporary viewport overrides reset.
 
