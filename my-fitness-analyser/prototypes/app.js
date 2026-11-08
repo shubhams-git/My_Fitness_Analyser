@@ -7,6 +7,7 @@ import { mountPremiumMotion } from './premium-motion.js';
 import { routeView } from './route-view.js';
 import { geographicRoute } from './route-geometry.js';
 import { mountRouteMaps } from './route-maps.js';
+import { openSatelliteReplay } from './satellite-replay.js';
 const $ = (selector, root = document) => root.querySelector(selector);
 const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 async function apiFetch(...args){const response=await window.fetch(...args);if(response.status===401){location.replace('/sign-in.html?next='+encodeURIComponent(location.pathname+location.search));throw new Error('Sign in to continue.');}return response;}
@@ -25,7 +26,7 @@ document.documentElement.classList.toggle('largest-text',params.get('text')==='l
 document.documentElement.classList.toggle('reduce-motion',params.get('motion')==='reduce');
 const reducedMotion = () => document.documentElement.classList.contains('reduce-motion') || matchMedia('(prefers-reduced-motion: reduce)').matches;
 const state = {direction:'field-notes',scenario:params.get('scenario')||'normal',activityId:params.get('activity')||null,selected:null,expandedBlocks:false,series:'pace',chartAxis:'distance',fullPaceRange:false,cursor:null,zoom:1,feedbackError:'',pending:false};
-let payload, activity, draft, premiumMotion, routeMaps;
+let payload, activity, draft, premiumMotion, routeMaps, satelliteReplay;
 let syncingGarmin=false;
 async function syncGarmin(){
   if(syncingGarmin)return;syncingGarmin=true;const button=$('[data-action="sync-garmin"]'),status=$('#library-status');if(button){button.disabled=true;button.textContent='Syncing Garmin…';}if(status)status.textContent='Fetching activities from Garmin…';
@@ -103,7 +104,7 @@ function specialState(){
   return null;
 }
 function render(){
-  premiumMotion?.destroy();routeMaps?.destroy();
+  satelliteReplay?.destroy();premiumMotion?.destroy();routeMaps?.destroy();
   if(activity.distance<10&&activity.hr!==null&&state.series==='pace')state.series='heart';if(activity.hr===null&&state.series==='heart')state.series='pace';
   document.body.dataset.theme='field-notes';document.body.className='field-notes fn-app';document.title=`${activity.title} — My Fitness Analyser`;
   const view=fieldNotesView({activity,persisted:savedActivity(),cloud:payload.cloudLibrary,icon,logo,dateText,distance,duration,paceText,summaryPace,escape,routePanel,stats,observationPanel,analysisPanel,blocksPanel,sourceNote,inlineCheckin,miniRoute:mapView('detail'),reduced:reducedMotion(),systemReduced:matchMedia('(prefers-reduced-motion:reduce)').matches});
@@ -115,14 +116,14 @@ function render(){
   showSavedCopy();
   if(payload.cloudLibrary&&!payload.activities.length){$('.mobile-dock')?.remove();$$('.fn-header [data-action="checkin"],.fn-header [data-action="source"]').forEach(button=>button.disabled=true);}
   if(routeGeometry())$('.fn-art .map-topline')?.insertAdjacentHTML('beforeend','<button class="text-button" data-action="expand-map">Explore map</button>');
-  if(!special)routeMaps=mountRouteMaps({records:activity.records,reduced:reducedMotion(),onSelect(index){premiumMotion?.stopReplay();updateCursor(index);}});
-  if(!special)premiumMotion=mountPremiumMotion({records:activity.records,reduced:reducedMotion(),onCursor:updateCursor,onPreferenceChange:render});
+  if(!special)routeMaps=mountRouteMaps({records:activity.records,reduced:reducedMotion(),onSelect(index){updateCursor(index);}});
+  if(!special)premiumMotion=mountPremiumMotion({reduced:reducedMotion(),onPreferenceChange:render});
 }
-function openDetail(title,html){premiumMotion?.stopReplay();const dialog=$('#detail-dialog');dialog.classList.remove('map-dialog');dialog.setAttribute('aria-label',title);dialog.innerHTML=`<header><h2>${title}</h2><button class="icon-button" data-action="close-dialog" aria-label="Close details">${icon('close')}</button></header><div class="dialog-content">${html}</div>`;dialog.showModal();routeMaps?.prune();}
+function openDetail(title,html){const dialog=$('#detail-dialog');dialog.classList.remove('map-dialog');dialog.setAttribute('aria-label',title);dialog.innerHTML=`<header><h2>${title}</h2><button class="icon-button" data-action="close-dialog" aria-label="Close details">${icon('close')}</button></header><div class="dialog-content">${html}</div>`;dialog.showModal();routeMaps?.prune();}
 function showSavedCopy(){if(savedActivity()&&draft.complete)$$('.checkin-complete').forEach(el=>{el.querySelector('h2').textContent='Check-in saved.';el.querySelector('h2+p').textContent='Saved to '+storageCopy()+'. Export your library to keep a backup.';});}
 function openCheckin(){if(state.direction==='field-notes'&&!specialState()){const target=$('#checkin');target.scrollIntoView({behavior:reducedMotion()?'instant':'smooth',block:'start'});target.focus({preventScroll:true});return;}$('#sheet').showModal();}
 function refreshForm(){const sheetOpen=$('#sheet').open;$('.sheet-body').innerHTML=feedbackForm();if($('#checkin'))$('#checkin').innerHTML=feedbackForm();if(sheetOpen&&!$('#sheet').open)$('#sheet').showModal();const quick=$('.quick-card');if(quick)quick.outerHTML=quickCard();const dock=$('.mobile-dock');if(dock)dock.innerHTML=`<div>${icon(draft.complete?'check':'journal')}<span>${draft.complete?'Check-in complete':'How did it feel?'}<small>${draft.complete?(savedActivity()?(payload.cloudLibrary?'Saved privately online':'Saved on this computer'):'Browser-only preview'):'Four answers. About 30 seconds.'}</small></span></div><button class="primary-button" data-action="checkin">${draft.complete?'Edit':'Check-in'} ${icon('arrow')}</button>`;}
-function selectBlock(index){premiumMotion?.stopReplay();state.selected=index;state.cursor=null;updateExploration();$('#announcer').textContent=index===null?'Full activity selected':`Block ${index+1} selected in the route and chart.`;}
+function selectBlock(index){state.selected=index;state.cursor=null;updateExploration();$('#announcer').textContent=index===null?'Full activity selected':`Block ${index+1} selected in the route and chart.`;}
 function updateExploration(){routeMaps?.update(state.selected===null?null:activity.blocks[state.selected],state.cursor);const chart=$('.chart-canvas');if(chart)chart.innerHTML=chartSvg();$$('[data-block]').forEach(b=>{b.setAttribute('aria-pressed',String(Number(b.dataset.block)===state.selected));b.closest('.block-row').classList.toggle('selected',Number(b.dataset.block)===state.selected);});$$('.route-selection').forEach(selection=>selection.textContent=state.selected===null?'Full activity':`Time block ${state.selected+1}`);const readout=chartReadout();if($('#chart-time'))$('#chart-time').textContent=readout.time;if($('#chart-value'))$('#chart-value').textContent=readout.value;if(chart){chart.setAttribute('aria-valuenow',String(state.cursor??0));chart.setAttribute('aria-valuetext',readout.time+', '+readout.value);}}
 function updateCursor(index){
   if(index<0||index>=activity.records.length)return;
@@ -153,18 +154,18 @@ document.addEventListener('close',()=>routeMaps?.prune(),true);
 document.addEventListener('click',event=>{
 
   const block=event.target.closest('[data-block],[data-select-block]');if(block){const index=Number(block.dataset.block??block.dataset.selectBlock);selectBlock(state.selected===index?null:index);return;}
-  const axis=event.target.closest('[data-chart-axis]');if(axis){premiumMotion?.stopReplay();state.chartAxis=axis.dataset.chartAxis;$('.analysis-panel').outerHTML=analysisPanel();if(state.cursor!==null)updateCursor(state.cursor);$(`[data-chart-axis="${state.chartAxis}"]`)?.focus({preventScroll:true});return;}
-  const series=event.target.closest('[data-series]');if(series){premiumMotion?.stopReplay();state.series=series.dataset.series;const panel=$('.analysis-panel');panel.outerHTML=analysisPanel();if(state.cursor!==null)updateCursor(state.cursor);$(`[data-series="${state.series}"]`)?.focus();return;}
+  const axis=event.target.closest('[data-chart-axis]');if(axis){state.chartAxis=axis.dataset.chartAxis;$('.analysis-panel').outerHTML=analysisPanel();if(state.cursor!==null)updateCursor(state.cursor);$(`[data-chart-axis="${state.chartAxis}"]`)?.focus({preventScroll:true});return;}
+  const series=event.target.closest('[data-series]');if(series){state.series=series.dataset.series;const panel=$('.analysis-panel');panel.outerHTML=analysisPanel();if(state.cursor!==null)updateCursor(state.cursor);$(`[data-series="${state.series}"]`)?.focus();return;}
   const choice=event.target.closest('[data-context]');if(choice){const context=choice.dataset.context;draft.context=draft.context.includes(context)?draft.context.filter(x=>x!==context):[...draft.context,context];choice.setAttribute('aria-pressed',String(draft.context.includes(context)));storeDraft();return;}
   const activityButton=event.target.closest('[data-activity]');if(activityButton){$('#detail-dialog').close();if(document.startViewTransition&&!reducedMotion())document.startViewTransition(()=>setActivity(activityButton.dataset.activity));else setActivity(activityButton.dataset.activity);return;}
   const target=event.target.closest('[data-action]');if(!target)return;
   const action=target.dataset.action;
-  if(action==='chart-range'){premiumMotion?.stopReplay();state.fullPaceRange=!state.fullPaceRange;$('.analysis-panel').outerHTML=analysisPanel();$('[data-action="chart-range"]')?.focus({preventScroll:true});return;}
-  if(action==='checkin'){premiumMotion?.stopReplay();openCheckin();}
+  if(action==='chart-range'){state.fullPaceRange=!state.fullPaceRange;$('.analysis-panel').outerHTML=analysisPanel();$('[data-action="chart-range"]')?.focus({preventScroll:true});return;}
+  if(action==='checkin'){openCheckin();}
   if(action==='sync-garmin')void syncGarmin();
   if(action==='import-file')$('#fit-import')?.click();
   if(action==='sign-out'){void logout().catch(error=>openDetail('Sign out',`<p>${escape(error.message)}</p>`));return;}
-  if(action==='route-replay')premiumMotion?.toggleReplay();
+  if(action==='route-replay'){satelliteReplay?.destroy();routeMaps?.suspend();satelliteReplay=openSatelliteReplay({activity,reduced:reducedMotion(),onClose:()=>routeMaps?.resume()});if(!satelliteReplay)routeMaps?.resume();}
   if(action==='expand-map'){
     openDetail('Route explorer',`<div class="route-explorer"><div class="explorer-summary"><p><strong>${escape(activity.title)}</strong><br>${distance(activity.distance)} km · ${dateText(activity.date)}</p><span class="map-legend"><i></i>Start <b></b>Finish</span></div><div class="route-svg">${mapView('expanded')}</div><div class="explorer-inspector"><div class="map-moments"><span>Inspect your effort</span><output id="map-inspection" for="map-position">Select the route or move through time</output></div><label>Session time<input class="chart-slider" id="map-position" type="range" min="0" max="${activity.records.length-1}" value="${state.cursor??0}" aria-label="Inspect map by time"></label><p>Tap near the route to inspect a recorded moment. S: start · F: finish · Numbers: kilometre crossings. GPS gaps stay open.</p></div></div>`);
     $('#detail-dialog').classList.add('map-dialog');routeMaps?.scan();if(state.cursor!==null)updateCursor(state.cursor);
@@ -203,12 +204,12 @@ document.addEventListener('change',async event=>{
   }
   if(input.id==='local-scenario'){state.scenario=input.value;activity=currentActivity();$('#detail-dialog').close();render();}
 });
-document.addEventListener('input',event=>{if(event.target.name==='note'){draft.note=event.target.value;storeDraft();}if(['chart-position','replay-position','map-position'].includes(event.target.id)){premiumMotion?.stopReplay();updateCursor(Number(event.target.value));}});
+document.addEventListener('input',event=>{if(event.target.name==='note'){draft.note=event.target.value;storeDraft();}if(['chart-position','replay-position','map-position'].includes(event.target.id)){updateCursor(Number(event.target.value));}});
 document.addEventListener('submit',event=>{if(event.target.matches('.checkin-form')){event.preventDefault();saveFeedback();}});
-function inspectChart(event){const chart=event.target.closest('.chart-canvas');if(!chart)return;const c=chartModel();if(!c)return;const rect=chart.getBoundingClientRect();premiumMotion?.stopReplay();updateCursor(c.nearest(((event.clientX-rect.left)/rect.width*c.width-c.left)/(c.right-c.left)));}
+function inspectChart(event){const chart=event.target.closest('.chart-canvas');if(!chart)return;const c=chartModel();if(!c)return;const rect=chart.getBoundingClientRect();updateCursor(c.nearest(((event.clientX-rect.left)/rect.width*c.width-c.left)/(c.right-c.left)));}
 document.addEventListener('pointerdown',event=>{if(event.target.closest('.chart-canvas'))inspectChart(event);});
 document.addEventListener('pointermove',event=>{const chart=event.target.closest('.chart-canvas');if(!chart||event.pointerType==='touch'&&!event.buttons)return;pointerX=event.clientX;if(pointerFrame)return;pointerFrame=requestAnimationFrame(()=>{pointerFrame=0;if(chart.isConnected)inspectChart({target:chart,clientX:pointerX});});});
-document.addEventListener('keydown',event=>{if(!event.target.matches('.chart-canvas'))return;const current=state.cursor??0,positions={ArrowLeft:current-1,ArrowDown:current-1,ArrowRight:current+1,ArrowUp:current+1,PageDown:current-15,PageUp:current+15,Home:0,End:activity.records.length-1};if(positions[event.key]!==undefined){event.preventDefault();premiumMotion?.stopReplay();updateCursor(Math.max(0,Math.min(activity.records.length-1,positions[event.key])));}});
+document.addEventListener('keydown',event=>{if(!event.target.matches('.chart-canvas'))return;const current=state.cursor??0,positions={ArrowLeft:current-1,ArrowDown:current-1,ArrowRight:current+1,ArrowUp:current+1,PageDown:current-15,PageUp:current+15,Home:0,End:activity.records.length-1};if(positions[event.key]!==undefined){event.preventDefault();updateCursor(Math.max(0,Math.min(activity.records.length-1,positions[event.key])));}});
 
 window.addEventListener('popstate',()=>{const p=new URLSearchParams(location.search);const next=p.get('activity')||payload.defaultId;if(next===state.activityId)return;state.activityId=next;state.selected=null;state.cursor=null;state.zoom=1;activity=currentActivity();draft=readDraft();render();});
 window.addEventListener('storage',event=>{if(activity&&event.key===draftKey()&&!$('#sheet').open){draft=readDraft();refreshForm();}});

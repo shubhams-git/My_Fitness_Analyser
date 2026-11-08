@@ -55,13 +55,17 @@ route explorer. Missing GPS never becomes an invented route. See F09.
 Motion is central to the brief. Choreograph a clear entrance, route drawing,
 bounded scroll depth, section continuity and direct selection/replay feedback.
 Use native scroll; sections remain reachable by links and keyboard. A deliberate
-12-second replay follows recorded elapsed timestamps. Play/pause is explicit;
-manual chart/block inspection and source/dialog changes stop replay.
+34-second satellite replay opens only through Replay route: overhead city view,
+smooth descent, a 78° terrain-follow camera, and a finish hold. The traversal uses
+recorded elapsed timestamps. Pause/resume, restart, timeline inspection and close
+remain explicit. Normal street-map/chart inspection never moves the camera.
 
 The motion toggle is in the desktop header and preview settings on mobile. OS
 reduced motion takes priority. Reduced mode shows all content in a static
-composition, disables replay and removes scroll movement. No mandatory intro,
-autoplay replay, endless foreground animation, randomized counters or scroll trap.
+composition, disables automatic replay and removes scroll movement; the satellite
+view remains available for deliberate top-down timeline inspection. No mandatory
+intro or replay on page arrival, endless foreground animation, randomized counters
+or scroll trap. Release street-map WebGL canvases during focused playback.
 
 GSAP core and ScrollTrigger 3.15.1 are pinned and served locally with notices.
 Dispose of animation contexts, observers and replay on activity replacement.

@@ -1,9 +1,19 @@
 # Current state
 
 Updated: 9 November 2026 (Australia/Sydney)
-Completed increment: F15 recorded run visualizations
+Completed increment: F16 satellite route replay (release verification in progress)
 
 ## Implemented
+
+- F16: dedicated satellite replay with a city overview, descent, 78° following
+  camera, real terrain/sky and growing GPS trail. Recorded pace/elevation/distance,
+  pause/resume/restart/timeline/finish, motion-off manual inspection, hidden-tab
+  pause, map teardown and street-map restoration. EOxCloudless 2024 and Mapterhorn
+  need no key or billing change; credits remain visible. Imagery is approximately
+  10 m and has no photogrammetric 3D buildings. 104 tests and foundation checks
+  pass. Rendered 320×568, 393×852 and 844×390 previews use a private read-only owner
+  export; motion-off, completion and focus restoration are observed. Physical
+  iPhone Safari remains unverified. See features/F16_SATELLITE_REPLAY.md.
 
 - F15: large filled pace/HR/cadence/elevation/power explorer with real terrain
   context and distance/time inspection linked to maps. Visible metric-specific

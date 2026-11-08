@@ -1,6 +1,9 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/satellite-replay.js", "destination": "/prototypes/satellite-replay.js" },
+    { "source": "/satellite-replay.css", "destination": "/prototypes/satellite-replay.css" },
+    { "source": "/replay-model.js", "destination": "/prototypes/replay-model.js" },
     { "source": "/activity-analysis.js", "destination": "/prototypes/activity-analysis.js" },
     { "source": "/activity-visuals.js", "destination": "/prototypes/activity-visuals.js" },
     { "source": "/activity-visuals.css", "destination": "/prototypes/activity-visuals.css" },

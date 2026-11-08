@@ -1,24 +1,7 @@
-import { recordIndexAtElapsed } from './interaction-model.js';
-
-export function mountPremiumMotion({records,reduced,onCursor,onPreferenceChange}) {
+export function mountPremiumMotion({reduced,onPreferenceChange}) {
   const gsap=window.gsap,ScrollTrigger=window.ScrollTrigger;
   const abort=new AbortController();
-  let context,media,replay=null,lastPaint=0,clock={time:0},paused=false;
-  const hasGPS=records.some(r=>r.lat!==null&&r.lon!==null);
-  const button=()=>document.querySelector('.fn-replay');
-  const setReplayLabel=playing=>{const b=button();if(!b)return;b.setAttribute('aria-pressed',String(playing));b.querySelector('span').textContent=playing?'Pause replay':paused?'Resume replay':'Replay route';b.classList.toggle('is-playing',playing);};
-  function stopReplay(){replay?.kill();replay=null;paused=false;clock.time=0;if(!reduced&&hasGPS)setReplayLabel(false);}
-  function toggleReplay(){
-    if(reduced||!hasGPS||!gsap||records.length<2)return;
-    if(replay?.isActive()){replay.pause();paused=true;setReplayLabel(false);return;}
-    if(replay&&paused){paused=false;replay.resume();setReplayLabel(true);return;}
-    const end=records.at(-1).t;
-    if(end<=0)return;
-    if(!paused||clock.time>=end)clock.time=0;
-    paused=false;setReplayLabel(true);
-    replay=gsap.to(clock,{time:end,duration:12*(end-clock.time)/end,ease:'none',onUpdate(){const now=performance.now();if(now-lastPaint<70&&clock.time<end)return;lastPaint=now;onCursor(recordIndexAtElapsed(records,clock.time));},onComplete(){replay=null;paused=false;setReplayLabel(false);onCursor(records.length-1);}});
-  }
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)stopReplay();},{signal:abort.signal});
+  let context,media;
   if(gsap&&ScrollTrigger){
     gsap.registerPlugin(ScrollTrigger);
     media=gsap.matchMedia();
@@ -68,7 +51,7 @@ export function mountPremiumMotion({records,reduced,onCursor,onPreferenceChange}
     }
   },{rootMargin:'-15% 0px -55% 0px'});
   document.querySelectorAll('#session-details,#checkin').forEach(el=>observer.observe(el));
-  const onSystemMotion=()=>{stopReplay();onPreferenceChange?.();};
+  const onSystemMotion=()=>{onPreferenceChange?.();};
   matchMedia('(prefers-reduced-motion:reduce)').addEventListener('change',onSystemMotion,{signal:abort.signal});
-  return {stopReplay,toggleReplay,destroy(){stopReplay();abort.abort();observer.disconnect();media?.revert();}};
+  return {destroy(){abort.abort();observer.disconnect();media?.revert();}};
 }

@@ -1,5 +1,14 @@
 # Decision register
 
+D38 — Satellite replay, 9 November 2026. Owner explicitly requests a Strava-like
+overhead/descent/follow sequence. Keep normal maps camera-stable and make the
+cinematic camera an explicit focused replay. Reuse MapLibre; EOxCloudless 2024
+personal/noncommercial imagery and Mapterhorn terrain preserve zero cost without
+new keys. Keep visible source/licence credits and disclose the 10 m imagery/absence
+of 3D building meshes. Reject unlicensed anonymous premium imagery. Never bridge
+GPS gaps, fabricate metrics, run autoplay under reduced motion, or retain hidden
+WebGL maps during replay. See F16 for design, provider references and verification.
+
 D37 — Recorded visualization depth, 9 November 2026. Owner supplies ten Strava
 references and requests more visual analysis plus a remaining-work review. Keep
 focused Training; expand the existing activity/Progress surfaces with selectable

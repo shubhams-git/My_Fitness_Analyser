@@ -24,7 +24,7 @@ const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','no-referrer');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org; connect-src 'self' https://tiles.openfreemap.org; worker-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'");
+  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org https://tiles.maps.eox.at https://tiles.mapterhorn.com; connect-src 'self' https://tiles.openfreemap.org https://tiles.maps.eox.at https://tiles.mapterhorn.com; worker-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'");
   if(!['127.0.0.1:'+port,'localhost:'+port].includes(req.headers.host)){res.writeHead(403);res.end('Local access only');return;}
   const pathname=new URL(req.url,`http://127.0.0.1:${port}`).pathname;
   const json=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};

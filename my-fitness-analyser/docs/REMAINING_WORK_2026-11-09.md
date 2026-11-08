@@ -5,6 +5,11 @@ sync/imports, real street maps/replay, check-ins, MASS import, weigh-in and gym
 logging, weight coaching and the new recorded visualizations are implemented.
 The remaining work falls into six workstreams, not six small fixes.
 
+F16 additionally delivers the requested satellite overview/descent/follow replay,
+with no new key or billed provider. Its free 10 m imagery is coarser than premium
+city aerial imagery; a sharper licensed provider remains optional. The six
+workstreams below remain the broader roadmap.
+
 | Priority / workstream | Next concrete deliverables | Completion condition |
 |---|---|---|
 | 1. Personal zones and goals | Member-reviewed HR/pace thresholds with effective dates; zone bars per run and aggregated over a chosen period; explicit running and weight goals | Changes are owner-scoped and reviewed; old reports retain their settings version; no threshold or goal is guessed from a reference image |
