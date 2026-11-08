@@ -117,3 +117,16 @@ changing thresholds must not silently reclassify an old report. GAP needs a
 quality-checked elevation/distance stream. Power curves require real power.
 Private heatmaps need repeated GPS coverage. Offline maps and community leaderboards
 require different infrastructure/data and are not described as delivered here.
+
+## F15 visualization delivery
+
+The 9 November reference selection is documented in VISUALIZATION_RESEARCH_2026-11-09.md.
+Activity analysis now exposes pace, heart rate, cadence, elevation and recorded
+running power with terrain context and exact distance/time inspection. Pace/HR
+bands are visible for the selected metric; personal zones remain next. True
+kilometre split bars, per-run best-effort results and distance-specific historical
+Analysis/Top 10 extend the original instruments. Ten benchmark distances now
+include half a mile. Methods are versioned recorded-progress-v3 and
+activity-instruments-v1. The six remaining workstreams, including intelligence,
+personal settings and advanced terrain/load analytics, are reviewed in
+REMAINING_WORK_2026-11-09.md. No Strava API or paid subscription service is added.

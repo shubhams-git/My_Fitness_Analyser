@@ -62,6 +62,7 @@ export function mountPremiumMotion({records,reduced,onCursor,onPreferenceChange}
   }
   const observer=new IntersectionObserver(entries=>{
     for(const entry of entries){
+      if(entry.target.id==='session-details')document.body.classList.toggle('is-exploring-data',entry.isIntersecting);
       if(entry.target.id==='checkin')document.body.classList.toggle('is-checking-in',entry.isIntersecting);
       if(entry.isIntersecting)document.querySelectorAll('.fn-header nav a').forEach(link=>{if(link.hash==='#'+entry.target.id)link.setAttribute('aria-current','location');else link.removeAttribute('aria-current');});
     }

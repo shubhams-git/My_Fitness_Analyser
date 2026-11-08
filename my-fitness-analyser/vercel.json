@@ -1,6 +1,10 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/activity-analysis.js", "destination": "/prototypes/activity-analysis.js" },
+    { "source": "/activity-visuals.js", "destination": "/prototypes/activity-visuals.js" },
+    { "source": "/activity-visuals.css", "destination": "/prototypes/activity-visuals.css" },
+    { "source": "/best-history.js", "destination": "/prototypes/best-history.js" },
     { "source": "/insight-format.js", "destination": "/prototypes/insight-format.js" },
     { "source": "/progress-patterns.js", "destination": "/prototypes/progress-patterns.js" },
     { "source": "/calendar-day.js", "destination": "/prototypes/calendar-day.js" },

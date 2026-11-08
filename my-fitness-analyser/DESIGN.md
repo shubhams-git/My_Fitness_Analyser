@@ -32,7 +32,7 @@ and accessibility review controls. Both use the same normalized activity model.
 The opening pairs an athletic activity title and distance with recorded route,
 explicit replay and a compact pace trace. A shared cursor links the trace,
 elapsed/pace readout, geographic route maps and detailed chart. A keyboard-operable
-slider supports manual inspection even with reduced motion. Mobile puts the
+chart inspector supports manual inspection even with reduced motion. Mobile puts the
 essential facts before the route; check-in is reachable beside the distance.
 A compact observation introduces the evidence.
 The detail chapter pairs a sticky geographic route map with the chart and sampled time
@@ -138,3 +138,14 @@ numbers, finish with a practical action. Reason extensively and display briefly.
 Reasonable likely explanations are welcome; do not turn uncertainty into repetitive
 boilerplate. Measurements, direction and report freshness remain enforced in code.
 Stale prose belongs in a collapsed dated previous report, never the primary claim.
+
+## Run instruments
+
+F15 gives each recorded metric one large filled canvas with real terrain context,
+clear units and an exact inspector. Metric selection preserves the same moment;
+distance/time axes are explicit. On phone, five available measurements use a
+single scrollable tab row. Distribution values sit outside their colored bars.
+Kilometre splits are distinct from collapsed minute blocks/device laps. Personal
+zone labels wait for reviewed settings. Best-effort history uses exact dots and a
+bounded guide between daily bests, with normal-size result controls and Top 10.
+The mobile check-in dock steps aside while session data is being inspected.

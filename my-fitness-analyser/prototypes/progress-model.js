@@ -1,6 +1,6 @@
 // Original, deterministic analytics. No Strava scores or inferred sensor samples.
-export const PROGRESS_VERSION = 'recorded-progress-v2';
-export const BENCHMARKS = [400, 1000, 1609.344, 2000, 3218.688, 5000, 10000, 21097.5, 42195];
+export const PROGRESS_VERSION = 'recorded-progress-v3';
+export const BENCHMARKS = [400, 804.672, 1000, 1609.344, 2000, 3218.688, 5000, 10000, 21097.5, 42195];
 const finite = Number.isFinite;
 const dayMs = 86400000;
 export const monthKey = date => date.slice(0, 7);

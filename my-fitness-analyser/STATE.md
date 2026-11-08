@@ -1,9 +1,17 @@
 # Current state
 
 Updated: 9 November 2026 (Australia/Sydney)
-Active increment: F14 runner-first experience and deeper coaching
+Active increment: F15 recorded run visualizations
 
 ## Implemented
+
+- F15: large filled pace/HR/cadence/elevation/power explorer with real terrain
+  context and distance/time inspection linked to maps. Visible metric-specific
+  distributions, true kilometre splits, per-run results and chronological best
+  efforts/Top 10. Half mile added; recorded-progress-v3 and activity-instruments-v1.
+  Mobile analysis hides the obstructing check-in dock. 98 tests and foundation
+  checks pass; release verification pending. No database/model call or billing
+  change. See F15 and docs/REMAINING_WORK_2026-11-09.md for six remaining workstreams.
 
 - F14: two independent Impeccable assessments; daily Training separated from
   Sessions and Progress. Current coach, latest run/check-in and seven-day summary
@@ -173,5 +181,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Verify one personal v3 running brief after the free Gemini service becomes
-available; then resume member-reviewed training zones with effective dates.
+Deliver member-reviewed pace/heart-rate zones and goals with effective dates.

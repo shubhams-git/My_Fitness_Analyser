@@ -1,5 +1,17 @@
 # Decision register
 
+D37 — Recorded visualization depth, 9 November 2026. Owner supplies ten Strava
+references and requests more visual analysis plus a remaining-work review. Keep
+focused Training; expand the existing activity/Progress surfaces with selectable
+filled sample traces, independently scaled recorded terrain, kilometre bars,
+per-run results and benchmark history. Preserve exact values, gaps, source timing,
+keyboard/map inspection and member isolation. Reject copying reference thresholds,
+fictional all-time awards or a proprietary fitness score. Reviewed personal zones,
+quality-checked terrain/load models and chart-specific AI remain explicit next
+work. No new dependency, provider, SQL, billing or branch. See F15 and the reference
+selection/remaining-work documents. This extends D35/D36 rather than undoing the
+simpler daily hierarchy.
+
 D36 — Runner-first coaching, 9 November 2026. Owner requests deep Impeccable
 review, firm concise advice and major simplification. Independent assessments
 identify overload, stale prose, UTC/profile day mismatch and unchecked claim
