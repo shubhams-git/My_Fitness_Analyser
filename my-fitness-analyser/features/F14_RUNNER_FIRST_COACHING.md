@@ -17,7 +17,16 @@ Independent baseline review: 23/40 Nielsen and provisional 13/20 technical; no i
 
 Local read-only owned-data fixture and clearly labelled synthetic route/RPE fixture exercised desktop, narrow phone, landscape, calendar arrow selection and direct view navigation. These fixtures never write the member's records or call a provider. Physical Safari remains a separate device check.
 
-Production deployment and live report persistence verification: pending release.
+App releases f458508 and 6bbfdfc are on origin/master; Vercel reports success.
+New static modules return 200; anonymous training remains 401. Live Training
+shows the actual latest 8 November Garmin run and last-seven-day totals. The
+new weight report was generated for the owner, saved and restored after reload.
+The first live v2 run report exposed a conclusion/explanation mismatch; v3 gives
+the primary verdict its own explanation/action. Both v3 provider attempts returned explicit HTTP 503. No personal v3 run report
+was published, no paid fallback or third retry was used. The new v3 contract
+passes the application/provider-shape tests; its live personal completion remains
+blocked by that provider response. The working weight report is current and
+persisted. Local audit servers were stopped and responsive overrides reset.
 
 ## Next increment
 

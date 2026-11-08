@@ -50,3 +50,9 @@ explanation and action; all optional findings remain additional observations.
 The UI no longer borrows one finding to explain a different conclusion. Tests
 require a complete primary message even when no optional finding survives.
 The existing report is retained in the database and v3 gets a fresh evidence key.
+
+Live outcome: the owner weight insight completed and restored after reload. Two
+personal v3 running requests returned explicit Google HTTP 503, including one
+retry. No v3 run answer was published or substituted, and no paid service was
+used. The earlier v2 personal answer remains stored. V3 live success is an open
+verification item, not a claimed result of the successful synthetic v2 probes.

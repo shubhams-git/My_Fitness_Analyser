@@ -13,7 +13,11 @@ Active increment: F14 runner-first experience and deeper coaching
   data-edit publication guard. Personal GPS route matching and rated session-RPE
   load added without new services or SQL. 92 tests and foundation checks pass.
   Real high-thinking synthetic Gemini run/weight probes validate the engineering;
-  personal production refresh and deployment verification pending. See F14.
+  personal weight report generated, saved and restored after reload. App releases
+  f458508/6bbfdfc are on master and Vercel is successful. Both personal v3 running
+  attempts returned Google HTTP 503; no v3 report is claimed as published. Static
+  modules return 200 and anonymous training stays 401. Preview servers stopped.
+  See F14.
 
 
 - F13: Impeccable 4.8.0 installed and applied to a rendered/source interface pass.
@@ -169,5 +173,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Add member-reviewed training-zone settings with effective dates and source-aware
-zone distributions before introducing personalised training-load curves.
+Verify one personal v3 running brief after the free Gemini service becomes
+available; then resume member-reviewed training zones with effective dates.
