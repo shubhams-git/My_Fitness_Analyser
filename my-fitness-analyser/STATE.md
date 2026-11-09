@@ -13,7 +13,11 @@ Completed increment: F19 personal running zones
   and foundation checks pass. UI/UX Pro Max design and independent Impeccable
   reviews/re-edits cover links/anchors, error focus, disabled states, retries and
   validation. Phone/desktop preview uses memory-only test thresholds; actual Safari
-  remains unverified. Existing Gemini reports/prompts are unchanged. See F19.
+  remains unverified. Existing Gemini reports/prompts are unchanged. Code f96e59c
+  has successful Vercel status; all four new assets return200 with correct types.
+  Actual signed-in Account loads blank settings, Cancel works, Progress retains
+  measurement/anchor and shows the honest unconfigured state. No warning/error
+  logs captured. No real setting was submitted. See F19.
 
 - F18: pace-band bars/cells are centred, including true zero rows. Replay now uses
   separate bounded header/map/footer rows, visible-viewport sizing, scroll locking

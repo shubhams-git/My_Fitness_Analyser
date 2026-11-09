@@ -79,6 +79,14 @@ member RPC allowed; zero settings rows. No owner thresholds were guessed or save
 Existing activity/weight records are untouched. Production verification follows
 in STATE.md after deployment.
 
+Code f96e59c is pushed to master with successful Vercel status. Four new static
+assets return200/correct content types. Actual signed-in Account loads blank
+settings, opens the editor and cancels; no production Save is submitted. Account
+to Progress preserves measurement and section anchor; no settings yields the
+expected setup state. No captured browser warning/error logs. Temporary preview
+tabs/server are cleaned up and viewport overrides reset. The live Account tab is
+left available for the member's own settings.
+
 Garmin supports manually adjusted, sport-specific HR zones:
 https://www8.garmin.com/manuals/webhelp/GUID-3A791586-B59F-4B37-B9C5-5A41F8C6BE0B/EN-GB/GUID-30C91919-943C-44E9-8048-901AC0881AEA.html
 
