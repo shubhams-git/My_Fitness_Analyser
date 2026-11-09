@@ -1,7 +1,7 @@
 # Current state
 
 Updated: 9 November 2026 (Australia/Sydney)
-Completed increment: F17 entry-point repair and chase replay (production verification pending)
+Completed increment: F17 entry-point repair and chase replay
 
 ## Implemented
 
@@ -18,8 +18,13 @@ Completed increment: F17 entry-point repair and chase replay (production verific
   score design 32/40 and technical 16/20, with no observed P0/P1. Their one minor
   finish-button label issue is corrected. Parent checks phone/landscape, enlarged
   text, reduced-motion manual inspection and retry; framing fits the route between
-  HUD/controls, with a sticky Close area for short/zoomed views. Production alias
-  verification follows deployment; see features/F17_UI_RELEASE_RECOVERY.md.
+  HUD/controls, with a sticky Close area for short/zoomed views. Code cbd6a92 is
+  deployed successfully. All three production aliases return identical HTML with
+  nine stylesheets. Actual signed-in `/` has colored filled pace/HR figures and a
+  loaded ~898 px replay canvas, 29.8 s timeline, recorded 14:57/2.27 km inspection
+  and no browser errors. Live replay is left paused for inspection. Largest-text
+  reduced-motion mode stays stopped with a working timeline and no horizontal
+  overflow; physical Safari remains unverified. See F17 for evidence and limits.
 
 - F16: dedicated satellite replay with a city overview, descent, 78° following
   camera, real terrain/sky and growing GPS trail. Recorded pace/elevation/distance,

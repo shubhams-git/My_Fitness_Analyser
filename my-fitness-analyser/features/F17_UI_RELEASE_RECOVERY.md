@@ -102,6 +102,13 @@ wrapping and camera insets. Final suite: 107 tests, plus foundation checks.
 
 Final test, rendered viewport, deployment and after-review outcomes appear in
 STATE.md. Browser emulation does not claim physical iPhone Safari verification.
+Code release cbd6a92 has successful Vercel status. Production `/`, `/index.html`
+and `/app.html` return identical nine-stylesheet activity HTML. Actual signed-in
+root inspection confirms orange/blue filled figures and a loaded nonzero satellite
+canvas, adaptive 29.8 s timeline and correct recorded metrics. No browser errors
+were captured. Preview image `private-data/interface-qa/f17-replay-preview.png`
+uses the read-only owned export and the same released source; it is not labelled
+as a physical-device capture. Temporary review tabs and servers are cleaned up.
 Impeccable update was attempted at the owner’s request; the upstream installer
 returned HTTP 504, and the owner explicitly deprioritized it. Existing installed
 Impeccable remains usable; no project dependency or hook was added by that attempt.
