@@ -15,7 +15,11 @@ Completed increment: F18 mobile replay and distribution alignment
   foundation checks pass; final Impeccable UI source detector has no findings.
   Independent after-review has no observed P0/P1. Rendered phone/short/landscape,
   enlarged text, seek/finish, Close/Escape and scroll restoration checked. Physical
-  iPhone Safari remains unverified by automation. See features/F18_MOBILE_REPLAY_POLISH.md.
+  iPhone Safari remains unverified by automation. Code 5366bae is deployed with
+  successful Vercel status. All three production activity aliases match; live
+  signed-in replay has a loaded ~538 px map stage, visible metrics, complete-route
+  finish and restored activity focus. No warning/error logs captured. See
+  features/F18_MOBILE_REPLAY_POLISH.md.
 
 - F17: two independent Impeccable reviews reproduced the root release defect:
   stale index.html omitted chart/replay/interface styles, producing black plots

@@ -60,3 +60,10 @@ Ignored private-data/interface-qa retains review, detector, test output and visu
 proof. Preview uses an owned read-only export, blocks writes and provider generation.
 Viewport emulation is not a physical iPhone Safari test. Production verification
 is recorded in STATE.md after deployment.
+
+Production code 5366bae is verified with successful Vercel status. Root, index and
+app aliases return identical nine-stylesheet HTML; released CSS has the bounded
+stage/visual-viewport sizing and model v3. Actual signed-in root replay loads a
+~538 px desktop map stage, updates recorded stats and finishes at 32:55 / 5.01 km
+with Play again. Closing restores the Replay route focus and clears body locking.
+No captured warning/error logs. Temporary review tabs and preview server cleaned up.
