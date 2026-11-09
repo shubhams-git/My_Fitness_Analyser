@@ -5,6 +5,11 @@ sync/imports, real street maps/replay, check-ins, MASS import, weigh-in and gym
 logging, weight coaching and the new recorded visualizations are implemented.
 The remaining work falls into six workstreams, not six small fixes.
 
+10 November: F19 delivers personal HR/pace settings with effective dates and
+per-run/monthly charts. Values await member entry. Explicit goals are next.
+Missing October/early-November Strava history remains reviewed backfill; imports
+must reconcile existing canonical runs.
+
 F16 additionally delivers the requested satellite overview/descent/follow replay,
 with no new key or billed provider. Its free 10 m imagery is coarser than premium
 city aerial imagery; a sharper licensed provider remains optional. The six
@@ -12,7 +17,7 @@ workstreams below remain the broader roadmap.
 
 | Priority / workstream | Next concrete deliverables | Completion condition |
 |---|---|---|
-| 1. Personal zones and goals | Member-reviewed HR/pace thresholds with effective dates; zone bars per run and aggregated over a chosen period; explicit running and weight goals | Changes are owner-scoped and reviewed; old reports retain their settings version; no threshold or goal is guessed from a reference image |
+| 1. Personal goals (zones delivered) | Explicit running/weight goals and progress; member enters reviewed zones in Account | Goals are owner-scoped, dated and deliberate; no target is guessed from a reference image |
 | 2. Intelligence | Verify a live v3 running brief after the reported free Gemini 503; add bounded run-specific/chart-specific takeaways to the evidence currently on screen | Saved report restores after reload; conclusion, quantities and action concern the same run/pattern; failure remains recoverable and no paid fallback is used |
 | 3. Advanced training analytics | Quality-checked terrain-adjusted pace; power-duration curve from recorded watts; transparent longer-term load model after usable rated/zone history | Calculations have defined methods, coverage and edge-case tests; no imitation Strava fitness/Relative Effort score or invented watt stream |
 | 4. Data onboarding and additional members | Reviewed NRC/Strava screenshot extraction/publishing UI; duplicate reconciliation; individual Garmin connections; invite the second member; scheduled sync with status/retry | A new member brings only their own sources; operator review is explicit; repeated submissions and syncs do not duplicate activities; owner key is never reused for another member |
@@ -21,9 +26,9 @@ workstreams below remain the broader roadmap.
 
 ## Next bounded release
 
-Start with member-reviewed zone/goal settings. This unlocks the meaningful version
-of the two distribution screenshots without multiplying unrelated dashboard
-sections. Verify the existing v3 running brief when the free provider is available;
+Next: explicit goals, building on the delivered zone editor and distributions.
+Later extend the AI evidence contract without rewriting saved reports.
+Verify the existing running brief when the free provider is available;
 it does not block deterministic charts or logging.
 
 For zones, obtain settings from the member or a reviewed Garmin configuration.

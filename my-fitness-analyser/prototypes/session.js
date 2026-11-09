@@ -3,7 +3,7 @@ export async function privateJson(url,options={}){
   const response=await fetch(url,{cache:'no-store',...options});
   if(response.status===401){location.replace(signInPath());throw new Error('Sign in to continue.');}
   let result;try{result=await response.json();}catch{throw new Error('The connection could not complete. Try again.');}
-  if(!response.ok)throw new Error(result.error||'The request could not finish.');return result;
+  if(!response.ok){const error=new Error(result.error||'The request could not finish.');error.status=response.status;throw error;}return result;
 }
 export async function logout(){
   await privateJson('/api/private?route=logout',{method:'POST'});

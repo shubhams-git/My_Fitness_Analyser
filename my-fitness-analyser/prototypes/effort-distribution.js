@@ -1,3 +1,5 @@
+import {activityZones,zoneAt} from './zone-model.js';
+import {zoneChart} from './zone-view.js';
 export function recordedRange(values,{focus=false}={}){
  const sorted=values.filter(Number.isFinite).toSorted((a,b)=>a-b);if(!sorted.length)return null;
  let min=sorted[0],max=sorted.at(-1),focused=false;
@@ -20,9 +22,10 @@ export function recordedDistribution(records,kind){
  }
  return {kind,bins,knownS,unknownS};
 }
-export function distributionMarkup(activity,{kind='pace'}={}){
+export function distributionMarkup(activity,{kind='pace',versions=[]}={}){
  if(activity.records.length<2||!['pace','heart'].includes(kind)||kind==='pace'&&activity.distance<10)return '';
+ const personal=activityZones(activity,versions)[kind];if(personal?.knownS)return zoneChart(personal,{title:kind==='heart'?'Your heart-rate zones':'Your pace zones',setting:zoneAt(versions,kind,activity.date)});
  const d=recordedDistribution(activity.records,kind);if(!d.knownS)return '';
  const time=s=>{const n=Math.round(s);return Math.floor(n/60)+':'+String(n%60).padStart(2,'0');};
- return `<section class="ed-analysis" aria-label="${kind==='heart'?'Heart-rate':'Pace'} distribution"><figure class="ed-figure ed-${kind}"><figcaption>${kind==='heart'?'Where your heart rate sat.':'Where your pace sat.'}<span>${kind==='heart'?'bpm':'min/km'} · ${time(d.knownS)} recorded</span></figcaption><table><caption class="sr-only">Time in recorded ${kind==='heart'?'heart-rate':'pace'} bands</caption><thead class="sr-only"><tr><th scope="col">Band</th><th scope="col">Duration bar</th><th scope="col">Recorded time</th><th scope="col">Share of covered time</th></tr></thead><tbody>${d.bins.map(b=>`<tr><th scope="row">${b.label}</th><td class="ed-bar-only"><i style="width:${b.seconds/d.knownS*100}%" aria-hidden="true"></i></td><td class="ed-duration">${time(b.seconds)}</td><td class="ed-share">${Math.round(b.seconds/d.knownS*100)}%</td></tr>`).join('')}</tbody></table>${d.unknownS?`<p>${time(d.unknownS)} without a usable ${kind==='heart'?'heart-rate':'pace'} sample.</p>`:''}</figure><details class="av-method"><summary>About these bands</summary><p>Fixed recorded ranges, not your personal training zones. Time is held to the next sample for at most fifteen seconds. Longer gaps and unavailable or stationary pace stay unclassified.</p></details></section>`;
+ return `<section class="ed-analysis" aria-label="${kind==='heart'?'Heart-rate':'Pace'} distribution"><figure class="ed-figure ed-${kind}"><figcaption>${kind==='heart'?'Where your heart rate sat.':'Where your pace sat.'}<span>${kind==='heart'?'bpm':'min/km'} · ${time(d.knownS)} recorded</span></figcaption><table><caption class="sr-only">Time in recorded ${kind==='heart'?'heart-rate':'pace'} bands</caption><thead class="sr-only"><tr><th scope="col">Band</th><th scope="col">Duration bar</th><th scope="col">Recorded time</th><th scope="col">Share of covered time</th></tr></thead><tbody>${d.bins.map(b=>`<tr><th scope="row">${b.label}</th><td class="ed-bar-only"><i style="width:${b.seconds/d.knownS*100}%" aria-hidden="true"></i></td><td class="ed-duration">${time(b.seconds)}</td><td class="ed-share">${Math.round(b.seconds/d.knownS*100)}%</td></tr>`).join('')}</tbody></table>${d.unknownS?`<p>${time(d.unknownS)} without a usable ${kind==='heart'?'heart-rate':'pace'} sample.</p>`:''}</figure><details class="av-method"><summary>About these bands</summary><p>Fixed recorded ranges. <a href="/account#running-zones">Set your personal training zones</a> to analyse effort against your own settings. Time is held to the next sample for at most fifteen seconds. Longer gaps and unavailable or stationary pace stay unclassified.</p></details></section>`;
 }

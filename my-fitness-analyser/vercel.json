@@ -1,6 +1,10 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/zone-model.js", "destination": "/prototypes/zone-model.js" },
+    { "source": "/zone-settings.js", "destination": "/prototypes/zone-settings.js" },
+    { "source": "/zone-view.js", "destination": "/prototypes/zone-view.js" },
+    { "source": "/zones.css", "destination": "/prototypes/zones.css" },
     { "source": "/satellite-replay.js", "destination": "/prototypes/satellite-replay.js" },
     { "source": "/satellite-replay.css", "destination": "/prototypes/satellite-replay.css" },
     { "source": "/replay-model.js", "destination": "/prototypes/replay-model.js" },

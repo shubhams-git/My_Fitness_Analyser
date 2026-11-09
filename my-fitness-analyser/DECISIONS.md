@@ -1,5 +1,14 @@
 # Decision register
 
+D41 — Versioned member-entered running zones, 10 November 2026. Continue after
+the owner's F18 approval. Extend Account/Progress/run analysis with boundaries,
+effective dates, source and reversible range mode. Immutable owner-scoped versions
+support later imports. Allow explicit backdating/correction; reject guessing max
+HR or silently applying today's settings to all history. Screenshot summaries never
+become sensor streams. Use UI/UX Pro Max design, Impeccable review and re-edit.
+No new dependency or billed provider. Goals and zone-aware Gemini evidence remain
+separate bounded increments. See F19 for verification and limits.
+
 D40 — Bounded mobile replay, 9 November 2026. Owner screenshots show missing
 Safari stats and raised distribution bars. Separate header, map stage and footer;
 track the visual viewport and restore page scroll/focus on exit. Honour closer

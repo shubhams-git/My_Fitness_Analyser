@@ -1,9 +1,19 @@
 # Current state
 
-Updated: 9 November 2026 (Australia/Sydney)
-Completed increment: F18 mobile replay and distribution alignment
+Updated: 10 November 2026 (Australia/Sydney)
+Completed increment: F19 personal running zones
 
 ## Implemented
+
+- F19: member-entered running HR/pace zones in Account, with dates, declared source,
+  reversible range mode and immutable history. Run analysis and monthly Progress
+  classify actual samples with the version effective on each run. No guessed
+  thresholds or screenshot streams. Live schema: owner RLS enabled, anonymous RPC
+  denied, member RPC allowed, zero settings rows. Exports retain history. 116 tests
+  and foundation checks pass. UI/UX Pro Max design and independent Impeccable
+  reviews/re-edits cover links/anchors, error focus, disabled states, retries and
+  validation. Phone/desktop preview uses memory-only test thresholds; actual Safari
+  remains unverified. Existing Gemini reports/prompts are unchanged. See F19.
 
 - F18: pace-band bars/cells are centred, including true zero rows. Replay now uses
   separate bounded header/map/footer rows, visible-viewport sizing, scroll locking
@@ -232,4 +242,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Deliver member-reviewed pace/heart-rate zones and goals with effective dates.
+Deliver explicit, owner-reviewed running and weight goals with progress views.

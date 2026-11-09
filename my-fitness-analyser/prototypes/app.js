@@ -73,7 +73,7 @@ function chartModel(){
 function chartSvg(){return metricSvg(chartModel(),state.series,state.cursor===null?null:activity.records[state.cursor],state.selected===null?null:activity.blocks[state.selected]);}
 function analysisPanel(){
  const available=Object.keys(MEASURES).filter(k=>(k!=='pace'||activity.distance>=10)&&activity.records.some(r=>metricValue(r,k)!==null));if(!available.includes(state.series))state.series=available[0]||'pace';
- return activityChartPanel(activity,state,chartModel(),chartSvg(),distributionMarkup(activity,{kind:state.series}));
+ return activityChartPanel(activity,state,chartModel(),chartSvg(),distributionMarkup(activity,{kind:state.series,versions:payload.zoneVersions||[]}));
 }
 function blocksPanel(){
   const historical=activity.records.length===0;
