@@ -1,10 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { calendarDay } from '../prototypes/calendar-day.js';
-import { insightText,assertFactDirections } from '../prototypes/insight-format.js';
+import { insightText,assertFactDirections,assertPersonalLimits,reportHasSupportedLimits } from '../prototypes/insight-format.js';
 import { matchedRoutes } from '../analysis/route-matches.mjs';
 import { progressModel,niceAxis } from '../prototypes/progress-model.js';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
+
+test('insight quantities carry one unit and recorded heart rate cannot establish a personal limit',()=>{
+ const facts=[{id:'run.hr',value:170,unit:'bpm'},{id:'run.cadence',value:154,unit:'spm'}];
+ const format=f=>`${f.value} ${f.unit}`;
+ assert.equal(insightText('Heart rate {run.hr} bpm; cadence {run.cadence} spm.',facts,format),'Heart rate 170 bpm; cadence 154 spm.');
+ assert.doesNotThrow(()=>assertPersonalLimits('Your reported breathing stayed conversational.'));
+ assert.throws(()=>assertPersonalLimits('This was well within your aerobic limits.'));
+ assert.equal(reportHasSupportedLimits({verdict:{text:'A strong finish.',explanation:'Well within your aerobic limits.'}}),false);
+ assert.equal(reportHasSupportedLimits({verdict:{text:'Your closing kilometre was faster.',explanation:'Heart rate rose through the finish.'}}),true);
+});
 
 test('calendar days follow member timezone at midnight and Australian daylight-saving boundaries',()=>{
  const instant=new Date('2026-11-08T13:30:00Z');assert.equal(calendarDay('Australia/Sydney',instant),'2026-11-09');assert.equal(calendarDay('America/New_York',instant),'2026-11-08');

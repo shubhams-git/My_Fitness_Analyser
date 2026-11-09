@@ -1,5 +1,15 @@
 # Decision register
 
+D39 — Repair real entry, then refine the chase camera, 9 November 2026. Independent
+Impeccable A/B reviews reproduce root-only absent CSS, black figures and zero-height
+replay. Use one canonical activity document for all aliases and test/render the
+actual home route. UI/UX Pro Max guides smaller operational typography, earlier run
+facts and one full chart. Preserve the requested satellite sequence; use native
+imagery zoom, a behind-runner camera, route-aware duration and finish pullback.
+Keep zero cost and visible provider credits. Correct duplicated briefing units and
+reject unmeasured personal aerobic-limit claims rather than giving them prominent
+authority. Fresh agents review after implementation; see F17 for exact scope.
+
 D38 — Satellite replay, 9 November 2026. Owner explicitly requests a Strava-like
 overhead/descent/follow sequence. Keep normal maps camera-stable and make the
 cinematic camera an explicit focused replay. Reuse MapLibre; EOxCloudless 2024

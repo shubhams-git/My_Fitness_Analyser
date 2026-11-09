@@ -38,7 +38,7 @@ const server=http.createServer(async(req,res)=>{
     if(url.pathname==='/api/private'&&url.searchParams.get('route')==='profile'){json(200,{user:viewer,garmin:{configured:false},submissions:[],historyFrom:'2026-07-01'});return;}
     if(url.pathname==='/api/feedback'&&req.method==='POST'){let body='';for await(const chunk of req)body+=chunk;const {id,draft}=JSON.parse(body);if(!activities.some(a=>a.id===id))throw new Error('Unknown fixture activity');const value={...validateFeedback(draft),revision:(feedback[id]?.revision||0)+1};feedback[id]=value;json(200,value);return;}
     if(url.pathname.startsWith('/api/')){json(409,{error:'This is a local UI review fixture. No provider or database write is available.'});return;}
-    const path=({'/':'/index.html','/training':'/training.html','/journal':'/journal.html','/account':'/account.html'})[url.pathname]||url.pathname;
+    const path=({'/':'/app.html','/index.html':'/app.html','/training':'/training.html','/journal':'/journal.html','/account':'/account.html'})[url.pathname]||url.pathname;
     const file=path==='/design/tokens.css'?fileURLToPath(new URL('../design/tokens.css',import.meta.url)):resolve(root,'.'+decodeURIComponent(path));
     if(extname(file)==='.mjs'&&!relative(root,file).replaceAll('\\','/').startsWith('assets/vendor/'))throw new Error('Not served');
     if(path!=='/design/tokens.css'&&(relative(root,file).startsWith('..')||!/^\.(html|css|js|mjs|svg|ttf|txt)$/.test(extname(file))))throw new Error('Not served');

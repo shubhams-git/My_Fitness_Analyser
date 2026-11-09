@@ -1,9 +1,25 @@
 # Current state
 
 Updated: 9 November 2026 (Australia/Sydney)
-Completed increment: F16 satellite route replay (release verification in progress)
+Completed increment: F17 entry-point repair and chase replay (production verification pending)
 
 ## Implemented
+
+- F17: two independent Impeccable reviews reproduced the root release defect:
+  stale index.html omitted chart/replay/interface styles, producing black plots
+  and a zero-height replay canvas. Root, index and app aliases now use one HTML
+  document, with response/CSS regression checks. UI/UX Pro Max guides readable
+  replay controls and shared Manrope UI, compact run facts/actions and removal of
+  duplicate pace preview/recap. Replay v2 uses a trailing camera, gradual pace,
+  native imagery zoom and a finish pullback; the owner's 5 km preview is 29.8 s.
+  Source imagery remains ~10 m. Brief units are deduplicated, unsupported personal
+  limits hidden/rejected, runner-coach-v4 prepared without a generation request.
+  107 tests and foundation checks pass. Fresh independent after-review agents
+  score design 32/40 and technical 16/20, with no observed P0/P1. Their one minor
+  finish-button label issue is corrected. Parent checks phone/landscape, enlarged
+  text, reduced-motion manual inspection and retry; framing fits the route between
+  HUD/controls, with a sticky Close area for short/zoomed views. Production alias
+  verification follows deployment; see features/F17_UI_RELEASE_RECOVERY.md.
 
 - F16: dedicated satellite replay with a city overview, descent, 78° following
   camera, real terrain/sky and growing GPS trail. Recorded pace/elevation/distance,

@@ -1,11 +1,18 @@
 import { geographicRoute } from './route-geometry.js';
 
-export const REPLAY_VERSION='satellite-replay-v1';
-export const REPLAY_SECONDS=34;
+export const REPLAY_VERSION='satellite-replay-v2';
+export const REPLAY_SECONDS=30;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const angleDelta=(from,to)=>((to-from+540)%360+360)%360-180;
 export function bearing(a,b){const rad=Math.PI/180,p=a[1]*rad,q=b[1]*rad,d=(b[0]-a[0])*rad;return Math.atan2(Math.sin(d)*Math.cos(q),Math.cos(p)*Math.sin(q)-Math.sin(p)*Math.cos(q)*Math.cos(d))/rad;}
 const mix=(a,b,u)=>a+(b-a)*u;
+export function replayDuration(records){const distances=records.map(r=>r.distance).filter(Number.isFinite),km=distances.length>1?Math.max(0,distances.at(-1)-distances[0])/1000:0;return Math.round(clamp(22+3.5*Math.sqrt(km),24,40)*10)/10;}
+export function travelProgress(u){u=clamp(u,0,1);const ramp=.1;if(u<ramp)return u*u/(2*ramp*(1-ramp));if(u>1-ramp)return 1-(1-u)**2/(2*ramp*(1-ramp));return (u-ramp/2)/(1-ramp);}
+export function replayFraming(height,hud,footer){
+ const total=hud+footer+32,scale=Math.min(1,Math.max(0,height-80)/Math.max(1,total));
+ const top=(hud+16)*scale,bottom=(footer+16)*scale,lead=Math.max(0,height-top-bottom)*.12;
+ return {fit:{top,bottom,left:24,right:24},chase:{top,bottom:bottom+lead,left:0,right:0}};
+}
 export function replayModel(records){
   const route=geographicRoute(records),segmentAt=new Map(),pointAt=new Map(route.points.map(p=>[p.index,p]));route.segments.forEach((s,n)=>s.forEach(p=>segmentAt.set(p.index,n)));
   const end=records.at(-1)?.t??0;
@@ -19,25 +26,33 @@ export function replayModel(records){
     const ahead=path.find(p=>p.index>index&&((Number.isFinite(row.distance)&&p.row.distance-row.distance>=100)||p.row.t-row.t>=18))||path.at(-1);
     const behind=[...path].reverse().find(p=>p.index<index&&row.t-p.row.t>=8)||path[0];
     const heading=coordinate&&ahead&&behind&&Math.hypot(ahead.coordinate[0]-behind.coordinate[0],ahead.coordinate[1]-behind.coordinate[1])>.00001?bearing(behind.coordinate,ahead.coordinate):null;
-    const trail=route.segments.map(s=>{const points=s.filter(p=>p.row.t<=time).map(p=>p.coordinate);if(continuous&&s===path&&coordinate)points.push(coordinate);return points;}).filter(s=>s.length>1);
-    return {index,row,coordinate,heading,segment,gap:!coordinate,trail:{type:'FeatureCollection',features:trail.map(coordinates=>({type:'Feature',properties:{},geometry:{type:'LineString',coordinates}}))}};
+    // The camera occupies an earlier point of this SAME continuous route,
+    // letting the runner move ahead without placing the viewer off the trail.
+    const chaseTime=Math.max(path[0]?.row.t??0,time-12),a=[...path].reverse().find(p=>p.row.t<=chaseTime),b=path.find(p=>p.row.t>chaseTime);
+    const chaseU=a&&b?clamp((chaseTime-a.row.t)/(b.row.t-a.row.t),0,1):0;
+    const chaseCoordinate=coordinate&&a?a.coordinate.map((v,n)=>mix(v,b?.coordinate[n]??v,chaseU)):coordinate;
+    return {index,row,coordinate,chaseCoordinate,heading,segment,gap:!coordinate,get trail(){
+      const lines=route.segments.map(s=>{const points=s.filter(p=>p.row.t<=time).map(p=>p.coordinate);if(continuous&&s===path&&coordinate)points.push(coordinate);return points;}).filter(s=>s.length>1);
+      return {type:'FeatureCollection',features:lines.map(coordinates=>({type:'Feature',properties:{},geometry:{type:'LineString',coordinates}}))};
+    }};
   }
-  return {route,end,sample,available:end>0&&route.segments.length>0&&records.every(r=>Number.isFinite(r.t))&&records.every((r,i)=>!i||r.t>=records[i-1].t)};
+  return {route,end,duration:replayDuration(records),sample,available:end>0&&route.segments.length>0&&records.every(r=>Number.isFinite(r.t))&&records.every((r,i)=>!i||r.t>=records[i-1].t)};
 }
 // Playback time is separate from recorded time: a held overview, a descent,
 // elapsed-time traversal (including pauses/gaps), and a quiet finish.
-export function replayPhase(seconds,end){
-  const t=clamp(seconds,0,REPLAY_SECONDS);
-  if(t<1.2)return {name:'overview',time:0,descent:0};
-  if(t<4.5){const u=(t-1.2)/3.3;return {name:'descent',time:0,descent:1-(1-u)**3};}
-  if(t<32)return {name:'following',time:(t-4.5)/27.5*end,descent:1};
-  return {name:'finished',time:end,descent:1};
+export function replayPhase(seconds,end,duration=REPLAY_SECONDS){
+  const t=clamp(seconds,0,duration),finish=duration-1.6;
+  if(t<1)return {name:'overview',time:0,descent:0};
+  if(t<3.8){const u=(t-1)/2.8;return {name:'descent',time:0,descent:1-(1-u)**3};}
+  if(t<finish)return {name:'following',time:travelProgress((t-3.8)/(finish-3.8))*end,descent:1};
+  return {name:'finished',time:end,descent:1,outro:clamp((t-finish)/1.6,0,1)};
 }
 export function followCamera(previous,sample,dt){
   if(!sample.coordinate)return previous;
-  if(!previous)return {center:[...sample.coordinate],bearing:sample.heading??0};
-  const u=1-Math.exp(-clamp(dt,0,.1)/.24),step=clamp(angleDelta(previous.bearing,sample.heading??previous.bearing)*u,-75*dt,75*dt);
-  return {center:previous.center.map((v,n)=>mix(v,sample.coordinate[n],u)),bearing:previous.bearing+step};
+  const target=sample.chaseCoordinate||sample.coordinate;
+  if(!previous)return {center:[...target],bearing:sample.heading??0};
+  const u=1-Math.exp(-clamp(dt,0,.1)/.32),step=clamp(angleDelta(previous.bearing,sample.heading??previous.bearing)*u,-65*dt,65*dt);
+  return {center:previous.center.map((v,n)=>mix(v,target[n],u)),bearing:previous.bearing+step};
 }
 export function replayMetrics(row){
   const clock=s=>`${Math.floor(Math.round(s)/60)}:${String(Math.round(s)%60).padStart(2,'0')}`;

@@ -1,10 +1,23 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {replayModel,replayPhase,followCamera,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
+import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,followCamera,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
 const fix=(t,lon=145+t/10000,extra={})=>({t,lat:-37.8,lon,distance:t*3,speed:3,elevation:27,...extra});
 test('cinematic sequence holds the city, descends, traverses elapsed time, then finishes exactly',()=>{
-  assert.equal(replayPhase(1,1000).name,'overview');assert.equal(replayPhase(2,1000).name,'descent');assert.equal(replayPhase(4.5,1000).time,0);
-  assert.equal(replayPhase(18.25,1000).time,500);assert.equal(replayPhase(REPLAY_SECONDS,1000).time,1000);assert.equal(replayPhase(100,1000).name,'finished');
+  assert.equal(replayPhase(.5,1000).name,'overview');assert.equal(replayPhase(2,1000).name,'descent');assert.equal(replayPhase(3.8,1000).time,0);
+  assert.ok(Math.abs(replayPhase(16.1,1000).time-500)<.001);assert.equal(replayPhase(REPLAY_SECONDS,1000).time,1000);assert.equal(replayPhase(100,1000).name,'finished');
+  assert.equal(replayPhase(28.4,1000).outro,0);assert.ok(Math.abs(replayPhase(REPLAY_SECONDS,1000).outro-1)<.001);
+});
+test('route-aware duration is modestly faster, bounded, with gradual acceleration and a genuine trailing camera',()=>{
+  const five=[fix(0),fix(2000,145.2,{distance:5000})],short=[fix(0),fix(800,145.08,{distance:2000})],long=[fix(0),fix(5000,145.5,{distance:20000})];
+  assert.ok(replayDuration(five)<34&&replayDuration(five)>27);assert.ok(replayDuration(short)<replayDuration(five));assert.ok(replayDuration(long)>replayDuration(five)&&replayDuration(long)<=40);
+  assert.equal(travelProgress(0),0);assert.equal(travelProgress(1),1);assert.equal(travelProgress(.5),.5);assert.ok(travelProgress(.025)<.025);
+  const m=replayModel(Array.from({length:81},(_,t)=>fix(t))),s=m.sample(40);
+  assert.ok(s.chaseCoordinate[0]<s.coordinate[0]);assert.ok(s.chaseCoordinate[0]>=m.route.points[0].coordinate[0]);
+  assert.deepEqual(followCamera(null,s,.016).center,s.chaseCoordinate);
+  assert.equal(m.sample(0).chaseCoordinate[0],m.sample(0).coordinate[0]);
+});
+test('camera fits the route between HUD and controls in portrait, landscape and enlarged text',()=>{
+ for(const [height,hud,footer]of [[852,174,282],[390,81,180],[568,280,400]]){const f=replayFraming(height,hud,footer);assert.ok(height-f.fit.top-f.fit.bottom>=79.9);assert.ok(f.chase.bottom>f.fit.bottom);assert.equal(f.fit.left,f.fit.right);assert.ok(f.chase.bottom+f.chase.top<height);}
 });
 test('GPS motion interpolates only adjacent real fixes; metrics remain recorded and gaps stay open',()=>{
   const rows=[fix(0),fix(2),fix(3,null,{lat:null}),fix(4),fix(6),fix(60),fix(62)],model=replayModel(rows);

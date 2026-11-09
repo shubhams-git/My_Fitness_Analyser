@@ -76,7 +76,15 @@ test('local preview serves its UI while denying credential/source paths and fore
     });
     const base=`http://127.0.0.1:${port}`;
     assert.equal((await fetch(base)).status,200);
-    for(const path of ['/','/app.html']){const html=await fetch(base+path).then(r=>r.text());assert.match(html,/href="\/real-map.css"/);assert.match(html,/href="\/assets\/vendor\/maplibre-gl.css"/);}
+    const activityShell=await fetch(base+'/app.html').then(r=>r.text());
+    for(const path of ['/','/index.html','/app.html']){
+      const response=await fetch(base+path);assert.equal(response.status,200);
+      const html=await response.text();assert.equal(html,activityShell,`${path} must use the canonical activity shell`);
+      for(const css of ['interface.css','activity-visuals.css','satellite-replay.css','real-map.css','assets/vendor/maplibre-gl.css']){
+        assert.ok(html.includes(`href="/${css}"`),`${path} is missing ${css}`);
+        const asset=await fetch(base+'/'+css);assert.equal(asset.status,200);assert.match(asset.headers.get('content-type'),/text\/css/);
+      }
+    }
     const data=await fetch(base+'/api/data');assert.equal(data.status,200);
     assert.match(data.headers.get('content-security-policy'),/connect-src 'self'/);
     assert.match(data.headers.get('content-security-policy'),/worker-src 'self'/);

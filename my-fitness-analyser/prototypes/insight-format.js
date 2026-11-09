@@ -10,4 +10,12 @@ export function assertFactDirections(text,facts){
   }
  }
 }
-export function insightText(text,facts,format){const map=new Map(facts.map(f=>[f.id,f]));return text.replace(token,(_,id,offset)=>{const f=map.get(id);if(!f)return '—';const word=directionWord(text.slice(Math.max(0,offset-45),offset));return format(word&&f.value<0?{...f,value:Math.abs(f.value)}:f);});}
+export function assertPersonalLimits(text){
+ // This evidence contract has no reviewed personal zones or thresholds yet.
+ // A recorded heart rate/check-in cannot establish a member's aerobic limit.
+ if(/\bwithin\s+(?:your\s+)?aerobic\s+limits?\b|\byour\s+(?:aerobic|anaerobic|lactate)\s+threshold\b|\b(?:your\s+)?(?:heart.rate|pace)\s+zone\s+(?:one|two|three|four|five)\b/i.test(text))throw new Error('Personal limits require reviewed thresholds.');
+}
+export function reportHasSupportedLimits(report){
+ try{for(const item of [report?.verdict,...(report?.findings||[])])for(const value of [item?.text,item?.headline,item?.explanation,item?.nextAction])if(value)assertPersonalLimits(value);return true;}catch{return false;}
+}
+export function insightText(text,facts,format){const map=new Map(facts.map(f=>[f.id,f]));return text.replace(token,(_,id,offset)=>{const f=map.get(id);if(!f)return '—';const word=directionWord(text.slice(Math.max(0,offset-45),offset));return format(word&&f.value<0?{...f,value:Math.abs(f.value)}:f);}).replace(/\b(bpm|spm|kg|km|kcal)\s+\1\b/gi,'$1').replace(/\/km\s*\/km/gi,'/km');}

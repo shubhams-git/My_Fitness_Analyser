@@ -55,9 +55,11 @@ route explorer. Missing GPS never becomes an invented route. See F09.
 Motion is central to the brief. Choreograph a clear entrance, route drawing,
 bounded scroll depth, section continuity and direct selection/replay feedback.
 Use native scroll; sections remain reachable by links and keyboard. A deliberate
-34-second satellite replay opens only through Replay route: overhead city view,
-smooth descent, a 78° terrain-follow camera, and a finish hold. The traversal uses
-recorded elapsed timestamps. Pause/resume, restart, timeline inspection and close
+Route-length-aware satellite replay (24–40 seconds; about 30 for a 5 km run) opens
+only through Replay route: overhead city view, smooth descent, a camera trailing
+the runner and a finish pullback. Follow zoom stays within the native imagery
+level; a 76° descent settles into 69° tracking. The traversal uses recorded elapsed
+timestamps with a gradual start/finish. Pause/resume, restart, timeline inspection and close
 remain explicit. Normal street-map/chart inspection never moves the camera.
 
 The motion toggle is in the desktop header and preview settings on mobile. OS

@@ -71,7 +71,7 @@ const server=http.createServer(async(req,res)=>{
     if(evidence)file=fileURLToPath(new URL(`../private-data/historical/screenshots/image-${evidence[1]}.png`,import.meta.url));
     else if(pathname==='/design/tokens.css')file=fileURLToPath(new URL('../design/tokens.css',import.meta.url));
     else {
-      file=resolve(root,'.'+decodeURIComponent(pathname==='/'?'/index.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname==='/journal'?'/journal.html':pathname==='/account'?'/account.html':pathname==='/sign-in'?'/sign-in.html':pathname));
+      file=resolve(root,'.'+decodeURIComponent(['/','/index.html'].includes(pathname)?'/app.html':pathname==='/studio'?'/studio.html':pathname==='/training'?'/training.html':pathname==='/journal'?'/journal.html':pathname==='/account'?'/account.html':pathname==='/sign-in'?'/sign-in.html':pathname));
       const rel=relative(root,file);
       if(extname(file)==='.mjs'&&!rel.replaceAll('\\','/').startsWith('assets/vendor/'))throw new Error('Not served');
       if(rel.startsWith('..')||isAbsolute(rel)||!/\.(html|css|js|mjs|svg|ttf|txt)$/.test(file))throw new Error('Not served');

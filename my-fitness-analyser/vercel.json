@@ -4,6 +4,7 @@
     { "source": "/satellite-replay.js", "destination": "/prototypes/satellite-replay.js" },
     { "source": "/satellite-replay.css", "destination": "/prototypes/satellite-replay.css" },
     { "source": "/replay-model.js", "destination": "/prototypes/replay-model.js" },
+    { "source": "/index.html", "destination": "/prototypes/app.html" },
     { "source": "/activity-analysis.js", "destination": "/prototypes/activity-analysis.js" },
     { "source": "/activity-visuals.js", "destination": "/prototypes/activity-visuals.js" },
     { "source": "/activity-visuals.css", "destination": "/prototypes/activity-visuals.css" },
@@ -59,7 +60,7 @@
     { "source": "/route-view.js", "destination": "/prototypes/route-view.js" },
     {
       "source": "/",
-      "destination": "/prototypes/index.html"
+      "destination": "/prototypes/app.html"
     },
     {
       "source": "/app.html",
