@@ -1,6 +1,6 @@
 import { geographicRoute } from './route-geometry.js';
 
-export const REPLAY_VERSION='satellite-replay-v2';
+export const REPLAY_VERSION='satellite-replay-v3';
 export const REPLAY_SECONDS=30;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const angleDelta=(from,to)=>((to-from+540)%360+360)%360-180;
@@ -8,6 +8,11 @@ export function bearing(a,b){const rad=Math.PI/180,p=a[1]*rad,q=b[1]*rad,d=(b[0]
 const mix=(a,b,u)=>a+(b-a)*u;
 export function replayDuration(records){const distances=records.map(r=>r.distance).filter(Number.isFinite),km=distances.length>1?Math.max(0,distances.at(-1)-distances[0])/1000:0;return Math.round(clamp(22+3.5*Math.sqrt(km),24,40)*10)/10;}
 export function travelProgress(u){u=clamp(u,0,1);const ramp=.1;if(u<ramp)return u*u/(2*ramp*(1-ramp));if(u>1-ramp)return 1-(1-u)**2/(2*ramp*(1-ramp));return (u-ramp/2)/(1-ramp);}
+// Start widening during the last part of traversal, then settle on the whole route.
+export function replayPullback(seconds,duration=REPLAY_SECONDS){
+ const start=3.8+(duration-1.6-3.8)*.88,u=clamp((seconds-start)/(duration-start),0,1);
+ return u*u*(3-2*u);
+}
 export function replayFraming(height,hud,footer){
  const total=hud+footer+32,scale=Math.min(1,Math.max(0,height-80)/Math.max(1,total));
  const top=(hud+16)*scale,bottom=(footer+16)*scale,lead=Math.max(0,height-top-bottom)*.12;
@@ -28,7 +33,7 @@ export function replayModel(records){
     const heading=coordinate&&ahead&&behind&&Math.hypot(ahead.coordinate[0]-behind.coordinate[0],ahead.coordinate[1]-behind.coordinate[1])>.00001?bearing(behind.coordinate,ahead.coordinate):null;
     // The camera occupies an earlier point of this SAME continuous route,
     // letting the runner move ahead without placing the viewer off the trail.
-    const chaseTime=Math.max(path[0]?.row.t??0,time-12),a=[...path].reverse().find(p=>p.row.t<=chaseTime),b=path.find(p=>p.row.t>chaseTime);
+    const chaseTime=Math.max(path[0]?.row.t??0,time-8),a=[...path].reverse().find(p=>p.row.t<=chaseTime),b=path.find(p=>p.row.t>chaseTime);
     const chaseU=a&&b?clamp((chaseTime-a.row.t)/(b.row.t-a.row.t),0,1):0;
     const chaseCoordinate=coordinate&&a?a.coordinate.map((v,n)=>mix(v,b?.coordinate[n]??v,chaseU)):coordinate;
     return {index,row,coordinate,chaseCoordinate,heading,segment,gap:!coordinate,get trail(){

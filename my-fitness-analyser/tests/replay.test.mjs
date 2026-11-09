@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,followCamera,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
+import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,replayPullback,followCamera,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
 const fix=(t,lon=145+t/10000,extra={})=>({t,lat:-37.8,lon,distance:t*3,speed:3,elevation:27,...extra});
 test('cinematic sequence holds the city, descends, traverses elapsed time, then finishes exactly',()=>{
   assert.equal(replayPhase(.5,1000).name,'overview');assert.equal(replayPhase(2,1000).name,'descent');assert.equal(replayPhase(3.8,1000).time,0);
@@ -44,4 +44,17 @@ test('camera takes the short heading across north, limits turns, and holds throu
 test('a dateline crossing remains a short geographic move rather than a world-spanning flight',()=>{
   const model=replayModel([fix(0,179.99),fix(10,-179.99)]);
   assert.ok(model.route.bounds[1][0]-model.route.bounds[0][0]<.1);assert.ok(Math.abs(model.sample(5).coordinate[0]-180)<1e-8);
+});
+
+
+test('pullback begins before the finish, stays continuous, and reveals the complete route',()=>{
+ for(const duration of [24,29.8,40]){
+  const finish=duration-1.6;
+  assert.equal(replayPullback(3.8,duration),0);
+  assert.equal(replayPullback(duration,duration),1);
+  assert.ok(replayPullback(finish-.5,duration)>0);
+  assert.ok(replayPullback(finish,duration)<1);
+  let previous=0;
+  for(let t=0;t<=duration;t+=.025){const next=replayPullback(t,duration);assert.ok(next>=previous&&next<=1);assert.ok(next-previous<.02);previous=next;}
+ }
 });

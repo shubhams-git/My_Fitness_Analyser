@@ -1,9 +1,21 @@
 # Current state
 
 Updated: 9 November 2026 (Australia/Sydney)
-Completed increment: F17 entry-point repair and chase replay
+Completed increment: F18 mobile replay and distribution alignment
 
 ## Implemented
+
+- F18: pace-band bars/cells are centred, including true zero rows. Replay now uses
+  separate bounded header/map/footer rows, visible-viewport sizing, scroll locking
+  and original page/focus restoration. Close/stats stay in their own area. Follow
+  framing is ~1.74x closer, with an eight-second recorded trailing position and a
+  smooth pullback beginning before the finish. Large About/credits block removed;
+  legally required imagery/data credits remain as small map-edge text. Street
+  provider branding/info toggle replaced with required data links. 108 tests and
+  foundation checks pass; final Impeccable UI source detector has no findings.
+  Independent after-review has no observed P0/P1. Rendered phone/short/landscape,
+  enlarged text, seek/finish, Close/Escape and scroll restoration checked. Physical
+  iPhone Safari remains unverified by automation. See features/F18_MOBILE_REPLAY_POLISH.md.
 
 - F17: two independent Impeccable reviews reproduced the root release defect:
   stale index.html omitted chart/replay/interface styles, producing black plots

@@ -87,3 +87,7 @@
  .explorer-inspector{padding:6px 16px}.explorer-inspector p{display:none}.explorer-inspector input{min-height:32px}.route-explorer .geo-map,.route-explorer .route-svg{min-height:100px}
  .route-explorer .geo-fit{top:auto;bottom:36px;right:65px}
 }
+
+/* Data licences stay legible at the map edge, without a branded info button. */
+.geo-map .geo-map-credit{max-width:calc(100vw - 120px);padding:2px 5px;background:#fbfcfbeb;color:#344238;font:400 10px/1.5 var(--font-display);text-align:right}
+.geo-map .geo-map-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px}

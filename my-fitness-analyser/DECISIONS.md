@@ -1,5 +1,14 @@
 # Decision register
 
+D40 — Bounded mobile replay, 9 November 2026. Owner screenshots show missing
+Safari stats and raised distribution bars. Separate header, map stage and footer;
+track the visual viewport and restore page scroll/focus on exit. Honour closer
+tracking with modest raster overzoom and earlier gradual pullback, accepting trail
+cropping during pursuit. Keep mandatory licence credit as a small visible caption;
+remove the large About/credit block and optional street-provider branding. Preserve
+selected identity, recorded data and zero cost. Physical Safari confirmation remains
+separate from the rendered Chromium checks; see F18 for exact acceptance/evidence.
+
 D39 — Repair real entry, then refine the chase camera, 9 November 2026. Independent
 Impeccable A/B reviews reproduce root-only absent CSS, black figures and zero-height
 replay. Use one canonical activity document for all aliases and test/render the

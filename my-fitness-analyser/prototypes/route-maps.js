@@ -53,7 +53,8 @@ export function mountRouteMaps({records,block=null,cursor=null,onSelect,reduced=
       const map=item.map;map.touchZoomRotate.disableRotation();
       map.addControl(new m.NavigationControl({showCompass:true,visualizePitch:false}),'top-right');
       map.addControl(new m.ScaleControl({maxWidth:100,unit:'metric'}),'bottom-left');
-      map.addControl(new m.AttributionControl({compact:true}),'bottom-right');
+      // Keep required data credits visible without an expandable information control.
+      map.addControl({onAdd(){this.el=document.createElement('div');this.el.className='maplibregl-ctrl geo-map-credit';this.el.innerHTML='<a href="https://www.openmaptiles.org/" target="_blank" rel="noopener noreferrer">© OpenMapTiles</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap</a>';return this.el;},onRemove(){this.el.remove();}},'bottom-right');
       map.getCanvas().setAttribute('aria-label','Street map. Arrow keys pan; plus and minus zoom. Select the route or use the session time slider to inspect recorded data.');
       const savedCamera=cameras.get(el);if(savedCamera)map.jumpTo(savedCamera);else fit(item,false);
       map.on('style.load',()=>{if(!item.dead)addRoute(item,m);});
