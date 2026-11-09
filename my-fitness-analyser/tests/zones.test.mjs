@@ -1,3 +1,4 @@
+import {distributionMarkup} from '../prototypes/effort-distribution.js';
 import {privateHandler} from '../cloud/handler.mjs';
 import {CloudZones} from '../cloud/zones.mjs';
 import {zoneChart,progressZonesMarkup,zoneDuration} from '../prototypes/zone-view.js';
@@ -67,5 +68,6 @@ test('zone API returns useful validation errors and scopes RPC writes to the ver
 test('zone views preserve measurement links and distinguish missing sensors from missing settings',()=>{
  const d=zoneDistribution([{t:0,hr:150},{t:10}],heart),html=zoneChart(d,{title:'Heart <rate>',setting:heart});assert.ok(html.includes('Heart &lt;rate&gt;'));assert.ok(html.includes('/account?zones=heart#running-zones'));assert.ok(html.includes('<colgroup>'));assert.equal(zoneDuration(5400),'1h 30m');
  const empty=progressZonesMarkup([{run:true,zones:{}}],'heart',{versions:[heart],through:'2026-11-10'});assert.ok(empty.includes('No usable heart-rate samples'));assert.ok(!empty.includes('Add your zone boundaries'));
+ const fallback=distributionMarkup({sport:'Run',date:'2026-11-01',distance:1000,records:[{t:0,speed:3},{t:10}]},{kind:'pace'});assert.ok(fallback.includes('/account?zones=pace#running-zones'));
  const unset=progressZonesMarkup([],'pace');assert.ok(unset.includes('Add your zone boundaries'));assert.ok(unset.includes('/account?zones=pace#running-zones'));
 });
