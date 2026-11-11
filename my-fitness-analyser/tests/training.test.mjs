@@ -9,9 +9,23 @@ import { REVIEW_VERSION,TOOL_NAME,validateReview } from '../analysis/contract.mj
 import { GeminiReviews,demoEvidence,buildRequest,extractReport } from '../analysis/gemini.mjs';
 import publicData from '../api/data.mjs';
 import publicTraining from '../api/training.mjs';
+import { fieldNotesView } from '../prototypes/field-notes.js';
 
 function session(extra={}){return {id:'sample',title:'Private title',date:'2026-10-20',sport:'Run',source:'Garmin Connect',synthetic:false,provider:{id:'provider-sample',detail:{activityTypeDTO:{typeKey:'running'}}},distance:5000,timer:1800,moving:1780,elapsed:1820,hr:145,records:[{t:0,hr:140,lat:-37,lon:145},{t:1800,hr:150,lat:-37.01,lon:145.01}],...extra};}
 const dataset=(a,options={})=>trainingDataset(a,{}, {anchor:'2026-11-01',window:'all',...options});
+test('stationary sessions never render route or run analysis, even with GPS samples',()=>{
+ const render=activity=>fieldNotesView({activity,icon:()=>'',logo:'',dateText:()=>'',escape:x=>x,routePanel:()=>'ROUTE MARKER',stats:()=>'SUMMARY MARKER',observationPanel:()=>'',analysisPanel:()=>'CHART MARKER',blocksPanel:()=>'',sourceNote:()=>'',inlineCheckin:()=>'',distance:()=>'',miniRoute:''});
+ const road=session(),treadmill=session({id:'treadmill',provider:{id:'treadmill',detail:{activityTypeDTO:{typeKey:'treadmill_running'}}}});
+ const bike=session({id:'bike',provider:{id:'bike',detail:{activityTypeDTO:{typeKey:'indoor_cycling'}}}});
+ for(const activity of [treadmill,bike]){
+  const html=render(activity);
+  assert.match(html,/SUMMARY MARKER/);
+  assert.doesNotMatch(html,/ROUTE MARKER|CHART MARKER|Replay route|Replay unavailable/);
+ }
+ assert.match(render(road),/ROUTE MARKER/);
+ const history=session({id:'history',source:'Nike Run Club',provider:null});
+ assert.deepEqual(dataset([road,treadmill,bike,history],{outdoorGarminOnly:true}).sessions.map(s=>s.id),[road.id]);
+});
 async function temporaryCache(){return pathToFileURL((await mkdtemp(join(tmpdir(),'fitness-analysis-')) )+'/');}
 async function removeCache(directory){assert.match(relative(tmpdir(),fileURLToPath(directory)),/^fitness-analysis-[^\\/]+[\\/]?$/);await rm(directory,{recursive:true,force:true});}
 function report(pack=demoEvidence()){return {schemaVersion:REVIEW_VERSION,evidenceHash:pack.hash,dataset:'synthetic',summary:'The imported record includes runs with different sensor coverage.',findings:[{kind:'coverage_gap',title:'Heart rate is missing in part of the record.',explanation:'Inspect the available heart-rate sessions without filling the gaps.',confidence:'direct_evidence',factIds:['history.hrSessions','history.sessions']}],visualizations:[{type:'session_distance',sessionIds:['s01','s02']}],nextChecks:[]};}

@@ -12,6 +12,26 @@ test('coaching evidence includes screenshot comparisons and full splits without 
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'});assert.equal(pack.content.sessions.length,8);assert.ok(pack.content.comparisons.length);assert.ok(pack.content.facts.some(f=>f.id==='s01.splitChange'&&f.value===10));
  const payload=JSON.stringify(coachingRequest(pack,'gemini-3.8-flash'));for(const forbidden of ['PRIVATE','private note','2026-10-17','"a7"','"lat"','"longitude"'])assert.equal(payload.includes(forbidden),false,forbidden);assert.equal(JSON.stringify(pack.content).includes('"a7"'),false);assert.equal(pack.mapping.s01,'a7');assert.equal(coachingRequest(pack,'gemini-3.8-flash').store,false);
 });
+test('whole-training coaching keeps Garmin performance separate from other workout context',()=>{
+ const input=library(),base=input.activities.a7,date='2026-10-17';
+ const garmin=(id,type,overrides={})=>({...base,id,provider:{id,detail:{activityTypeDTO:{typeKey:type}}},source:'Garmin Connect',sourceFile:'Garmin API + original FIT',date,timer:1800,...overrides});
+ Object.assign(input.activities,{
+  road:garmin('road','running',{avgPower:300,records:[{t:0,lat:-37,lon:145}]}),
+  treadmill:garmin('treadmill','treadmill_running',{distance:9000}),
+  bike:garmin('bike','indoor_cycling'),
+  backward:garmin('backward','running',{title:'Backward run'}),
+  watchStrength:garmin('watchStrength','strength_training')
+ });
+ const strengthEntries=[{date_key:date,focus:'Legs',minutes:35,note:'private note'}];
+ const pack=coachingEvidence(input,{anchor:date,strengthEntries});
+ assert.deepEqual(Object.values(pack.mapping),['road']);
+ assert.equal(pack.content.facts.find(f=>f.id==='history.distance').value,2200);
+ assert.equal(pack.content.facts.find(f=>f.id==='s01.power').value,300);
+ assert.deepEqual(pack.content.workouts.days.map(d=>[d.kind,d.sessions,d.durationS]),[['stationary-bike',1,1800],['strength',1,2100],['treadmill',1,1800],['workout',1,1800]]);
+ assert.equal(pack.content.workouts.overlappingStrengthDays,1);
+ assert.doesNotMatch(JSON.stringify(pack.content),/2026-10-17|private note|9000/);
+ assert.notEqual(pack.hash,coachingEvidence(input,{anchor:date,strengthEntries:[]}).hash);
+});
 test('schema and semantic gates reject invented numbers, missing evidence and unavailable charts',()=>{
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),good=report(pack);validateCoaching(good,pack);
  for(const mutate of [r=>r.verdict.text='You improved by 20%.',r=>r.findings[0].factIds=['history.runs'],r=>r.charts[0].type='heart_rate',r=>r.extra='unexpected']){const bad=structuredClone(good);mutate(bad);assert.throws(()=>validateCoaching(bad,pack));}

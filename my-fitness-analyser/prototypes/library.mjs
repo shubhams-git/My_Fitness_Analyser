@@ -1,3 +1,4 @@
+import {activityKind,activityLabels} from './activity-kind.js';
 import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { Decoder, Stream } from '@garmin/fitsdk';
@@ -15,7 +16,7 @@ export function applyGarmin(activity,id,detail,fetchedAt=new Date().toISOString(
   activity.title=typeof detail.activityName==='string'?detail.activityName:activity.title;
   if(/^\d{4}-\d\d-\d\dT\d\d:\d\d/.test(s.startTimeLocal||'')){activity.date=s.startTimeLocal.slice(0,10);activity.time=s.startTimeLocal.slice(11,16)+' (recorded local time)';}
   for(const [key,field]of Object.entries({distance:'distance',timer:'duration',elapsed:'elapsedDuration',moving:'movingDuration',hr:'averageHR',maxHr:'maxHR',elevationGain:'elevationGain'}))if(Number.isFinite(s[field]))activity[key]=s[field];
-  if(detail.activityTypeDTO?.typeKey==='track_running')activity.sport='Track run';
+  activity.sport=detail.activityTypeDTO?.typeKey==='track_running'?'Track run':activityLabels[activityKind(activity)];
   activity.sourceFile='Garmin API + original FIT';activity.sourceIssues=['Summary values come from Garmin; recorded samples and device laps come from the original FIT. FIT summary values are retained separately.'];
   activity.observation={...observation(activity),version:ANALYSIS_VERSION};
   return activity;
@@ -27,7 +28,8 @@ export function decodeActivity(bytes) {
   if(errors.length)throw new Error('FIT decoding failed. The original file has not been imported.');
   if(messages.sessionMesgs?.length!==1)throw new Error('Import one activity session at a time. Multisport files are not supported yet.');
   const s=messages.sessionMesgs[0];
-  if(!['running','walking'].includes(s.sport))throw new Error('This release supports running and walking FIT activities.');
+  if(!['running','walking','hiking','cycling','training','fitnessEquipment','generic'].includes(s.sport))throw new Error('This FIT sport is outside the supported activities.');
+  const sport=activityLabels[activityKind({sport:{running:'Run',walking:'Walk',hiking:'Walk',cycling:'Ride'}[s.sport],fitSubSport:s.subSport})];
   const start=new Date(s.startTime),base=start.getTime()/1000;
   if(!Number.isFinite(base))throw new Error('The activity has no valid start timestamp.');
   const coordinate=(v,limit)=>{const n=finite(v)==null?null:v*180/2**31;return n!==null&&Math.abs(n)<=limit?n:null;};
@@ -35,7 +37,7 @@ export function decodeActivity(bytes) {
   const hash=createHash('sha256').update(bytes).digest('hex');
   const date=start.toISOString().slice(0,10),time=start.toISOString().slice(11,16)+' UTC';
   const device=messages.deviceInfoMesgs?.find(d=>d.garminProduct==='fr965'||d.garminProduct==='fr255Music')?.garminProduct;
-  const activity={id:'fit-'+hash,title:s.sport==='walking'?'Imported walk':'Imported run',date,time,startInstant:start.toISOString(),sport:s.sport==='walking'?'Walk':'Run',source:'Original FIT',device:device==='fr965'?'Forerunner 965':device==='fr255Music'?'Forerunner 255 Music':'FIT recording device',synthetic:false,sourceHash:hash,parserVersion:'fit-local-v1',distance:finite(s.totalDistance),timer:finite(s.totalTimerTime),elapsed:finite(s.totalElapsedTime),moving:null,hr:finite(s.avgHeartRate),maxHr:finite(s.maxHeartRate),cadence:s.avgCadence==null?null:s.avgCadence*2,elevationGain:finite(s.totalAscent),records,laps:(messages.lapMesgs||[]).map(l=>({distance:finite(l.totalDistance),duration:finite(l.totalTimerTime)})),blockLabel:'1-minute blocks',sourceNote:null,sourceIssues:['Start time is displayed in UTC. Moving time is unavailable in this import.'],sourceFile:'Original FIT'};
+  const activity={id:'fit-'+hash,title:'Imported '+sport.toLowerCase(),date,time,startInstant:start.toISOString(),sport,fitSubSport:s.subSport??null,avgPower:finite(s.avgPower),source:'Original FIT',device:device==='fr965'?'Forerunner 965':device==='fr255Music'?'Forerunner 255 Music':'FIT recording device',synthetic:false,sourceHash:hash,parserVersion:'fit-local-v1',distance:finite(s.totalDistance),timer:finite(s.totalTimerTime),elapsed:finite(s.totalElapsedTime),moving:null,hr:finite(s.avgHeartRate),maxHr:finite(s.maxHeartRate),cadence:s.avgCadence==null?null:s.avgCadence*2,elevationGain:finite(s.totalAscent),records,laps:(messages.lapMesgs||[]).map(l=>({distance:finite(l.totalDistance),duration:finite(l.totalTimerTime)})),blockLabel:'1-minute blocks',sourceNote:null,sourceIssues:['Start time is displayed in UTC. Moving time is unavailable in this import.'],sourceFile:'Original FIT'};
   activity.blocks=timeBlocks(records);
   activity.observation={title:'Your session is ready to explore.',evidence:'Inspect the recorded route, measurements and device laps, then add how it felt.',method:'Source summary from one FIT session. Time blocks use recorded sample boundaries; device laps remain separate.',version:'fit-local-v1'};
   return activity;

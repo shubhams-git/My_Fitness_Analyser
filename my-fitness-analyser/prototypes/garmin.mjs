@@ -1,3 +1,4 @@
+import {supportedGarminKind} from './activity-kind.js';
 import { readFile } from 'node:fs/promises';
 import { parseEnv } from 'node:util';
 import { inflateRawSync } from 'node:zlib';
@@ -61,7 +62,7 @@ export class GarminSync {
         for(const item of page){
           const id=String(item.activityId);if(!/^[1-9]\d{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))throw new Error('Garmin returned an invalid activity identity.');if(seen.has(id))continue;seen.add(id);result.seen++;
           if(this.cutoff&&(!/^\d{4}-\d{2}-\d{2}/.test(item.startTimeLocal||'')||item.startTimeLocal.slice(0,10)<this.cutoff)){result.skipped++;continue;}
-          if(!['running','track_running','treadmill_running','indoor_running','walking'].includes(item.activityType?.typeKey)){result.skipped++;continue;}
+          if(!supportedGarminKind(item.activityType?.typeKey)){result.skipped++;continue;}
           try{const detail=await client.json(`/activity-service/activity/${id}`),bytes=fitFromZip(await client.request(`/download-service/files/activity/${id}`,{binary:true}));const outcome=await this.library.importGarmin(bytes,id,detail);result[outcome]++;}
           catch(e){result.failed++;result.errors.push({activityId:id,message:e.message});}
         }

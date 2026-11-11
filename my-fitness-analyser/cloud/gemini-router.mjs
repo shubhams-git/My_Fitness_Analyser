@@ -18,7 +18,6 @@ export async function routedGemini({task,key,keys=key?[key]:[],request,validate,
  const attempts=[],deadline=clock()+totalMs;let lastStatus=503;
  const route=modelRoute(task);
  const attemptLimit=task==='weight-coaching'?4:7;
- const start=cursor++%keys.length;
  for(const [modelIndex,entry] of route.entries()){
   for(let keyOffset=0;keyOffset<keys.length;keyOffset++){
   // Reserve one attempt for each remaining model.
@@ -29,7 +28,7 @@ export async function routedGemini({task,key,keys=key?[key]:[],request,validate,
   const remaining=deadline-clock();if(remaining<=0)break;
   const attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'network',httpStatus:null};attempts.push(attempt);
   try{
-   const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal:AbortSignal.timeout(Math.max(1,Math.min(entry.timeout,remaining))),headers:{'Content-Type':'application/json','x-goog-api-key':keys[(start+attempts.length-1)%keys.length],'Api-Revision':'2026-05-20'},body:JSON.stringify(request(entry))});
+   const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal:AbortSignal.timeout(Math.max(1,Math.min(entry.timeout,remaining))),headers:{'Content-Type':'application/json','x-goog-api-key':keys[cursor++%keys.length],'Api-Revision':'2026-05-20'},body:JSON.stringify(request(entry))});
    attempt.httpStatus=response.status;
    if(!response.ok){
     attempt.outcome='http';lastStatus=response.status;

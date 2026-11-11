@@ -7,8 +7,19 @@ import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/co
 import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,signalDirection,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
-export async function aiPreference(api){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:DISCLOSURE,updatedAt:r?.updated_at||null};}
-export async function setAiPreference(api,enabled){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure:DISCLOSURE}});}
+export const TRAINING_DISCLOSURE='gemini-training-v2';
+export async function aiPreference(api,disclosure=DISCLOSURE){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===disclosure?r.enabled:r?.enabled===false?false:null,revision:r?Number(r.revision):0,disclosureVersion:disclosure,updatedAt:r?.updated_at||null};}
+export async function setAiPreference(api,enabled,disclosure=DISCLOSURE){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure}});}
+async function recentStrength(api,anchor){
+ const start=new Date(Date.parse(anchor)-13*86400000).toISOString().slice(0,10);
+ const filter=`owner_id=eq.${api.config.owner}&deleted=eq.false&date_key=gte.${start}&date_key=lte.${anchor}`;
+ const [manual,imported]=await Promise.all([
+  api.json(`/rest/v1/strength_entries_latest?${filter}&select=date_key,focus:data->>focus,minutes:data->>mins`),
+  api.json(`/rest/v1/journal_sessions_latest?${filter}&select=date_key,focus,minutes`)
+ ]);
+ const manualDays=new Set(manual.map(row=>row.date_key));
+ return [...manual,...imported.filter(row=>!manualDays.has(row.date_key))];
+}
 const compactModel=model=>model==='gemini-3.1-flash-lite';
 function compactVerdicts(pack){
  const baseline=recordedBrief({pack},'provider').report.verdict;
@@ -23,13 +34,24 @@ function compactVerdicts(pack){
    factIds:[factId,difference],signal:{factId,direction}
   };
  }
+ const strength=pack.content.facts.find(f=>f.id==='workouts.strength.count');
+ const recentLegs=pack.content.workouts?.days.some(row=>row.kind==='strength'&&row.daysAgo<=2&&row.focuses.some(focus=>['Legs','Lower body','Full body'].includes(focus)));
+ if(strength&&recentLegs){
+  const factId=strength.id;
+  choices.strength={
+   text:'You logged lower-body strength work close to your next run.',
+   explanation:'Your recent log includes {'+factId+'} strength sessions, with lower-body work in the last few days.',
+   nextAction:'Start your next easy run conversationally. Let how your legs feel guide any pickup.',
+   factIds:[factId],signal:{factId,direction:'none'}
+  };
+ }
  return choices;
 }
 export function coachingRequest(pack,model,thinking='high'){
  const compact=compactModel(model),schema=coachingSchema(pack);
  const choices=compact?compactVerdicts(pack):null;
  const input=compact?{choices,facts:pack.content.facts.filter(f=>Object.values(choices).some(choice=>choice.factIds.includes(f.id)))}:{schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content};
- const system=compact?'Select the most useful measured coaching observation for the runner’s next run. Return its choice key only in the required JSON object.':COACH_SYSTEM;
+ const system=compact?'Select the most useful measured coaching observation for the runner’s next run. Return its choice key only in the required JSON object.':COACH_SYSTEM+(pack.content.workouts?`\nUse outdoor Garmin runs for running-performance comparisons. Treat the last fourteen days of other activities as context for the next run. Look for relevant timing and strength focus before choosing the next action. Duration alone does not establish intensity, fatigue, or recovery. Missing sessions are unknown. Never add treadmill distance to running totals or infer training load from machine pace. If other training changes your advice, cite a workouts count fact and explain the practical adjustment in plain language.`:'');
  const responseSchema=compact?{type:'object',properties:{choice:{type:'string',enum:Object.keys(choices)}},required:['choice'],additionalProperties:false}:schema;
  return {model,store:false,system_instruction:system,input:JSON.stringify(input),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(responseSchema)},generation_config:generationConfig(model,thinking,compact?256:16384)};
 }
@@ -68,9 +90,10 @@ function recordedBrief(context,reason){
  return {report,evidence:pack.content,mapping:pack.mapping,generatedAt:new Date().toISOString(),model:null,stale:false,fallback:reason};
 }
 export class TrainingIntelligence {
- constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api)}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;}
+ constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
+ preference(){return aiPreference(this.api,this.disclosure);}
  configured(){return Boolean(geminiKeys(this.env).length&&this.env.GEMINI_FREE_TIER_CONFIRMED==='1');}
- async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const pack=coachingEvidence(data,{anchor:localDay(profiles[0]?.timezone||'Australia/Sydney'),zoneVersions:zones.versions,goalVersions:goals.versions}),model=modelRoute('run-coaching')[0].model,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,MODEL_POLICY,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
+ async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,zoneVersions:zones.versions,goalVersions:goals.versions}),model=modelRoute('run-coaching')[0].model,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,MODEL_POLICY,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
   const exact=await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
@@ -82,18 +105,18 @@ export class TrainingIntelligence {
   return valid.find(r=>r.evidence_key===context.key)||valid[0]||null;
  }
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key}:null;}
- async status(){const consent=await aiPreference(this.api),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,runs:context.pack.content.sessions.length,review:this.item(await this.saved(context),context.key)};}
+ async status(){const consent=await this.preference(),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model,minRuns:this.wholeTraining?1:2};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,runs:context.pack.content.sessions.length,review:this.item(await this.saved(context),context.key)};}
  async generate(){
-  let pref=await aiPreference(this.api);if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');
+  const pref=await this.preference();if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');
   if(!this.configured())throw new CloudError(409,'Gemini is unavailable. The server needs a supported Flash model and a confirmed Free-tier project.');
-  const context=await this.context();if(context.pack.content.sessions.length<2)throw new CloudError(409,'Import at least two runs before requesting a history briefing.');
+  const context=await this.context();if(context.pack.content.sessions.length<(this.wholeTraining?1:2))throw new CloudError(409,this.wholeTraining?'Sync an outdoor Garmin run before requesting your brief.':'Import at least two runs before requesting a history briefing.');
   const cached=await this.saved(context);if(cached?.evidence_key===context.key)return this.item(cached,context.key);
   const claim=await this.api.request('/rest/v1/rpc/begin_training_review',{method:'POST',body:{evidence_key:context.key,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
   if(claim.status===429)return recordedBrief(context,'cooldown');
   if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===409?409:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===409?'A review is already running. Try again shortly.':'The review could not start. Please retry.');
   const id=await claim.json();
   let trace=[];try{
-   const routed=await routedGemini({task:'run-coaching',keys:geminiKeys(this.env),fetcher:this.fetcher,request:entry=>coachingRequest(context.pack,entry.model,entry.thinking),validate:(json,entry)=>extractCoaching(json,context.pack,entry.model),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await aiPreference(this.api);if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
+   const routed=await routedGemini({task:'run-coaching',keys:geminiKeys(this.env),fetcher:this.fetcher,request:entry=>coachingRequest(context.pack,entry.model,entry.thinking),validate:(json,entry)=>extractCoaching(json,context.pack,entry.model),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await this.preference();if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
    trace=routed.attempts;const report=routed.report;
    if((await this.context()).key!==context.key)throw new CloudError(409,'Your training changed during analysis. Review the updated runs.');
    const stored=await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack,result_model:routed.model,attempt_log:trace}});
@@ -103,7 +126,7 @@ export class TrainingIntelligence {
    await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'failed',result_report:null,result_evidence:null,result_model:null,attempt_log:error.attempts||trace}}).catch(()=>{});
    if(!error.attempts)throw error;
    console.warn('Gemini coaching attempts exhausted',JSON.stringify(error.attempts));
-   const latestPref=await aiPreference(this.api);
+   const latestPref=await this.preference();
    if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');
    return recordedBrief(await this.context(),'provider');
   }

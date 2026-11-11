@@ -253,3 +253,8 @@ html.largest-text{scroll-padding-top:24px}
 @media(max-width:600px){.fn-header nav a[href="/journal"]{display:flex;align-items:center;min-height:44px;font-size:.75rem}}
 @media(max-width:600px){.fn-header{height:auto;min-height:116px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:0 12px;padding-top:10px;padding-bottom:4px}.fn-header .fn-brand{grid-column:1;grid-row:1}.fn-header .fn-header-actions{grid-column:2;grid-row:1}.fn-header nav{grid-column:1/-1;grid-row:2;display:flex;margin:0;gap:28px;min-height:44px}.fn-header nav a[href="/training"],.fn-header nav button[data-action="activities"]{display:flex;align-items:center;min-height:44px;font-size:.75rem}}
 @media(min-width:601px) and (max-width:1100px){.fn-header nav{gap:20px}.fn-header nav a[href="#session-details"]{display:none}}
+
+.fn-app .fn-workout{grid-template-columns:minmax(0,1fr);grid-template-areas:"intro" "footer";min-height:0}
+.fn-app .fn-workout .fn-intro h1{font-size:clamp(2.5rem,7vw,5rem);overflow-wrap:anywhere}
+.fn-app .fn-workout .fn-hero-footer .metric-rail{width:100%;grid-template-columns:1fr}
+.fn-app .fn-workout .metric-rail .metric:first-child{display:block}

@@ -32,7 +32,7 @@ test('live schema design executes with owner isolation, protected goals and audi
  const db=new PGlite(),owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';let n=1;
  try{
   await db.exec(`create role authenticated;create role anon;create schema auth;create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;grant usage on schema auth to authenticated;create table fitness_owners(owner_id uuid primary key);create table fitness_profiles(owner_id uuid primary key,timezone text);insert into fitness_owners values('${owner}'),('${other}');insert into fitness_profiles values('${owner}','Australia/Sydney'),('${other}','Australia/Sydney');`);
-  for(const file of ['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql'])await db.exec(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
+  for(const file of ['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql','20261112_whole_training_disclosure.sql'])await db.exec(await readFile(new URL('../supabase/migrations/'+file,import.meta.url),'utf8'));
   await db.exec(`set role authenticated;select set_config('request.jwt.claim.sub','${owner}',false);`);
   const save=(head,g=weekly,id=`aaaaaaaa-aaaa-4aaa-8aaa-${String(n++).padStart(12,'0')}`)=>db.query('select save_training_goal($1,$2,$3,$4) as v',[g.kind,head,id,{effectiveFrom:g.effectiveFrom,target:g.target,deadline:g.deadline,distanceM:g.distanceM}]);
   const id='bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb';await save(0,weekly,id);await save(0,weekly,id);await assert.rejects(save(0),e=>e.code==='PT409');await assert.rejects(save(1,{...weekly,target:1}),e=>e.code==='PT400');
@@ -48,6 +48,7 @@ test('live schema design executes with owner isolation, protected goals and audi
     select '${owner}', repeat('c',64), 'gemini-3.6-flash','p','s',1,'failed',now()-interval '45 seconds'
     from generate_series(1,3);
     set role authenticated;`);
+  await db.query("select set_ai_preference(true,'gemini-training-v2')");
   await begin();
   await db.exec(`select set_config('request.jwt.claim.sub','${other}',false);`);assert.equal((await db.query('select * from training_goal_versions')).rows.length,0);await save(0);await assert.rejects(db.query("select finish_training_review_v2($1,'failed',null,null,null,'[]')",[report]),e=>e.code==='42501');
   await db.exec('reset role;set role anon;');await assert.rejects(save(0),e=>e.code==='42501');

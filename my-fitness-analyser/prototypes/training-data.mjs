@@ -1,3 +1,4 @@
+import {activityKind,isGarminOutdoorRun} from './activity-kind.js';
 import {runningGoalProgress} from './goal-model.js';
 import { activityZones } from './zone-model.js';
 import { createHash } from 'node:crypto';
@@ -13,18 +14,18 @@ const dateMs=date=>Date.parse(date+'T12:00:00Z');
 const monday=date=>{const d=new Date(date);d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d.toISOString().slice(0,10);};
 export function mergeTrainingActivities(seeds,saved){const map=new Map(seeds.filter(a=>!a.synthetic).map(a=>[a.id,a]));for(const a of saved){for(const [id,b]of map)if(id!==a.id&&(a.sourceHash&&a.sourceHash===b.sourceHash||a.provider&&a.provider.id===b.garminActivityId))map.delete(id);map.set(a.id,a);}return [...map.values()];}
 
-export function trainingDataset(activities,feedback={}, {window='90',anchor=calendarDay(),synthetic=false,zoneVersions=[],goalVersions=[]}={}){
+export function trainingDataset(activities,feedback={}, {window='90',anchor=calendarDay(),synthetic=false,outdoorGarminOnly=false,zoneVersions=[],goalVersions=[]}={}){
   const seen=new Set();let sessions=[];
-  const sorted=[...activities].filter(a=>Boolean(a.synthetic)===synthetic).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||a.id.localeCompare(b.id));
+  const sorted=[...activities].filter(a=>Boolean(a.synthetic)===synthetic&&(!outdoorGarminOnly||isGarminOutdoorRun(a))).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||a.id.localeCompare(b.id));
   for(const a of sorted){
     const identity=a.provider?.id||a.sourceHash||a.id;if(seen.has(identity))continue;seen.add(identity);
     if(!Number.isFinite(dateMs(a.date))||dateMs(a.date)>dateMs(anchor)+day)continue;
     const gps=a.records.filter(r=>Number.isFinite(r.lat)&&Number.isFinite(r.lon)).length;
-    const kind=a.provider?.detail?.activityTypeDTO?.typeKey||'',environment=/treadmill|indoor/.test(kind)?'indoor':gps?'outdoor':'unknown';
+    const kind=a.provider?.detail?.activityTypeDTO?.typeKey||'',environment=activityKind(a)==='treadmill'||/treadmill|indoor/.test(kind)?'indoor':gps?'outdoor':'unknown';
     const duration=number(a.timer??a.running??a.moving??a.elapsed),basis=a.timer!=null?'timer':a.running!=null?'running':a.moving!=null?'moving':a.elapsed!=null?'elapsed':'unavailable';
     const rawPace=a.displayedPace??(a.distance>=10&&duration>0?duration/a.distance*1000:null),pace=a.distance>=10&&rawPace>0&&rawPace<=3600?rawPace:null;
     const movingFraction=a.timer>0&&a.moving!==null&&a.moving!==undefined?a.moving/a.timer:null;
-    const run=['Run','Track run','Track Run'].includes(a.sport),flags=[];
+    const run=activityKind(a)==='run',flags=[];
     if(a.distance!==null&&a.distance<10)flags.push('insufficient_distance');
     if(!gps)flags.push('no_gps');if(a.hr==null)flags.push('no_hr');
     if(movingFraction!==null&&movingFraction<.8)flags.push('different_time_bases');
@@ -37,7 +38,7 @@ export function trainingDataset(activities,feedback={}, {window='90',anchor=cale
   const goalSessions=sessions; if(window!=='all')sessions=sessions.filter(s=>dateMs(s.date)>=dateMs(anchor)-90*day);
   const weeks=Array.from({length:8},(_,i)=>{const start=monday(dateMs(anchor)-(7-i)*7*day);return {start,distanceM:0,sessions:0,garminM:0,historicalM:0};});
   for(const s of sessions){const week=weeks.find(w=>w.start===monday(dateMs(s.date)));if(week){week.distanceM+=s.distanceM??0;week.sessions++;week[s.sourceKind==='screenshot'?'historicalM':'garminM']+=s.distanceM??0;}}
-  const metrics={sessions:sessions.length,runs:sessions.filter(s=>s.run).length,walks:sessions.filter(s=>!s.run).length,distanceM:sessions.reduce((n,s)=>n+(s.distanceM??0),0),recordedTimeS:sessions.reduce((n,s)=>n+(s.durationS??0),0),durationCoverage:sessions.filter(s=>s.durationS!==null).length,hrSessions:sessions.filter(s=>s.hrBpm!==null).length,gpsSessions:sessions.filter(s=>s.gpsSamples>0).length,paceSessions:sessions.filter(s=>s.paceSPerKm!==null&&s.run).length,comparableSessions:sessions.filter(s=>s.comparable).length,checkins:sessions.filter(s=>s.checkinComplete).length};
+  const metrics={sessions:sessions.length,runs:sessions.filter(s=>s.run).length,walks:sessions.filter(s=>s.sport==='Walk').length,distanceM:sessions.reduce((n,s)=>n+(s.distanceM??0),0),recordedTimeS:sessions.reduce((n,s)=>n+(s.durationS??0),0),durationCoverage:sessions.filter(s=>s.durationS!==null).length,hrSessions:sessions.filter(s=>s.hrBpm!==null).length,gpsSessions:sessions.filter(s=>s.gpsSamples>0).length,paceSessions:sessions.filter(s=>s.paceSPerKm!==null&&s.run).length,comparableSessions:sessions.filter(s=>s.comparable).length,checkins:sessions.filter(s=>s.checkinComplete).length};
   const measured=[];
   if(sessions.some(s=>s.flags.includes('insufficient_distance')))measured.push({kind:'quality',title:'Some distance recordings cannot support pace.',body:'Heart rate and recorded time remain available. Distance-based conclusions are withheld for these sessions.',sessionIds:sessions.filter(s=>s.flags.includes('insufficient_distance')).map(s=>s.id)});
   if(metrics.comparableSessions<3)measured.push({kind:'coverage',title:'A fitness trend would be premature.',body:'The imported history does not yet contain enough comparable outdoor runs. Indoor sessions, short recordings and differing time bases stay separate.',sessionIds:sessions.filter(s=>s.run).map(s=>s.id)});
