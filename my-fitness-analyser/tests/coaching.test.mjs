@@ -20,11 +20,10 @@ test('schema and semantic gates reject invented numbers, missing evidence and un
 test('Flash-Lite returns one verdict and still must pass the full evidence checks',()=>{
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),model='gemini-3.1-flash-lite';
  const request=coachingRequest(pack,model,null);
- assert.deepEqual(Object.keys(request.response_format.schema.properties),['verdict']);
- const {verdict}=report(pack);
+ assert.deepEqual(Object.keys(request.response_format.schema.properties),['choice']);
  const result=value=>({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(value)}]}]});
- assert.deepEqual(extractCoaching(result({verdict}),pack,model).charts,[]);
- assert.throws(()=>extractCoaching(result({verdict:{...verdict,text:'You improved by 20%.'}}),pack,model));
+ assert.deepEqual(extractCoaching(result({choice:'pace'}),pack,model).charts,[]);
+ assert.throws(()=>extractCoaching(result({choice:'invented'}),pack,model));
 });
 test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports remain cache hits',async()=>{
  const api={config:{owner},json:async()=>[]},engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_MODEL:'gemini-3.6-flash'}}),context=await engine.context(),pack=context.pack;

@@ -4,19 +4,34 @@ import {CloudZones} from './zones.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
 import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/coaching-evidence.mjs';
-import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,validateCoaching } from '../analysis/coaching-contract.mjs';
+import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,signalDirection,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
 export async function aiPreference(api){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:DISCLOSURE,updatedAt:r?.updated_at||null};}
 export async function setAiPreference(api,enabled){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure:DISCLOSURE}});}
 const compactModel=model=>model==='gemini-3.1-flash-lite';
+function compactVerdicts(pack){
+ const baseline=recordedBrief({pack},'provider').report.verdict;
+ const choices={latest:baseline};
+ const comparison=pack.content.facts.find(f=>f.id.startsWith('comparison.')&&f.id.endsWith('.paceChange')&&f.value!==0);
+ if(comparison){
+  const factId=comparison.id,direction=signalDirection(factId,comparison.value),difference=factId.replace('paceChange','paceDifference');
+  choices.pace={
+   text:'You ran '+direction+' by {'+difference+'} compared with earlier similar runs.',
+   explanation:'The comparison uses runs with the same source, timing basis and environment.',
+   nextAction:'Repeat a familiar route at a similar effort to see whether the pace difference holds.',
+   factIds:[factId,difference],signal:{factId,direction}
+  };
+ }
+ return choices;
+}
 export function coachingRequest(pack,model,thinking='high'){
  const compact=compactModel(model),schema=coachingSchema(pack);
- const {facts,comparisons,sessions,goalContext,zoneContext}=pack.content;
- const input=compact?{facts,comparisons,goalContext,zoneContext,sessions:sessions.map(({ref})=>({ref}))}:pack.content;
- const system=compact?`Give this runner one actionable verdict. Pick one clear measured pattern. Return only verdict, with text (24 words), explanation (35 words), nextAction (22 words), factIds and signal. Every measured number must be a {fact.id} placeholder listed in factIds. Never type a number directly or repeat a unit. For signal choose one cited fact: positive paceChange or splitChange is slower, negative is faster, zero is steady. Positive week.distanceChange or week.distanceChangePercent is up, negative is down, zero is steady. All other facts use none. Make comparisons only when supported by the selected signal. Give one concrete next-run action. No other fields.`:COACH_SYSTEM;
- const responseSchema=compact?{type:'object',properties:{verdict:schema.properties.verdict},required:['verdict'],additionalProperties:false}:schema;
- return {model,store:false,system_instruction:system,input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...input}),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(responseSchema)},generation_config:generationConfig(model,thinking)};
+ const choices=compact?compactVerdicts(pack):null;
+ const input=compact?{choices,facts:pack.content.facts.filter(f=>Object.values(choices).some(choice=>choice.factIds.includes(f.id)))}:{schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content};
+ const system=compact?'Select the most useful measured coaching observation for the runner’s next run. Return its choice key only in the required JSON object.':COACH_SYSTEM;
+ const responseSchema=compact?{type:'object',properties:{choice:{type:'string',enum:Object.keys(choices)}},required:['choice'],additionalProperties:false}:schema;
+ return {model,store:false,system_instruction:system,input:JSON.stringify(input),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(responseSchema)},generation_config:generationConfig(model,thinking,compact?256:16384)};
 }
 export function extractCoaching(result,pack,model){
  if(result.status!=='completed')throw new CloudError(502,'Gemini did not finish a complete briefing. Your training record is unchanged.');
@@ -25,8 +40,9 @@ export function extractCoaching(result,pack,model){
  let report;try{
   report=JSON.parse(outputs[0].content.map(c=>c.text).join(''));
   if(compactModel(model)){
-   if(!report||Object.keys(report).length!==1||!Object.hasOwn(report,'verdict'))throw new Error('Invalid compact brief');
-   report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:report.verdict,findings:[],charts:[]};
+   const choices=compactVerdicts(pack);
+   if(!report||Object.keys(report).length!==1||!Object.hasOwn(report,'choice')||!Object.hasOwn(choices,report.choice))throw new Error('Invalid compact brief');
+   report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:choices[report.choice],findings:[],charts:[]};
   }
   // Main claim and chart references must pass. An optional weak observation
   // should not discard an otherwise sound brief or trigger another API call.
