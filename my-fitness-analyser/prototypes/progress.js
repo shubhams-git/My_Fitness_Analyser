@@ -1,3 +1,4 @@
+import {goalMarkup} from './goals-view.js';
 import {progressZonesMarkup} from './zone-view.js';
 import { mountBestHistory,effortDistance } from './best-history.js';
 import { progressModel, BENCHMARKS, niceAxis } from './progress-model.js';
@@ -39,6 +40,7 @@ export function mountProgress(root,data){
   const pMin=fastest.length?Math.floor((Math.min(...fastest.map(e=>e.paceSPerKm))-15)/30)*30:0,pMax=fastest.length?Math.ceil((Math.max(...fastest.map(e=>e.paceSPerKm))+15)/30)*30:1;
   const px=d=>50+(Math.log(d)-Math.log(400))/(Math.log(Math.max(5000,...fastest.map(e=>e.distance)))-Math.log(400))*(width-100),py=p=>28+(p-pMin)/(pMax-pMin)*120;
   root.innerHTML=`<div class="pr-heading"><div class="tr-window" role="group" aria-label="Progress sport">${[['run','Running'],['walk','Walking'],['all','All activities']].map(([key,label])=>`<button data-progress-sport="${key}" aria-pressed="${sport===key}">${label}</button>`).join('')}</div></div>
+  ${data.cloud&&sport!=='walk'?`<div class="goal-pair">${goalMarkup(data.goals?.weekly,'weekly-distance')}${goalMarkup(data.goals?.time,'run-time')}</div>`:''}
   <div class="pr-workspace"><section class="pr-month" aria-labelledby="pr-month-title"><div class="pr-panel-head"><h2 id="pr-month-title">${metric==='distanceM'?'Monthly distance':'Monthly running time'}</h2><label class="pr-month-select"><span class="sr-only">Progress month</span><select id="progress-month">${model.monthly.toReversed().map(m=>`<option value="${m.key}" ${selected===m.key?'selected':''}>${month(m.key)}</option>`).join('')}</select></label></div>
   <div class="pr-readout"><div><strong id="pr-value">${value(selectedMetric)}</strong><span id="pr-unit">${unit}</span></div><p id="pr-context">Through ${date(chosen.date)}${baseline!==undefined?' · '+value(baseline)+' '+unit+' in '+month(compare.key).split(' ')[0]+' by day '+Math.min(chosen.day,compare.days):''}</p></div>
   <div class="pr-controls" role="group" aria-label="Monthly measurement"><button data-progress-metric="distanceM" aria-pressed="${metric==='distanceM'}">Distance</button><button data-progress-metric="durationS" aria-pressed="${metric==='durationS'}">Recorded time</button></div>

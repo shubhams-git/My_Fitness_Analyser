@@ -1,3 +1,4 @@
+import {CloudGoals} from './goals.mjs';
 import { CloudZones } from './zones.mjs';
 import { randomUUID,createHash } from 'node:crypto';
 import { CloudLibrary,CloudError,cloudConfig } from './supabase.mjs';
@@ -23,6 +24,7 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     const api=await auth(request,response,config),library=libraryFactory(api);
     const garminConfigured=Boolean(env.GARMIN_PERSONAL_API_KEY&&config.owner===api.config.owner);
     if(request.method==='POST')requireOrigin(request,config);
+    if(route==='goals'&&['GET','POST'].includes(request.method)){const goals=new CloudGoals(api);send(200,request.method==='GET'?await goals.snapshot():await goals.save(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='zones'&&['GET','POST'].includes(request.method)){const zones=new CloudZones(api);send(200,request.method==='GET'?await zones.snapshot():await zones.save(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='weight-ai'&&['GET','POST'].includes(request.method)){const engine=new WeightIntelligence(api,{env});send(200,request.method==='GET'?await engine.status():await engine.generate());return;}
     if(route==='weight-ai-consent'&&request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await new WeightIntelligence(api,{env}).setPreference(body.enabled));return;}
@@ -58,12 +60,12 @@ export async function privateHandler(request,response,route,{configReader=cloudC
       const submissions=await api.json(`/rest/v1/screenshot_submissions?owner_id=eq.${api.config.owner}&select=id,provider,original_name,status,created_at&order=created_at.desc&limit=50`);
       send(200,{user:{...api.user,displayName:profiles[0]?.display_name||api.user.displayName||'Athlete'},garmin:{configured:garminConfigured},submissions,historyFrom:'2026-07-01'});return;
     }
-    if(route==='journal'&&request.method==='GET'){send(200,{...await new CloudJournal(api).dataset({window:new URL(request.url,'http://localhost').searchParams.get('window')||'90'}),local:false,cloud:true,viewer:api.user});return;}
+    if(route==='journal'&&request.method==='GET'){send(200,{...await new CloudJournal(api).dataset({window:new URL(request.url,'http://localhost').searchParams.get('window')||'90',goalVersions:(await new CloudGoals(api).snapshot()).versions}),local:false,cloud:true,viewer:api.user});return;}
     if(route==='weigh-in'&&request.method==='POST'){send(200,await new CloudJournal(api).save(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='strength-entry'&&request.method==='POST'){send(200,await new CloudJournal(api).saveStrength(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='mass-preview'&&request.method==='POST'){send(200,await new CloudJournal(api).preview(await readBody(request)));return;}
     if(route==='mass-commit'&&request.method==='POST'){send(200,await new CloudJournal(api).commit(await readBody(request),{head:Number(request.headers['x-journal-revision']),hash:request.headers['x-import-hash'],confirmSameDay:request.headers['x-confirm-same-day']==='1'}));return;}
-    if(route==='training'&&request.method==='GET'){const [data,profiles]=await Promise.all([library.read(),api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=timezone`)]);const timezone=profiles[0]?.timezone||'Australia/Sydney';send(200,{...trainingDataset(Object.values(data.activities),data.feedback,{zoneVersions:(await new CloudZones(api).snapshot()).versions,window:new URL(request.url,'http://localhost').searchParams.get('window')==='all'?'all':'90',anchor:localDay(timezone)}),timezone,lastSync:data.garminSync?.lastSuccessAt||null,local:false,cloud:true,viewer:api.user,garminConfigured});return;}
+    if(route==='training'&&request.method==='GET'){const [data,profiles]=await Promise.all([library.read(),api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=timezone`)]);const timezone=profiles[0]?.timezone||'Australia/Sydney';send(200,{...trainingDataset(Object.values(data.activities),data.feedback,{goalVersions:(await new CloudGoals(api).snapshot()).versions,zoneVersions:(await new CloudZones(api).snapshot()).versions,window:new URL(request.url,'http://localhost').searchParams.get('window')==='all'?'all':'90',anchor:localDay(timezone)}),timezone,lastSync:data.garminSync?.lastSuccessAt||null,local:false,cloud:true,viewer:api.user,garminConfigured});return;}
     if(route==='data'&&request.method==='GET'){
       const data=await library.read(),activities=Object.values(data.activities).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.time||'').localeCompare(a.time||'')||a.id.localeCompare(b.id));
       send(200,{zoneVersions:(await new CloudZones(api).snapshot()).versions,activities,activityAliases:data.activityAliases,defaultId:activities[0]?.id||null,feedback:data.feedback,viewer:api.user,mode:'private-training-record',localLibrary:true,cloudLibrary:true,importLimitMB:3.5,garmin:{...data.garminSync,configured:garminConfigured,running:false}});return;

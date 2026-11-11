@@ -35,7 +35,7 @@ test('weight AI is explicit and consent-scoped, caches valid reports and never r
  const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{calls++;return status===200?Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report((await engine.context()).pack))}]}]}):new Response('private body test-secret',{status});}});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
  enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);
- saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,2);
+ saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,4);
  enabled=false;assert.equal((await engine.status()).review,null);
 });
 test('weight consent SQL isolates owners, audits choices and rejects publication after revocation',async()=>{
@@ -56,7 +56,7 @@ test('weight consent SQL isolates owners, audits choices and rejects publication
 test('weight changes during a provider request prevent publication against old evidence',async()=>{
  const changed=structuredClone(data);let published=false,failed=false,engine;
  const api={config:{owner},json:async(path,options)=>{
-  if(path.includes('weight_ai_preferences'))return [{enabled:true,disclosure_version:'gemini-weight-v1'}];
+  if(path.includes('weight_ai_preferences'))return [{enabled:true,disclosure_version:'gemini-weight-v1',revision:1}];
   if(path.includes('finish_weight_review')){published=options.body.result_status==='complete';failed=options.body.result_status==='failed';return true;}return [];
  },request:async()=>Response.json('pending')};
  engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:{GEMINI_API_KEY:'synthetic',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(p))}]}]});}});
@@ -69,3 +69,9 @@ test('weight changes during a provider request prevent publication against old e
   assert.throws(()=>validateWeightReport({...r,signal:{factId:'period.trendChange',direction:'up'}},p),/direction/);
   assert.throws(()=>validateWeightReport({...r,headline:'You have gained fat.'},p),/unsupported/);
  });
+
+test('weight coaching receives only the explicit weight target and measured progress',()=>{
+ const p=weightEvidence(data,{goalVersions:[{kind:'weight',revision:1,effectiveFrom:'2026-08-01',target:75,deadline:null},{kind:'weekly-distance',revision:1,effectiveFrom:'2026-08-03',target:99999}]});
+ assert.equal(p.content.facts.find(f=>f.id==='goal.weight.target').value,75);assert.ok(!JSON.stringify(p.content).includes('99999'));
+ const r=report(p);r.focus='goal';r.headline='You are {goal.weight.remaining} from your target.';r.explanation='Your recorded trend is {goal.weight.current}.';r.factIds=['goal.weight.remaining','goal.weight.current'];r.signal={factId:'goal.weight.remaining',direction:'none'};r.supportingFactIds=['goal.weight.current'];validateWeightReport(r,p);
+});

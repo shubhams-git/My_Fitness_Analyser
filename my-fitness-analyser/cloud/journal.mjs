@@ -1,3 +1,4 @@
+import {weightGoalProgress} from '../prototypes/goal-model.js';
 import { createHash } from 'node:crypto';
 import { weightTrend } from '../prototypes/weight-trend.js';
 import { CloudError } from './supabase.mjs';
@@ -32,14 +33,14 @@ export function massState(snapshot,{manual=true}={}){
   for(const r of snapshot.imports)state.imports[r.sha256]={hash:r.sha256,importedAt:r.created_at,exportedAt:r.exported_at};
   return state;
 }
-export function journalProjection(snapshot,{window='90',now=new Date()}={}){
+export function journalProjection(snapshot,{window='90',now=new Date(),goalVersions=[]}={}){
   const state=massState(snapshot),today=localDay(snapshot.timezone,now);
   for(const kind of ['weights','sessions'])state[kind]=Object.fromEntries(Object.entries(state[kind]).filter(([,r])=>r.dateKey===null||r.dateKey>=HISTORY_FROM));
   const view=journalDataset(state,{window,anchor:today});
   const all=journalDataset(state,{window:'all',anchor:today});
   const recent=(a,b)=>b.dateKey.localeCompare(a.dateKey)||(Date.parse(b.recordedAt||0)||0)-(Date.parse(a.recordedAt||0)||0)||b.id.localeCompare(a.id);
   view.entries.sort(recent);all.entries.sort(recent);
-  return {...view,trend:weightTrend(all.points,{window,anchor:today}),revision:Number(snapshot.revision),today,timezone:snapshot.timezone,canLog:true,canLogStrength:Array.isArray(snapshot.manualSessions),canImport:true,importLimitMB:3.5,latestReading:all.entries[0]||null,daySessions:all.sessions.map(({entryKey,source,dateKey,focus})=>({entryKey,source,dateKey,focus})),removedSessions:(snapshot.manualSessions||[]).filter(r=>r.deleted).map(r=>({...r.data,entryKey:r.id,revision:Number(r.revision),source:'manual'})),dayReadings:all.entries.map(({entryKey,source,revision,dateKey,kg})=>({entryKey,source,revision,dateKey,kg})),removed:snapshot.weights.filter(r=>r.source==='manual'&&r.deleted).map(r=>({...r.data,entryKey:r.entry_key,revision:Number(r.revision),source:'manual'})),scope:'Your private MASS history, weigh-ins and recorded strength sessions. Missing days are left open.'};
+  return {...view,weightGoal:weightGoalProgress(all.points,goalVersions,today),trend:weightTrend(all.points,{window,anchor:today}),revision:Number(snapshot.revision),today,timezone:snapshot.timezone,canLog:true,canLogStrength:Array.isArray(snapshot.manualSessions),canImport:true,importLimitMB:3.5,latestReading:all.entries[0]||null,daySessions:all.sessions.map(({entryKey,source,dateKey,focus})=>({entryKey,source,dateKey,focus})),removedSessions:(snapshot.manualSessions||[]).filter(r=>r.deleted).map(r=>({...r.data,entryKey:r.id,revision:Number(r.revision),source:'manual'})),dayReadings:all.entries.map(({entryKey,source,revision,dateKey,kg})=>({entryKey,source,revision,dateKey,kg})),removed:snapshot.weights.filter(r=>r.source==='manual'&&r.deleted).map(r=>({...r.data,entryKey:r.entry_key,revision:Number(r.revision),source:'manual'})),scope:'Your private MASS history, weigh-ins and recorded strength sessions. Missing days are left open.'};
 }
 export class CloudJournal {
   constructor(api){this.api=api;}

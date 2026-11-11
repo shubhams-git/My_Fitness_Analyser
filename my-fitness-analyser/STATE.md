@@ -1,9 +1,14 @@
 # Current state
 
-Updated: 10 November 2026 (Australia/Sydney)
-Completed increment: F19 personal running zones
+Updated: 11 November 2026 (Australia/Sydney)
+Completed increment: F20 goals and goal-aware coaching
 
 ## Implemented
+
+- F20: weekly distance, benchmark time and weight goals; dated revisions,
+  progress and zone-aware Gemini evidence. Bounded free-model fallback with
+  optional confirmed-free key pool. Migration applied; 126 tests pass.
+  Impeccable review fixes applied. See features/F20_GOALS_AND_COACHING.md.
 
 - F19: member-entered running HR/pace zones in Account, with dates, declared source,
   reversible range mode and immutable history. Run analysis and monthly Progress
@@ -246,4 +251,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Deliver explicit, owner-reviewed running and weight goals with progress views.
+Build reviewed Strava backfill and canonical duplicate reconciliation.

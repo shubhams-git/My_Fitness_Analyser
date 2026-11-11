@@ -1,6 +1,8 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/goal-model.js", "destination": "/prototypes/goal-model.js" },
+    { "source": "/goals-view.js", "destination": "/prototypes/goals-view.js" },
     { "source": "/zone-model.js", "destination": "/prototypes/zone-model.js" },
     { "source": "/zone-settings.js", "destination": "/prototypes/zone-settings.js" },
     { "source": "/zone-view.js", "destination": "/prototypes/zone-view.js" },

@@ -1,13 +1,15 @@
+import {CloudGoals} from './goals.mjs';
+import {MODEL_POLICY,modelRoute,generationConfig,routedGemini,geminiKeys} from './gemini-router.mjs';
+import {CloudZones} from './zones.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
 import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/coaching-evidence.mjs';
 import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
-const MODELS=['gemini-3.8-flash','gemini-3.7-flash','gemini-3.6-flash'];
 export async function aiPreference(api){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:DISCLOSURE,updatedAt:r?.updated_at||null};}
 export async function setAiPreference(api,enabled){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure:DISCLOSURE}});}
-export function coachingRequest(pack,model){return {model,store:false,system_instruction:COACH_SYSTEM,input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content}),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(coachingSchema(pack))},generation_config:{thinking_level:'high',max_output_tokens:16384}};}
+export function coachingRequest(pack,model,thinking='high'){return {model,store:false,system_instruction:COACH_SYSTEM,input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content}),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(coachingSchema(pack))},generation_config:generationConfig(model,thinking)};}
 export function extractCoaching(result,pack){
  if(result.status!=='completed')throw new CloudError(502,'Gemini did not finish a complete briefing. Your training record is unchanged.');
  const outputs=result.steps?.filter(s=>s.type==='model_output')||[];
@@ -23,21 +25,21 @@ export function extractCoaching(result,pack){
  }catch{throw new CloudError(502,'The briefing did not pass its evidence checks. Your training record is unchanged.');}return report;
 }
 export class TrainingIntelligence {
- constructor(api,library,{env=process.env,fetcher=fetch}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;}
- configured(){return Boolean(this.env.GEMINI_API_KEY&&this.env.GEMINI_FREE_TIER_CONFIRMED==='1'&&MODELS.includes(this.env.GEMINI_MODEL||'gemini-3.6-flash'));}
- async context(){const [data,profiles]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`)]);const pack=coachingEvidence(data,{anchor:localDay(profiles[0]?.timezone||'Australia/Sydney')}),model=this.env.GEMINI_MODEL||'gemini-3.6-flash',fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
+ constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api)}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;}
+ configured(){return Boolean(geminiKeys(this.env).length&&this.env.GEMINI_FREE_TIER_CONFIRMED==='1');}
+ async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const pack=coachingEvidence(data,{anchor:localDay(profiles[0]?.timezone||'Australia/Sydney'),zoneVersions:zones.versions,goalVersions:goals.versions}),model=modelRoute('run-coaching')[0].model,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,MODEL_POLICY,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
   const exact=await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
   const valid=rows.filter(r=>{try{
-   if(r.schema_version!==COACH_SCHEMA||r.prompt_version!==COACH_PROMPT||!r.evidence)return false;
+   if(r.schema_version!==COACH_SCHEMA||![COACH_PROMPT,'runner-coach-v4'].includes(r.prompt_version)||!r.evidence)return false;
    const canonical=evidenceHash(r.evidence.content),legacy=canonical!==r.evidence.hash&&legacyEvidenceHash(r.evidence.content)===r.evidence.hash;
    if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy&&r.evidence_key===context.legacyKey&&canonical===context.pack.hash&&r.model_id===context.model)r.evidence_key=context.key;return true;
   }catch{return false;}});
   return valid.find(r=>r.evidence_key===context.key)||valid[0]||null;
  }
- item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,stale:row.evidence_key!==key}:null;}
- async status(){const consent=await aiPreference(this.api),base={consent,configured:this.configured(),model:this.env.GEMINI_MODEL||'gemini-3.6-flash'};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,runs:context.pack.content.sessions.length,review:this.item(await this.saved(context),context.key)};}
+ item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key}:null;}
+ async status(){const consent=await aiPreference(this.api),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,runs:context.pack.content.sessions.length,review:this.item(await this.saved(context),context.key)};}
  async generate(){
   let pref=await aiPreference(this.api);if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');
   if(!this.configured())throw new CloudError(409,'Gemini is unavailable. The server needs a supported Flash model and a confirmed Free-tier project.');
@@ -46,18 +48,13 @@ export class TrainingIntelligence {
   const claim=await this.api.request('/rest/v1/rpc/begin_training_review',{method:'POST',body:{evidence_key:context.key,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
   if(!claim.ok)throw new CloudError(claim.status===429?429:claim.status===403?403:409,claim.status===429?'Your review limit is reached. Try tomorrow.':claim.status===403?'Gemini permission changed. Check your AI settings.':'A review is already running or was just requested. Try again shortly.');
   const id=await claim.json();
-  try{
-   // Recheck just before transmission. Revocation after this point cannot recall a request.
-   pref=await aiPreference(this.api);if(pref.enabled!==true)throw new CloudError(403,'Gemini analysis was switched off.');
-   let result;try{result=await this.fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal:AbortSignal.timeout(90000),headers:{'Content-Type':'application/json','x-goog-api-key':this.env.GEMINI_API_KEY,'Api-Revision':'2026-05-20'},body:JSON.stringify(coachingRequest(context.pack,context.model))});}catch{throw new CloudError(503,'Gemini could not be reached. Your saved record is unchanged.');}
-   if(!result.ok){const messages={429:'Gemini’s free quota is unavailable. Try later; no paid fallback was used.',401:'Gemini access was denied. Check the server API key.',403:'Gemini access was denied. Check the server API key and project restrictions.',404:'The configured Gemini model is unavailable for this project.',400:'Gemini did not accept the structured briefing request.',503:'Gemini is temporarily unavailable. Try later; your training record is unchanged.'};throw new CloudError(result.status===429?429:503,(messages[result.status]||'Gemini could not complete this briefing.')+` (HTTP ${result.status})`);}
-   let size=0;const chunks=[];for await(const c of result.body){size+=c.length;if(size>256000)throw new CloudError(502,'Gemini returned an oversized briefing.');chunks.push(c);}
-   let json;try{json=JSON.parse(Buffer.concat(chunks).toString());}catch{throw new CloudError(502,'Gemini returned an unreadable briefing.');}
-   const report=extractCoaching(json,context.pack);
+  let trace=[];try{
+   const routed=await routedGemini({task:'run-coaching',keys:geminiKeys(this.env),fetcher:this.fetcher,request:entry=>coachingRequest(context.pack,entry.model,entry.thinking),validate:json=>extractCoaching(json,context.pack),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await aiPreference(this.api);if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
+   trace=routed.attempts;const report=routed.report;
    if((await this.context()).key!==context.key)throw new CloudError(409,'Your training changed during analysis. Review the updated runs.');
-   const stored=await this.api.json('/rest/v1/rpc/finish_training_review',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack}});
+   const stored=await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack,result_model:routed.model,attempt_log:trace}});
    if(!stored)throw new CloudError(409,'Your AI preference changed. This briefing was not published.');
-   return this.item({id,report,evidence:context.pack,finished_at:new Date().toISOString(),model_id:context.model,evidence_key:context.key},context.key);
-  }catch(error){await this.api.json('/rest/v1/rpc/finish_training_review',{method:'POST',body:{target_id:id,result_status:'failed',result_report:null,result_evidence:null}}).catch(()=>{});throw error;}
+   return this.item({id,report,evidence:context.pack,finished_at:new Date().toISOString(),model_id:routed.model,model_policy:MODEL_POLICY,provider_attempts:trace,evidence_key:context.key},context.key);
+  }catch(error){await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'failed',result_report:null,result_evidence:null,result_model:null,attempt_log:error.attempts||trace}}).catch(()=>{});throw error;}
  }
 }

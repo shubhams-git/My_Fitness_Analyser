@@ -25,10 +25,10 @@ test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports
  const later={...context,key:'b'.repeat(64),legacyKey:'c'.repeat(64)};assert.equal(engine.item(await engine.saved(later),later.key).stale,true);
  reordered.facts[0].value=999;assert.notEqual(evidenceHash(reordered),pack.hash);
 });
-test('no consent means no library or Google access; quota errors never try another model or expose provider bodies',async()=>{
+test('no consent means no library or Google access; quota fallbacks are bounded and never expose provider bodies',async()=>{
  let enabled=false,calls=0;const api={config:{owner},json:async(path,options)=>path.includes('ai_preferences')?[{enabled,disclosure_version:'gemini-run-v1',revision:1}]:path.includes('finish_')?true:[],request:async()=>Response.json('review-id')},data={read:async()=>library()};
  let status=429;const engine=new TrainingIntelligence(api,data,{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_MODEL:'gemini-3.8-flash'},fetcher:async()=>{calls++;return new Response('private provider body test-secret',{status});}});
- assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,1);
+ assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,3);
  status=403;await assert.rejects(engine.generate(),e=>e.status===503&&e.message.includes('HTTP 403')&&!e.message.includes('test-secret'));
 });
 test('PostgreSQL consent is member-scoped, revocation blocks publication, audit persists and rate claims serialize',async()=>{
@@ -84,4 +84,12 @@ test('a main verdict must carry its own explanation and actionable advice even w
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),good=report(pack);good.findings=[];validateCoaching(good,pack);
  for(const key of ['explanation','nextAction']){const bad=structuredClone(good);delete bad.verdict[key];assert.throws(()=>validateCoaching(bad,pack));}
  const bad=structuredClone(good);bad.verdict.explanation='You improved by 25 percent.';assert.throws(()=>validateCoaching(bad,pack));
+});
+
+test('zone-aware coaching cites measured per-run zones and owned running goals without leaking weight goals',()=>{
+ const data=library();data.activities.a7.records=[{t:0,hr:150,speed:3},{t:10,hr:155,speed:3}];
+ const zoneVersions=[{kind:'heart',revision:1,effectiveFrom:'2026-07-01',boundaries:[120,140,160,180]}],goalVersions=[{kind:'weekly-distance',revision:1,effectiveFrom:'2026-10-12',target:10000,deadline:null},{kind:'weight',revision:1,effectiveFrom:'2026-10-12',target:87.3}];
+ const pack=coachingEvidence(data,{anchor:'2026-10-17',zoneVersions,goalVersions});assert.ok(pack.content.facts.some(f=>f.id==='s01.zones.heart.zone3Seconds'&&f.value===10));assert.equal(pack.content.facts.find(f=>f.id==='goal.weekly.target').value,10000);assert.ok(!JSON.stringify(pack.content).includes('87.3'));
+ const r=report(pack),id='s01.zones.heart.zone3Share';r.findings=[{kind:'zones',headline:'You spent {'+id+'} in your heart-rate zone three.',explanation:'That was your dominant recorded zone.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'none'},nextAction:'Keep your next easy run conversational.'}];validateCoaching(r,pack);
+ assert.notEqual(coachingEvidence(data,{anchor:'2026-10-17',zoneVersions:[{...zoneVersions[0],revision:2}],goalVersions}).hash,pack.hash);
 });

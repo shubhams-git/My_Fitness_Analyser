@@ -1,5 +1,10 @@
 # Decision register
 
+D42 — Explicit goals and routed coaching, 11 November 2026. Keep goal progress
+deterministic and effective-dated. Share only relevant measured facts through
+existing separate consent scopes. Route by task and rotate confirmed Free keys;
+retain prior reports when all attempts fail. See F20.
+
 D41 — Versioned member-entered running zones, 10 November 2026. Continue after
 the owner's F18 approval. Extend Account/Progress/run analysis with boundaries,
 effective dates, source and reversible range mode. Immutable owner-scoped versions
