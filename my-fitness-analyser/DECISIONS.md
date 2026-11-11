@@ -296,3 +296,11 @@ No new runtime dependency. Verification: docs/QA_ACTIVE_DESIGN.md. Exact visual
 finish requires owner review; work remains directly on master.
 
 For a material change record: ID, date, status, problem, chosen option, alternatives, consequence, verification and superseded ID. Small implementation choices belong in the feature record, not an unnecessary full architecture essay.
+
+### Coaching refresh recovery
+
+Production reproduced an app-side review limit before reaching Gemini. Keep
+owner consent, the concurrent review guard, and evidence cache. Use a thirty
+second cooldown instead of counting failed attempts toward a daily cap. When
+Gemini cannot return a validated brief, show a labelled, evidence-backed run
+summary and keep the previous Gemini brief in storage.

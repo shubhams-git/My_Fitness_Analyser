@@ -28,8 +28,8 @@ test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports
 test('no consent means no library or Google access; quota fallbacks are bounded and never expose provider bodies',async()=>{
  let enabled=false,calls=0;const api={config:{owner},json:async(path,options)=>path.includes('ai_preferences')?[{enabled,disclosure_version:'gemini-run-v1',revision:1}]:path.includes('finish_')?true:[],request:async()=>Response.json('review-id')},data={read:async()=>library()};
  let status=429;const engine=new TrainingIntelligence(api,data,{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_MODEL:'gemini-3.8-flash'},fetcher:async()=>{calls++;return new Response('private provider body test-secret',{status});}});
- assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,3);
- status=403;await assert.rejects(engine.generate(),e=>e.status===503&&e.message.includes('HTTP 403')&&!e.message.includes('test-secret'));
+ assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;assert.equal((await engine.generate()).fallback,'provider');assert.equal(calls,3);
+ status=403;assert.equal((await engine.generate()).fallback,'provider');
 });
 test('PostgreSQL consent is member-scoped, revocation blocks publication, audit persists and rate claims serialize',async()=>{
  const db=new PGlite();try{

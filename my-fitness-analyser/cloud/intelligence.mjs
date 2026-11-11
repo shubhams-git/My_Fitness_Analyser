@@ -24,6 +24,21 @@ export function extractCoaching(result,pack){
   validateCoaching(report,pack);
  }catch{throw new CloudError(502,'The briefing did not pass its evidence checks. Your training record is unchanged.');}return report;
 }
+function recordedBrief(context,reason){
+ const {pack}=context;
+ const distance=pack.content.facts.find(f=>/^s\d+\.distanceM$/.test(f.id)&&f.value>=1000);
+ const factId=distance?.id||'history.runs';
+ const paceId=distance?.id.replace('distanceM','paceSPerKm');
+ const hasPace=pack.content.facts.some(f=>f.id===paceId);
+ const report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{
+  text:distance?'You covered {'+factId+'} in your latest recorded run over a kilometre.':'You have {'+factId+'} runs in your log.',
+  explanation:hasPace?'Your recorded pace for that run was {'+paceId+'}.':'Your run log gives you a baseline for your next session.',
+  nextAction:'If your next run is an easy one, settle into a conversational pace early.',
+  factIds:hasPace?[factId,paceId]:[factId],signal:{factId,direction:'none'}
+ },findings:[],charts:[]};
+ validateCoaching(report,pack);
+ return {report,evidence:pack.content,mapping:pack.mapping,generatedAt:new Date().toISOString(),model:null,stale:false,fallback:reason};
+}
 export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api)}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;}
  configured(){return Boolean(geminiKeys(this.env).length&&this.env.GEMINI_FREE_TIER_CONFIRMED==='1');}
@@ -46,7 +61,8 @@ export class TrainingIntelligence {
   const context=await this.context();if(context.pack.content.sessions.length<2)throw new CloudError(409,'Import at least two runs before requesting a history briefing.');
   const cached=await this.saved(context);if(cached?.evidence_key===context.key)return this.item(cached,context.key);
   const claim=await this.api.request('/rest/v1/rpc/begin_training_review',{method:'POST',body:{evidence_key:context.key,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
-  if(!claim.ok)throw new CloudError(claim.status===429?429:claim.status===403?403:409,claim.status===429?'Your review limit is reached. Try tomorrow.':claim.status===403?'Gemini permission changed. Check your AI settings.':'A review is already running or was just requested. Try again shortly.');
+  if(claim.status===429)return recordedBrief(context,'cooldown');
+  if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===409?409:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===409?'A review is already running. Try again shortly.':'The review could not start. Please retry.');
   const id=await claim.json();
   let trace=[];try{
    const routed=await routedGemini({task:'run-coaching',keys:geminiKeys(this.env),fetcher:this.fetcher,request:entry=>coachingRequest(context.pack,entry.model,entry.thinking),validate:json=>extractCoaching(json,context.pack),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await aiPreference(this.api);if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
@@ -55,6 +71,13 @@ export class TrainingIntelligence {
    const stored=await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack,result_model:routed.model,attempt_log:trace}});
    if(!stored)throw new CloudError(409,'Your AI preference changed. This briefing was not published.');
    return this.item({id,report,evidence:context.pack,finished_at:new Date().toISOString(),model_id:routed.model,model_policy:MODEL_POLICY,provider_attempts:trace,evidence_key:context.key},context.key);
-  }catch(error){await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'failed',result_report:null,result_evidence:null,result_model:null,attempt_log:error.attempts||trace}}).catch(()=>{});throw error;}
+  }catch(error){
+   await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'failed',result_report:null,result_evidence:null,result_model:null,attempt_log:error.attempts||trace}}).catch(()=>{});
+   if(!error.attempts)throw error;
+   console.warn('Gemini coaching attempts exhausted',JSON.stringify(error.attempts));
+   const latestPref=await aiPreference(this.api);
+   if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');
+   return recordedBrief(await this.context(),'provider');
+  }
  }
 }

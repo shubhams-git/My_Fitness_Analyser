@@ -10,3 +10,13 @@ test('free-confirmed pool deduplicates keys and rotates on every attempted reque
 test('invalid structured output falls back; revoked sharing stops before another transmission',async()=>{
  let calls=0;await assert.rejects(routedGemini({task:'weight-coaching',keys:['a','b'],request:e=>e,validate:()=>{throw Error('invalid');},beforeAttempt:()=>{if(calls)throw Error('revoked');},fetcher:async()=>{calls++;return Response.json({});}}),/revoked/);assert.equal(calls,1);
 });
+test('quota and credential errors try the whole pool before dropping the primary model',async()=>{
+ const used=[];
+ const result=await routedGemini({task:'run-coaching',keys:['a','b','c','d','e'],request:entry=>entry,validate:json=>json,
+  fetcher:async(_,options)=>{
+   used.push(options.headers['x-goog-api-key']);
+   return used.length<5?new Response(null,{status:used.length===1?403:429}):Response.json({ok:true});
+  }});
+ assert.equal(new Set(used).size,5);
+ assert.ok(result.attempts.every(attempt=>attempt.model==='gemini-3.6-flash'));
+});
