@@ -17,6 +17,15 @@ test('schema and semantic gates reject invented numbers, missing evidence and un
  for(const mutate of [r=>r.verdict.text='You improved by 20%.',r=>r.findings[0].factIds=['history.runs'],r=>r.charts[0].type='heart_rate',r=>r.extra='unexpected']){const bad=structuredClone(good);mutate(bad);assert.throws(()=>validateCoaching(bad,pack));}
  assert.deepEqual(extractCoaching({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(good)}]}]},pack),good);assert.throws(()=>extractCoaching({status:'incomplete'},pack));
 });
+test('Flash-Lite returns one verdict and still must pass the full evidence checks',()=>{
+ const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),model='gemini-3.1-flash-lite';
+ const request=coachingRequest(pack,model,null);
+ assert.deepEqual(Object.keys(request.response_format.schema.properties),['verdict']);
+ const {verdict}=report(pack);
+ const result=value=>({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(value)}]}]});
+ assert.deepEqual(extractCoaching(result({verdict}),pack,model).charts,[]);
+ assert.throws(()=>extractCoaching(result({verdict:{...verdict,text:'You improved by 20%.'}}),pack,model));
+});
 test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports remain cache hits',async()=>{
  const api={config:{owner},json:async()=>[]},engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_MODEL:'gemini-3.6-flash'}}),context=await engine.context(),pack=context.pack;
  const reordered=JSON.parse(canonicalJson(pack.content));assert.equal(evidenceHash(reordered),pack.hash);

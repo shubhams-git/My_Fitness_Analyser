@@ -42,7 +42,7 @@ export async function routedGemini({task,key,keys=key?[key]:[],request,validate,
    }
    let size=0;const chunks=[];for await(const chunk of response.body){size+=chunk.length;if(size>256000)throw new Error('size');chunks.push(chunk);}
    let json;try{json=JSON.parse(Buffer.concat(chunks).toString());}catch{attempt.outcome='invalid';lastStatus=502;break;}
-   let report;try{report=validate(json);}catch{attempt.outcome='invalid';lastStatus=502;break;}
+   let report;try{report=validate(json,entry);}catch{attempt.outcome='invalid';lastStatus=502;break;}
    attempt.outcome='complete';return {report,model:entry.model,attempts,policy:MODEL_POLICY};
   }catch{attempt.outcome='network';lastStatus=503;break;}
   }

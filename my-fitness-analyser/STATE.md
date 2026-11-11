@@ -7,7 +7,10 @@ Completed increment: F20 goals and goal-aware coaching
 
 - Coaching refresh recovery: replaced the three-request daily database cap with
   a short cooldown, added bounded key retries, and return a labelled run-record
-  brief during provider outages. Next action: verify the production refresh.
+  brief during provider outages. Production reached Gemini, and the app showed
+  the run-record brief after two provider 503s and a rejected Flash-Lite response.
+  Flash-Lite now receives a verdict-only schema. All 128 tests passed.
+  Next action: verify the latest brief refresh in production.
 
 - F20: weekly distance, benchmark time and weight goals; dated revisions,
   progress and zone-aware Gemini evidence. Bounded free-model fallback with

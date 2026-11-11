@@ -9,13 +9,25 @@ import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
 export async function aiPreference(api){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:DISCLOSURE,updatedAt:r?.updated_at||null};}
 export async function setAiPreference(api,enabled){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure:DISCLOSURE}});}
-export function coachingRequest(pack,model,thinking='high'){return {model,store:false,system_instruction:COACH_SYSTEM,input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content}),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(coachingSchema(pack))},generation_config:generationConfig(model,thinking)};}
-export function extractCoaching(result,pack){
+const compactModel=model=>model==='gemini-3.1-flash-lite';
+export function coachingRequest(pack,model,thinking='high'){
+ const compact=compactModel(model),schema=coachingSchema(pack);
+ const {facts,comparisons,sessions,goalContext,zoneContext}=pack.content;
+ const input=compact?{facts,comparisons,goalContext,zoneContext,sessions:sessions.map(({ref})=>({ref}))}:pack.content;
+ const system=compact?`Give this runner one actionable verdict. Pick one clear measured pattern. Return only verdict, with text (24 words), explanation (35 words), nextAction (22 words), factIds and signal. Every measured number must be a {fact.id} placeholder listed in factIds. Never type a number directly or repeat a unit. For signal choose one cited fact: positive paceChange or splitChange is slower, negative is faster, zero is steady. Positive week.distanceChange or week.distanceChangePercent is up, negative is down, zero is steady. All other facts use none. Make comparisons only when supported by the selected signal. Give one concrete next-run action. No other fields.`:COACH_SYSTEM;
+ const responseSchema=compact?{type:'object',properties:{verdict:schema.properties.verdict},required:['verdict'],additionalProperties:false}:schema;
+ return {model,store:false,system_instruction:system,input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...input}),response_format:{type:'text',mime_type:'application/json',schema:providerSchema(responseSchema)},generation_config:generationConfig(model,thinking)};
+}
+export function extractCoaching(result,pack,model){
  if(result.status!=='completed')throw new CloudError(502,'Gemini did not finish a complete briefing. Your training record is unchanged.');
  const outputs=result.steps?.filter(s=>s.type==='model_output')||[];
  if(outputs.length!==1||outputs[0].content?.some(c=>c.type!=='text'))throw new CloudError(502,'Gemini returned an unexpected briefing format.');
  let report;try{
   report=JSON.parse(outputs[0].content.map(c=>c.text).join(''));
+  if(compactModel(model)){
+   if(!report||Object.keys(report).length!==1||!Object.hasOwn(report,'verdict'))throw new Error('Invalid compact brief');
+   report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:report.verdict,findings:[],charts:[]};
+  }
   // Main claim and chart references must pass. An optional weak observation
   // should not discard an otherwise sound brief or trigger another API call.
   validateCoaching({...report,findings:[]},pack);
@@ -65,7 +77,7 @@ export class TrainingIntelligence {
   if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===409?409:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===409?'A review is already running. Try again shortly.':'The review could not start. Please retry.');
   const id=await claim.json();
   let trace=[];try{
-   const routed=await routedGemini({task:'run-coaching',keys:geminiKeys(this.env),fetcher:this.fetcher,request:entry=>coachingRequest(context.pack,entry.model,entry.thinking),validate:json=>extractCoaching(json,context.pack),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await aiPreference(this.api);if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
+   const routed=await routedGemini({task:'run-coaching',keys:geminiKeys(this.env),fetcher:this.fetcher,request:entry=>coachingRequest(context.pack,entry.model,entry.thinking),validate:(json,entry)=>extractCoaching(json,context.pack,entry.model),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await aiPreference(this.api);if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
    trace=routed.attempts;const report=routed.report;
    if((await this.context()).key!==context.key)throw new CloudError(409,'Your training changed during analysis. Review the updated runs.');
    const stored=await this.api.json('/rest/v1/rpc/finish_training_review_v2',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack,result_model:routed.model,attempt_log:trace}});
