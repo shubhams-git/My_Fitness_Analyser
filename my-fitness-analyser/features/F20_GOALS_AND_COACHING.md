@@ -40,3 +40,10 @@ against Supabase. Quick Impeccable source review led to dated pause actions,
 explicit discard/reload with focus restoration and distinct goal link labels.
 Source detector scanned goal files; its journal-chart scan reported an
 operational error. No physical Safari test claimed.
+
+Release b2ac951 deployed successfully on Vercel. Signed-in Account loaded the
+blank weight editor and Cancel; Journal rendered the goal alongside real history.
+Phone preview rendered the weekly target without horizontal overflow using a
+test target. A real synthetic zone/goal briefing passed strict validation on
+3.6 Flash high on its first attempt. Multi-key and failure paths were exercised
+with simulated transport. No live personal goal was created during verification.
