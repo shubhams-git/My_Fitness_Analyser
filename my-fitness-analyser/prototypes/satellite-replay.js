@@ -43,7 +43,15 @@ export function openSatelliteReplay({activity,reduced=false,onClose}){
     }
     dialog.dataset.phase=phase.name;$('[data-replay-phase]').textContent=phase.name==='overview'?'Your route, from above':phase.name==='descent'?'Descending to your start':phase.name==='finished'?'Your complete route':exit>0?'Bringing your route into view':sample.gap?'GPS gap · waiting for next fix':'Following your run';
   }
-  function tick(now){if(!playing||dead)return;const dt=last?Math.min((now-last)/1000,.25):0;last=now;clock=Math.min(model.duration,clock+dt);draw(dt);if(clock>=model.duration){pause();return;}raf=requestAnimationFrame(tick);}
+  function tick(now){
+    if(!playing||dead)return;
+    const elapsed=last?(now-last)/1000:0;
+    last=now;
+    clock=Math.min(model.duration,clock+elapsed);
+    draw(Math.min(elapsed,.25));
+    if(clock>=model.duration){pause();return;}
+    raf=requestAnimationFrame(tick);
+  }
   function start(){if(!ready||reduced||dead||document.hidden)return;if(clock>=model.duration){clock=0;camera=null;draw(0,true);}setPlaying(true);last=0;raf=requestAnimationFrame(tick);}
   function fail(){if(dead)return;pause();ready=false;imageryFailed=true;dialog.dataset.phase='error';message.hidden=false;message.querySelector('strong').textContent='Satellite imagery unavailable.';message.querySelector('span').textContent='Check your connection, retry, or close to return to your street map.';$('[data-replay-retry]').hidden=false;play.disabled=true;slider.disabled=true;$('[data-replay-restart]').disabled=true;}
   function destroy(){if(dead)return;dead=true;pause();clearTimeout(timeout);abort.abort();resize.disconnect();marker?.remove();map?.remove();dialog.remove();document.documentElement.classList.remove('replay-open');Object.assign(document.body.style,bodyStyle);window.scrollTo({left:pageScroll.x,top:pageScroll.y,behavior:'instant'});onClose?.();if(opener?.isConnected)opener.focus({preventScroll:true});}

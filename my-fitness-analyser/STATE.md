@@ -5,6 +5,10 @@ Completed local increment: coaching model priority and key rotation
 
 ## Implemented
 
+- Satellite route replay now runs for 20–24.5 seconds after imagery loads.
+  Local Chromium played the synthetic 4.8 km preview to completion in 22.8
+  seconds and showed the full trail over satellite imagery. Pending deployment.
+
 - Running coaching prefers Gemini 3.8 Flash, then 3.6 Flash and 3.1
   Flash-Lite. A cached fallback offers an explicit retry. Hosted training
   and weight model attempts reserve distinct consecutive keys through a

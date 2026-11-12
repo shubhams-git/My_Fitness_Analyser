@@ -55,7 +55,7 @@ route explorer. Missing GPS never becomes an invented route. See F09.
 Motion is central to the brief. Choreograph a clear entrance, route drawing,
 bounded scroll depth, section continuity and direct selection/replay feedback.
 Use native scroll; sections remain reachable by links and keyboard. A deliberate
-Route-length-aware satellite replay (24–40 seconds; about 30 for a 5 km run) opens
+Route-length-aware satellite replay (20–24.5 seconds; about 23 for a 5 km run) opens
 only through Replay route: overhead city view, smooth descent, a camera trailing
 the runner and a finish pullback. Follow zoom stays within the native imagery
 level; a 76° descent settles into 69° tracking. The traversal uses recorded elapsed

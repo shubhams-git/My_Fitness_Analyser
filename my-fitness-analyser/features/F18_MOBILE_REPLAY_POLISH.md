@@ -18,8 +18,10 @@
   GPS segment. Existing smooth camera/heading, elapsed traversal, gaps and actual
   measurement readouts remain. The completed trail can leave the close viewport.
 - Smooth pullback begins during the final 12% of traversal playback and settles
-  on the full completed route. Duration remains route-aware, 24–40 s; this owner's
-  5 km route is 29.8 s. Calculation version satellite-replay-v3.
+  on the full completed route. The 12 November timing update keeps the route-aware
+  duration between 20 and 24.5 s. A 5 km run takes 22.7 s. The opening and finish
+  phase timings are preserved, with the time saving coming from faster traversal.
+  Calculation version satellite-replay-v4.
 - Remove the replay About panel and large footer attribution block. Mandatory
   EOX/Copernicus/licence/terrain credits remain in a quiet map-edge caption.
   Street maps show a small visible OpenMapTiles/OpenStreetMap data credit instead

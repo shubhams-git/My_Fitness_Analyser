@@ -4,12 +4,16 @@ import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,repl
 const fix=(t,lon=145+t/10000,extra={})=>({t,lat:-37.8,lon,distance:t*3,speed:3,elevation:27,...extra});
 test('cinematic sequence holds the city, descends, traverses elapsed time, then finishes exactly',()=>{
   assert.equal(replayPhase(.5,1000).name,'overview');assert.equal(replayPhase(2,1000).name,'descent');assert.equal(replayPhase(3.8,1000).time,0);
-  assert.ok(Math.abs(replayPhase(16.1,1000).time-500)<.001);assert.equal(replayPhase(REPLAY_SECONDS,1000).time,1000);assert.equal(replayPhase(100,1000).name,'finished');
-  assert.equal(replayPhase(28.4,1000).outro,0);assert.ok(Math.abs(replayPhase(REPLAY_SECONDS,1000).outro-1)<.001);
+  const finish=REPLAY_SECONDS-1.6;
+  assert.ok(Math.abs(replayPhase((3.8+finish)/2,1000).time-500)<.001);assert.equal(replayPhase(REPLAY_SECONDS,1000).time,1000);assert.equal(replayPhase(100,1000).name,'finished');
+  assert.equal(replayPhase(finish,1000).outro,0);assert.ok(Math.abs(replayPhase(REPLAY_SECONDS,1000).outro-1)<.001);
 });
-test('route-aware duration is modestly faster, bounded, with gradual acceleration and a genuine trailing camera',()=>{
+test('route-aware duration is 20 to 24.5 seconds, with gradual acceleration and a genuine trailing camera',()=>{
   const five=[fix(0),fix(2000,145.2,{distance:5000})],short=[fix(0),fix(800,145.08,{distance:2000})],long=[fix(0),fix(5000,145.5,{distance:20000})];
-  assert.ok(replayDuration(five)<34&&replayDuration(five)>27);assert.ok(replayDuration(short)<replayDuration(five));assert.ok(replayDuration(long)>replayDuration(five)&&replayDuration(long)<=40);
+  assert.equal(replayDuration([]),20);
+  assert.equal(replayDuration(short),21.7);
+  assert.equal(replayDuration(five),22.7);
+  assert.equal(replayDuration(long),24.5);
   assert.equal(travelProgress(0),0);assert.equal(travelProgress(1),1);assert.equal(travelProgress(.5),.5);assert.ok(travelProgress(.025)<.025);
   const m=replayModel(Array.from({length:81},(_,t)=>fix(t))),s=m.sample(40);
   assert.ok(s.chaseCoordinate[0]<s.coordinate[0]);assert.ok(s.chaseCoordinate[0]>=m.route.points[0].coordinate[0]);
@@ -48,7 +52,7 @@ test('a dateline crossing remains a short geographic move rather than a world-sp
 
 
 test('pullback begins before the finish, stays continuous, and reveals the complete route',()=>{
- for(const duration of [24,29.8,40]){
+ for(const duration of [20,22.7,24.5]){
   const finish=duration-1.6;
   assert.equal(replayPullback(3.8,duration),0);
   assert.equal(replayPullback(duration,duration),1);

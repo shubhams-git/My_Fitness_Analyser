@@ -1,12 +1,16 @@
 import { geographicRoute } from './route-geometry.js';
 
-export const REPLAY_VERSION='satellite-replay-v3';
-export const REPLAY_SECONDS=30;
+export const REPLAY_VERSION='satellite-replay-v4';
+export const REPLAY_SECONDS=22.7;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const angleDelta=(from,to)=>((to-from+540)%360+360)%360-180;
 export function bearing(a,b){const rad=Math.PI/180,p=a[1]*rad,q=b[1]*rad,d=(b[0]-a[0])*rad;return Math.atan2(Math.sin(d)*Math.cos(q),Math.cos(p)*Math.sin(q)-Math.sin(p)*Math.cos(q)*Math.cos(d))/rad;}
 const mix=(a,b,u)=>a+(b-a)*u;
-export function replayDuration(records){const distances=records.map(r=>r.distance).filter(Number.isFinite),km=distances.length>1?Math.max(0,distances.at(-1)-distances[0])/1000:0;return Math.round(clamp(22+3.5*Math.sqrt(km),24,40)*10)/10;}
+export function replayDuration(records){
+  const distances=records.map(r=>r.distance).filter(Number.isFinite);
+  const km=distances.length>1?Math.max(0,distances.at(-1)-distances[0])/1000:0;
+  return Math.round(Math.min(20+1.2*Math.sqrt(km),24.5)*10)/10;
+}
 export function travelProgress(u){u=clamp(u,0,1);const ramp=.1;if(u<ramp)return u*u/(2*ramp*(1-ramp));if(u>1-ramp)return 1-(1-u)**2/(2*ramp*(1-ramp));return (u-ramp/2)/(1-ramp);}
 // Start widening during the last part of traversal, then settle on the whole route.
 export function replayPullback(seconds,duration=REPLAY_SECONDS){
