@@ -5,6 +5,7 @@ import { readFile } from 'node:fs/promises';
 import { coachingEvidence,canonicalJson,evidenceHash } from '../analysis/coaching-evidence.mjs';
 import { COACH_SCHEMA,COACH_PROMPT,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { TrainingIntelligence,coachingRequest,extractCoaching } from '../cloud/intelligence.mjs';
+const keyEnv={GEMINI_API_KEY:'test-secret',GEMINI_API_KEY_2:'second-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_KEY_POOL_FREE_CONFIRMED:'1'};
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 function library(){return {feedback:{},activities:Object.fromEntries(Array.from({length:8},(_,i)=>['a'+i,{id:'a'+i,title:'PRIVATE title DO NOT SEND',date:'2026-10-'+String(10+i).padStart(2,'0'),sport:'Run',source:'Nike Run Club',sourceFile:'Owner-supplied screenshots',distance:2200,running:900+i*10,timer:null,moving:null,elapsed:920+i*10,displayedPace:400+i*4,hr:null,cadence:160,elevationGain:10,records:[],splits:[{distanceM:1000,paceSecondsPerKm:400},{distanceM:1000,paceSecondsPerKm:410}],sourceNote:'private note',synthetic:false}]))};}
 function report(pack){const id='comparison.s01.paceChange';return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your recorded pace changed by {'+id+'}.',explanation:'Your latest short run was slower than earlier similar-distance runs.',nextAction:'Start your next short run at a conversational effort.',factIds:[id],signal:{factId:id,direction:'slower'}},findings:[{kind:'pace',headline:'Your latest pace was slower by {'+id+'}.',explanation:'Compared with earlier similar-distance runs from the same source.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'slower'},nextAction:'Record effort on your next similar run.'}],charts:[{type:'pace',sessionIds:['s01','s02']}]};}
@@ -97,9 +98,9 @@ test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports
  reordered.facts[0].value=999;assert.notEqual(evidenceHash(reordered),pack.hash);
 });
 test('no consent means no library or Google access; quota fallbacks are bounded and never expose provider bodies',async()=>{
- let enabled=false,calls=0;const api={config:{owner},json:async(path,options)=>path.includes('ai_preferences')?[{enabled,disclosure_version:'gemini-run-v1',revision:1}]:path.includes('finish_')?true:[],request:async()=>Response.json('review-id')},data={read:async()=>library()};
- let status=429;const engine=new TrainingIntelligence(api,data,{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_MODEL:'gemini-3.8-flash'},fetcher:async()=>{calls++;return new Response('private provider body test-secret',{status});}});
- assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;assert.equal((await engine.generate()).fallback,'provider');assert.equal(calls,3);
+ let enabled=false,calls=0;const api={config:{owner},json:async(path,options)=>path.includes('ai_preferences')?[{enabled,disclosure_version:'gemini-run-v1',revision:1}]:path.includes('reserve_gemini_key_slot')?calls%2+1:path.includes('finish_')?true:[],request:async()=>Response.json('review-id')},data={read:async()=>library()};
+ let status=429;const engine=new TrainingIntelligence(api,data,{env:keyEnv,fetcher:async()=>{calls++;return new Response('private provider body test-secret',{status});}});
+ assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;assert.equal((await engine.generate()).fallback,'provider');assert.equal(calls,6);
  status=403;assert.equal((await engine.generate()).fallback,'provider');
 });
 test('PostgreSQL consent is member-scoped, revocation blocks publication, audit persists and rate claims serialize',async()=>{
@@ -120,11 +121,42 @@ test('a validated response is persisted once and reused; opting out hides it wit
  let enabled=true,saved=null,providerCalls=0,pack;
  const api={config:{owner},json:async(path,options)=>{
   if(path.includes('ai_preferences'))return [{enabled,disclosure_version:'gemini-run-v1',revision:1}];
-  if(path.includes('finish_training_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:COACH_SCHEMA,prompt_version:COACH_PROMPT,finished_at:new Date().toISOString()};return true;}
+  if(path.includes('reserve_gemini_key_slot'))return 1;
+  if(path.includes('finish_training_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:options.body.result_model,schema_version:COACH_SCHEMA,prompt_version:COACH_PROMPT,finished_at:new Date().toISOString()};return true;}
   return saved?[saved]:[];
  },request:async()=>Response.json('saved')};
- const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{providerCalls++;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]});}});
+ const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:keyEnv,fetcher:async()=>{providerCalls++;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]});}});
  pack=(await engine.context()).pack;assert.equal((await engine.generate()).id,'saved');await engine.generate();assert.equal(providerCalls,1);assert.ok(saved.evidence.mapping.s01);enabled=false;assert.equal((await engine.status()).review,null);assert.ok(saved.report);
+});
+
+test('a saved Flash-Lite report can be retried on the preferred model with the next key',async()=>{
+ let saved=null,pack,slot=0;
+ const requests=[];
+ const api={config:{owner},json:async(path,options)=>{
+  if(path.includes('ai_preferences'))return [{enabled:true,disclosure_version:'gemini-run-v1',revision:1}];
+  if(path.includes('reserve_gemini_key_slot'))return slot++%2+1;
+  if(path.includes('finish_training_review')){
+   const b=options.body;
+   saved={id:'saved',report:b.result_report,evidence:b.result_evidence,evidence_key:(await engine.context()).key,
+    model_id:b.result_model,schema_version:COACH_SCHEMA,prompt_version:COACH_PROMPT,provider_attempts:b.attempt_log,finished_at:new Date().toISOString()};
+   return true;
+  }
+  return saved?[saved]:[];
+ },request:async()=>Response.json('saved')};
+ const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:keyEnv,fetcher:async(_,options)=>{
+  requests.push({model:JSON.parse(options.body).model,key:options.headers['x-goog-api-key']});
+  if(requests.length<3)return new Response(null,{status:503});
+  return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]});
+ }});
+ pack=(await engine.context()).pack;
+ assert.equal((await engine.generate()).model,'gemini-3.1-flash-lite');
+ assert.equal((await engine.status()).review.usedFallback,true);
+ assert.equal(requests.length,3);
+ assert.equal((await engine.generate()).model,'gemini-3.8-flash');
+ assert.equal((await engine.generate()).usedFallback,false);
+ assert.deepEqual(requests.map(r=>r.model),['gemini-3.8-flash','gemini-3.6-flash','gemini-3.1-flash-lite','gemini-3.8-flash']);
+ assert.deepEqual(requests.map(r=>r.key),['test-secret','second-secret','test-secret','second-secret']);
+ assert.doesNotMatch(JSON.stringify(saved.provider_attempts),/secret/);
 });
 
  test('pace claims cannot reverse direction and optional weak findings are omitted without weakening the main claim',()=>{
@@ -141,10 +173,11 @@ test('a training edit during generation prevents publishing advice for the super
  const data=library();let pack,completed=false;
  const api={config:{owner},json:async(path,options)=>{
   if(path.includes('ai_preferences'))return [{enabled:true,disclosure_version:'gemini-run-v1',revision:1}];
+  if(path.includes('reserve_gemini_key_slot'))return 1;
   if(path.includes('finish_training_review')){completed=options.body.result_status==='complete';return true;}
   return [];
  },request:async()=>Response.json('pending')};
- const engine=new TrainingIntelligence(api,{read:async()=>structuredClone(data)},{env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{
+ const engine=new TrainingIntelligence(api,{read:async()=>structuredClone(data)},{env:keyEnv,fetcher:async()=>{
   const response=report(pack);data.feedback.a7={answers:{effort:9}};
   return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(response)}]}]});
  }});

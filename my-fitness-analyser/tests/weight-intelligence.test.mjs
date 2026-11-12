@@ -6,6 +6,7 @@ import { weightTrend } from '../prototypes/weight-trend.js';
 import { weightEvidence } from '../analysis/weight-evidence.mjs';
 import { validateWeightReport,WEIGHT_SCHEMA,WEIGHT_PROMPT } from '../analysis/weight-contract.mjs';
 import { WeightIntelligence,weightRequest } from '../cloud/weight-intelligence.mjs';
+const keyEnv={GEMINI_API_KEY:'test-secret',GEMINI_API_KEY_2:'second-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_KEY_POOL_FREE_CONFIRMED:'1'};
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 const data={anchor:'2026-11-08',today:'2026-11-08',points:Array.from({length:12},(_,i)=>({date:new Date(Date.UTC(2026,8,1+i*3)).toISOString().slice(0,10),kg:80-i*.1+Math.sin(i)*.2,readings:1})),note:'secret note',viewer:{id:owner,email:'private@example.test'}};
 function report(p){return {schemaVersion:WEIGHT_SCHEMA,evidenceHash:p.hash,headline:'Your recorded trend moved by {period.trendDifference}.',explanation:'Across {history.days} recorded days, the trend changed. Your latest reading is {latest.age} old.',advice:'Keep your usual routine and compare the next few readings.',signal:{factId:'period.trendChange',direction:'down'},factIds:['period.trendChange','period.trendDifference','history.days','latest.age'],focus:'trend',nextStep:'refresh-readings',supportingFactIds:['period.trendChange','history.days']};}
@@ -31,11 +32,11 @@ test('weight evidence excludes identities, notes and dates; schema rejects inven
 });
 test('weight AI is explicit and consent-scoped, caches valid reports and never retries quota on a paid fallback',async()=>{
  let enabled=false,calls=0,reads=0,saved=null,status=200;
- const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async()=>Response.json('saved')};
- const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:{GEMINI_API_KEY:'test-secret',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{calls++;return status===200?Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report((await engine.context()).pack))}]}]}):new Response('private body test-secret',{status});}});
+ const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_gemini_key_slot'))return 1;if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async()=>Response.json('saved')};
+ const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:async()=>{calls++;return status===200?Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report((await engine.context()).pack))}]}]}):new Response('private body test-secret',{status});}});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
  enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);
- saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,4);
+ saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,5);
  enabled=false;assert.equal((await engine.status()).review,null);
 });
 test('weight consent SQL isolates owners, audits choices and rejects publication after revocation',async()=>{
@@ -57,9 +58,9 @@ test('weight changes during a provider request prevent publication against old e
  const changed=structuredClone(data);let published=false,failed=false,engine;
  const api={config:{owner},json:async(path,options)=>{
   if(path.includes('weight_ai_preferences'))return [{enabled:true,disclosure_version:'gemini-weight-v1',revision:1}];
-  if(path.includes('finish_weight_review')){published=options.body.result_status==='complete';failed=options.body.result_status==='failed';return true;}return [];
+  if(path.includes('reserve_gemini_key_slot'))return 1;if(path.includes('finish_weight_review')){published=options.body.result_status==='complete';failed=options.body.result_status==='failed';return true;}return [];
  },request:async()=>Response.json('pending')};
- engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:{GEMINI_API_KEY:'synthetic',GEMINI_FREE_TIER_CONFIRMED:'1'},fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(p))}]}]});}});
+ engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:keyEnv,fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(p))}]}]});}});
  await assert.rejects(engine.generate(),e=>e.status===409);assert.equal(published,false);assert.equal(failed,true);
 });
 

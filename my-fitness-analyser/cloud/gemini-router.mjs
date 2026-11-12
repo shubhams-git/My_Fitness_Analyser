@@ -1,12 +1,12 @@
-import {randomInt} from 'node:crypto';
+import {createHash} from 'node:crypto';
 import {CloudError} from './supabase.mjs';
 export const MODEL_POLICY='flash-routes-v2';
 const intensive=new Set(['run-coaching','weight-coaching','goal-analysis','zone-analysis']);
 const basic=new Set(['summary-format','activity-label','import-field-normalization']);
 export function modelRoute(task){
  if(task==='run-coaching')return [
-  {model:'gemini-3.6-flash',thinking:'high',timeout:55000},
   {model:'gemini-3.8-flash',thinking:'high',timeout:50000},
+  {model:'gemini-3.6-flash',thinking:'high',timeout:55000},
   {model:'gemini-3.1-flash-lite',thinking:'medium',timeout:40000}
  ];
  if(intensive.has(task))return [{model:'gemini-3.6-flash',thinking:'high',timeout:75000},{model:'gemini-3.8-flash',thinking:null,timeout:65000},{model:'gemini-3.1-flash-lite',thinking:null,timeout:40000}];
@@ -15,10 +15,30 @@ export function modelRoute(task){
 }
 export function generationConfig(model,thinking='high',maxOutput=16384){return {max_output_tokens:maxOutput,...(thinking?{thinking_level:thinking}:{})};}
 export function geminiKeys(env){const names=['GEMINI_API_KEY',...(env.GEMINI_KEY_POOL_FREE_CONFIRMED==='1'?Array.from({length:4},(_,i)=>'GEMINI_API_KEY_'+(i+2)):[])];return [...new Set(names.map(n=>env[n]?.trim()).filter(Boolean))];}
-let cursor;
-export async function routedGemini({task,key,keys=key?[key]:[],request,validate,beforeAttempt=async()=>{},fetcher=fetch,totalMs=210000,clock=Date.now}){
- if(!keys.length)throw new CloudError(503,'Gemini credentials are unavailable.');
- cursor??=randomInt(keys.length);
+export function geminiConfigured(env){
+ return env.GEMINI_FREE_TIER_CONFIRMED==='1'&&geminiKeys(env).length>=2;
+}
+export function sharedGeminiKey(api,task,reviewId,keys){
+ const keyIds=keys.map(key=>createHash('sha256').update('gemini-key-slot:'+key).digest('hex'));
+ return async()=>{
+  let slot;
+  try{
+   slot=await api.json('/rest/v1/rpc/reserve_gemini_key_slot',{method:'POST',body:{review_kind:task,review_id:reviewId,key_ids:keyIds}});
+  }catch{
+   throw new CloudError(503,'Gemini key rotation is unavailable. Try again later.');
+  }
+  if(!Number.isInteger(slot)||!keys[slot-1])throw new CloudError(503,'Gemini key rotation is unavailable. Try again later.');
+  return keys[slot-1];
+ };
+}
+let lastLocalKey;
+export async function routedGemini({task,keys,request,validate,reserveKey,beforeAttempt=async()=>{},fetcher=fetch,totalMs=210000,clock=Date.now}){
+ keys=[...new Set(keys||[])];
+ if(keys.length<2)throw new CloudError(503,'Gemini needs at least two distinct confirmed Free-tier keys for rotation.');
+ const nextKey=reserveKey||(()=>{
+  lastLocalKey=keys[(keys.indexOf(lastLocalKey)+1)%keys.length];
+  return lastLocalKey;
+ });
  const attempts=[],deadline=clock()+totalMs;let lastStatus=503;
  const route=modelRoute(task);
  const attemptLimit=task==='weight-coaching'?4:7;
@@ -29,10 +49,14 @@ export async function routedGemini({task,key,keys=key?[key]:[],request,validate,
   // Consent and evidence are checked outside the provider-failure catch. They
   // are authorization boundaries, not reasons to try a different model.
   await beforeAttempt(entry);
-  const remaining=deadline-clock();if(remaining<=0)break;
+  if(clock()>=deadline)break;
+  const body=JSON.stringify(request(entry));
+  const apiKey=await nextKey();
+  const remaining=deadline-clock();
+  if(!keys.includes(apiKey))throw new CloudError(503,'Gemini key rotation returned an invalid slot.');
   const attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'network',httpStatus:null};attempts.push(attempt);
   try{
-   const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal:AbortSignal.timeout(Math.max(1,Math.min(entry.timeout,remaining))),headers:{'Content-Type':'application/json','x-goog-api-key':keys[cursor++%keys.length],'Api-Revision':'2026-05-20'},body:JSON.stringify(request(entry))});
+   const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal:AbortSignal.timeout(Math.max(1,Math.min(entry.timeout,remaining))),headers:{'Content-Type':'application/json','x-goog-api-key':apiKey,'Api-Revision':'2026-05-20'},body});
    attempt.httpStatus=response.status;
    if(!response.ok){
     attempt.outcome='http';lastStatus=response.status;
@@ -40,6 +64,9 @@ export async function routedGemini({task,key,keys=key?[key]:[],request,validate,
     if(response.status===400){
      const body=await response.json().catch(()=>null);
      rejectedKey=body?.error?.details?.some?.(detail=>detail?.reason==='API_KEY_INVALID')===true;
+     const message=typeof body?.error?.message==='string'?body.error.message:'';
+     const reason=rejectedKey?'key rejected':/schema|response_format/i.test(message)?'schema rejected':'invalid request';
+     console.warn('Gemini request rejected',entry.model,reason);
     }else await response.body?.cancel().catch(()=>{});
     if(rejectedKey||[401,403,429].includes(response.status))continue;
     break;

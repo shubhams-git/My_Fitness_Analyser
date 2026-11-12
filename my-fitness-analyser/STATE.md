@@ -1,9 +1,15 @@
 # Current state
 
 Updated: 12 November 2026 (Australia/Sydney)
-Completed local increment: evidence-backed coaching analysis after F21
+Completed local increment: coaching model priority and key rotation
 
 ## Implemented
+
+- Running coaching prefers Gemini 3.8 Flash, then 3.6 Flash and 3.1
+  Flash-Lite. A cached fallback offers an explicit retry. Hosted training
+  and weight model attempts reserve distinct consecutive keys through a
+  shared database row. The rotation migration and Vercel key pool still
+  need to be applied to production with owner approval.
 
 - Coaching models now write an evidence-backed assessment, up to three
   independent findings, and a next-run action. Training shows findings
@@ -269,5 +275,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Check the revised coaching report on physical iPhone Safari using the
-synthetic coaching fixture.
+With approval, configure the production Free-tier key pool, apply the
+rotation migration, and deploy the coaching update.

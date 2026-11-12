@@ -1,6 +1,6 @@
 import Ajv from 'ajv';
 import { assertFactDirections,assertPersonalLimits } from '../prototypes/insight-format.js';
-export const COACH_SCHEMA='coaching-review-v3',COACH_PROMPT='runner-coach-v7',DISCLOSURE='gemini-run-v1';
+export const COACH_SCHEMA='coaching-review-v3',COACH_PROMPT='runner-coach-v8',DISCLOSURE='gemini-run-v1';
 const verdictWords={text:24,explanation:85,nextAction:35};
 const findingWords={headline:16,explanation:65,nextAction:28};
 export function discomfortVerdict(pack){
@@ -52,7 +52,7 @@ The verdict names your strongest conclusion in up to 24 words. Its explanation u
 
 Develop two or three separate findings when the evidence supports them. Use fewer when evidence is thin. Choose their topics and order yourself. Each finding adds a distinct observation or interpretation beyond the verdict and other findings. Explain what you noticed, the evidence and why it matters in up to 65 words. Use a headline of up to 16 words and a useful action or check of up to 28 words. Label direct measurements measured and inferences interpretation. Avoid generic encouragement, lists of metrics, and repeated advice.
 
-Use an exact {fact.id} placeholder for every measured quantity. Include each placeholder's ID in that item's factIds. Placeholders already include units. Cite evidence for each comparison and action. Use the direction supported by signal.factId: positive paceChange or splitChange is slower, negative is faster, zero is steady. Positive week distanceChange is up, negative is down, zero is steady. Other facts use none. For natural pace prose, cite the absolute paceDifference alongside the signed signal. Use at most one optional comparison chart with recorded values from the listed sessions.
+Use an exact {fact.id} placeholder for every measured quantity. Include each placeholder's ID in that item's factIds. Placeholders already include units. Before submitting, check every text field. Digits are allowed only inside fact placeholders, including for split numbers, calendar dates and zone labels. For example, write "You reported {s01.effort} effort" when that fact exists. If an exact fact is unavailable, use a qualitative description or omit the quantity. Cite evidence for each comparison and action. Use the direction supported by signal.factId: positive paceChange or splitChange is slower, negative is faster, zero is steady. Positive week distanceChange is up, negative is down, zero is steady. Other facts use none. For natural pace prose, cite the absolute paceDifference alongside the signed signal. Use at most one optional comparison chart with recorded values from the listed sessions.
 
 Use personal zones only when the relevant measured zone facts exist. Use explicit active goals when they help explain the decision. Treat timing bases, missing runs and missing sensors as limits on what you can infer. A pace difference does not establish a fitness improvement. Workouts and their timing may inform a conservative next step. Workout duration or strength focus alone cannot establish fatigue or recovery. Avoid physiological thresholds, injury predictions, diagnoses, and numerical targets that the runner did not set. When evidence is sparse, explain the key missing comparison or measurement and give a conservative next observation.
 

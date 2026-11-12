@@ -1,5 +1,13 @@
 # Decision register
 
+D45 — Coaching model priority and key rotation, 12 November 2026. Running
+coaching tries Gemini 3.8 Flash, Gemini 3.6 Flash, then Gemini 3.1 Flash-Lite.
+An explicit retry starts from the preferred model even when an earlier
+fallback is cached. Hosted coaching and weight insights share a database
+reservation for key selection across server instances. Require at least two
+distinct confirmed Free-tier keys. Reserve one key per provider attempt and
+keep keys out of logs and reports.
+
 D44 — Coaching analysis, 12 November 2026. Give every coaching model the
 evidence packet and the same bounded report. The model chooses and writes its
 findings. The app checks source references and comparison directions before
