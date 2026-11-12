@@ -1,9 +1,14 @@
 # Current state
 
 Updated: 12 November 2026 (Australia/Sydney)
-Completed local increment: F21 core training intelligence, Release 1
+Completed local increment: evidence-backed coaching analysis after F21
 
 ## Implemented
+
+- Coaching models now write an evidence-backed assessment, up to three
+  independent findings, and a next-run action. Training shows findings
+  inline with supporting measurements per claim. The same local validation
+  applies to all model routes. This increment is ready for review locally.
 
 - F21: Training and Progress show recent running, coverage, comparable pace
   and workout context without a goal or AI consent. Goals remain optional.
@@ -264,4 +269,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Review Release 1 on physical iPhone Safari using the local synthetic fixture.
+Check the revised coaching report on physical iPhone Safari using the
+synthetic coaching fixture.

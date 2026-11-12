@@ -1,5 +1,11 @@
 # Decision register
 
+D44 — Coaching analysis, 12 November 2026. Give every coaching model the
+evidence packet and the same bounded report. The model chooses and writes its
+findings. The app checks source references and comparison directions before
+publication. Training shows findings inline and keeps supporting measurements
+available on demand. Cached briefs remain available as previous reports.
+
 D43 — Goal-independent training intelligence, 12 November 2026. Keep one
 recorded activity model for recent volume, workout mix and comparable pace.
 Treat optional goals as an overlay, with race objectives deferred. Preserve

@@ -8,3 +8,15 @@
 .ai-wait [data-ai-elapsed]{color:var(--color-muted);font-variant-numeric:tabular-nums}
 .ai-space .ai-wait p{margin:6px 0 0;font-size:.8125rem}
 @media(prefers-reduced-motion:reduce){.ai-wait progress{display:none}}
+.ai-analysis{margin-top:18px;border-top:1px solid var(--color-divider)}
+.ai-analysis>h3,.ai-next>h3{font:650 1rem/1.4 var(--font-body);margin:18px 0 12px;color:var(--color-text)}
+.ai-analysis>article{padding:12px 0 6px}
+.ai-analysis>article+article{border-top:1px solid var(--color-divider)}
+.ai-analysis h4{font:650 1.125rem/1.4 var(--font-body);margin:0 0 8px}
+.ai-analysis .ai-action-line{margin-top:8px}
+.ai-analysis .ai-evidence,.ai-verdict .ai-evidence{border:0;margin-top:4px;padding:0}
+.ai-analysis .ai-evidence summary,.ai-verdict .ai-evidence summary{color:var(--color-accent)}
+.ai-space .ai-proof>div{flex-wrap:wrap;gap:4px 16px}
+.ai-space .ai-proof dd{white-space:normal}
+.ai-space .ai-status{white-space:normal;text-align:right}
+.ai-verdict h3[tabindex]{scroll-margin-top:160px}

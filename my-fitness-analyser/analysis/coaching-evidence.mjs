@@ -5,7 +5,7 @@ import { trainingDataset } from '../prototypes/training-data.mjs';
 import { comparableRunPaces,recordedTraining } from '../prototypes/progress-model.js';
 import { calendarDay } from '../prototypes/calendar-day.js';
 import { kilometreSplits } from '../prototypes/activity-analysis.js';
-export const COACH_EVIDENCE='coaching-evidence-v4';
+export const COACH_EVIDENCE='coaching-evidence-v5';
 export function canonicalJson(value){if(Array.isArray(value))return '['+value.map(canonicalJson).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).filter(k=>value[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+canonicalJson(value[k])).join(',')+'}';return JSON.stringify(value);}
 export const evidenceHash=content=>createHash('sha256').update(canonicalJson(content)).digest('hex');
 // Reconstruct the original v1 serialization for already-published reports.
@@ -63,7 +63,7 @@ export function coachingEvidence(library,{anchor=calendarDay(),zoneVersions=[],g
  const sessions=selected.map((s,i)=>{
   const ref='s'+String(i+1).padStart(2,'0'),a=library.activities[s.id]||activities.find(a=>a.id===s.id),answers=library.feedback[s.id]?.answers||{};mapping[ref]=s.id;
   for(const [field,label,unit]of [['distanceM','Recorded distance','m'],['durationS','Recorded duration','s'],['paceSPerKm','Recorded pace','s/km'],['hrBpm','Average heart rate','bpm']])add(ref+'.'+field,label,s[field],unit,[ref]);
-  add(ref+'.cadence','Average cadence',a?.cadence,'spm');add(ref+'.elevation','Recorded elevation gain',a?.elevationGain,'m');
+  add(ref+'.cadence','Average cadence',a?.cadence,'spm',[ref]);add(ref+'.elevation','Recorded elevation gain',a?.elevationGain,'m',[ref]);
   add(ref+'.power','Recorded average running power',a?.avgPower??a?.provider?.detail?.summaryDTO?.avgPower,'W',[ref]);
   for(const e of s.bestEfforts||[])if([400,1000,2000,5000].includes(e.distanceM))add(ref+'.best'+e.distanceM,'Fastest elapsed '+e.distanceM+' metre segment',e.elapsedS,'s',[ref]);
   add(ref+'.effort','Reported effort',s.effortRating,'/10',[ref]);
@@ -108,7 +108,7 @@ export function coachingEvidence(library,{anchor=calendarDay(),zoneVersions=[],g
  const activeGoal=(progress,prefix)=>['active','met'].includes(progress.status)?appendGoalEvidence(progress,prefix,anchor,add):null;
  const goalContext={weekly:activeGoal(data.goals.weekly,'goal.weekly'),time:activeGoal(data.goals.time,'goal.time')};
  const zoneRuns=runs.filter(s=>(Date.parse(anchor)-Date.parse(s.date))/86400000<28),zoneContext=['heart','pace'].flatMap(kind=>{const d=aggregateZones(zoneRuns,kind),meta=zoneFacts(d,'zones.28d.'+kind);return meta?[{...meta,periodDays:28,settingsVersions:d.revisions.length,sampledRuns:d.sampledRuns,uncoveredRuns:d.uncoveredRuns}]:[];});
- const content={goalContext,zoneContext,version:COACH_EVIDENCE,dataset:'personal',scope:'Running record from July 2026. Different sources retain their timing basis.',runsInHistory:runs.length,truncated:runs.length>selected.length,sessions,facts,comparisons,task:{product:'A runner’s personal coach, session explorer and progress journal.',goal:goalContext,availableActions:['run conversationally','adjust opening pace','repeat a familiar distance','review a cited run','complete a post-run check-in'],analysis:'Find what changed, explain why it matters and choose the most useful next action. Rank patterns across the whole record rather than summarising every field.'}};
+ const content={goalContext,zoneContext,version:COACH_EVIDENCE,dataset:'personal',scope:'Running record from July 2026. Different sources retain their timing basis.',runsInHistory:runs.length,truncated:runs.length>selected.length,sessions,facts,comparisons};
  if(wholeTraining){
   const workouts=workoutContext(data.sessions,strengthEntries,anchor);
   content.scope='Outdoor Garmin runs for performance. Other recorded workouts provide context for the next run.';
@@ -116,6 +116,8 @@ export function coachingEvidence(library,{anchor=calendarDay(),zoneVersions=[],g
   for(const kind of new Set(workouts.days.map(row=>row.kind))){
    const rows=workouts.days.filter(row=>row.kind===kind),key=kind.replaceAll('-','_');
    add('workouts.'+key+'.count','Recent '+kind+' sessions',rows.reduce((sum,row)=>sum+row.sessions,0),'count');
+   const timedDays=rows.filter(row=>row.durationS!==null);
+   if(timedDays.length)add('workouts.'+key+'.duration','Recorded '+kind+' time in the last fourteen days',timedDays.reduce((sum,row)=>sum+row.durationS,0),'s');
   }
  }
  const hash=evidenceHash(content);return {content,mapping,hash,legacyHash:hash};

@@ -4,7 +4,11 @@ export const MODEL_POLICY='flash-routes-v2';
 const intensive=new Set(['run-coaching','weight-coaching','goal-analysis','zone-analysis']);
 const basic=new Set(['summary-format','activity-label','import-field-normalization']);
 export function modelRoute(task){
- if(task==='run-coaching')return [{model:'gemini-3.6-flash',thinking:'high',timeout:45000},{model:'gemini-3.8-flash',thinking:null,timeout:22000},{model:'gemini-3.1-flash-lite',thinking:'minimal',timeout:22000}];
+ if(task==='run-coaching')return [
+  {model:'gemini-3.6-flash',thinking:'high',timeout:55000},
+  {model:'gemini-3.8-flash',thinking:'high',timeout:50000},
+  {model:'gemini-3.1-flash-lite',thinking:'medium',timeout:40000}
+ ];
  if(intensive.has(task))return [{model:'gemini-3.6-flash',thinking:'high',timeout:75000},{model:'gemini-3.8-flash',thinking:null,timeout:65000},{model:'gemini-3.1-flash-lite',thinking:null,timeout:40000}];
  if(basic.has(task))return [{model:'gemini-3.8-flash',thinking:'low',timeout:25000},{model:'gemini-3.6-flash',thinking:'low',timeout:25000},{model:'gemini-3.5-flash-lite',thinking:'low',timeout:20000},{model:'gemini-3.1-flash-lite',thinking:null,timeout:20000}];
  throw new CloudError(400,'Unsupported intelligence task.');

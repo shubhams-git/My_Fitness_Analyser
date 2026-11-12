@@ -29,6 +29,7 @@ test('whole-training coaching keeps Garmin performance separate from other worko
  assert.equal(pack.content.facts.find(f=>f.id==='s01.power').value,300);
  assert.deepEqual(pack.content.workouts.days.map(d=>[d.kind,d.sessions,d.durationS]),[['stationary-bike',1,1800],['strength',1,2100],['treadmill',1,1800],['workout',1,1800]]);
  assert.equal(pack.content.workouts.overlappingStrengthDays,1);
+ assert.equal(pack.content.facts.find(f=>f.id==='workouts.strength.duration').value,2100);
  assert.doesNotMatch(JSON.stringify(pack.content),/2026-10-17|private note|9000/);
  assert.notEqual(pack.hash,coachingEvidence(input,{anchor:date,strengthEntries:[]}).hash);
 });
@@ -37,13 +38,18 @@ test('schema and semantic gates reject invented numbers, missing evidence and un
  for(const mutate of [r=>r.verdict.text='You improved by 20%.',r=>r.findings[0].factIds=['history.runs'],r=>r.charts[0].type='heart_rate',r=>r.extra='unexpected']){const bad=structuredClone(good);mutate(bad);assert.throws(()=>validateCoaching(bad,pack));}
  assert.deepEqual(extractCoaching({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(good)}]}]},pack),good);assert.throws(()=>extractCoaching({status:'incomplete'},pack));
 });
-test('Flash-Lite returns one verdict and still must pass the full evidence checks',()=>{
+test('Flash-Lite receives full evidence and can return independent, validated findings',()=>{
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),model='gemini-3.1-flash-lite';
- const request=coachingRequest(pack,model,null);
- assert.deepEqual(Object.keys(request.response_format.schema.properties),['choice']);
+ const request=coachingRequest(pack,model,'medium'),schema=request.response_format.schema;
+ assert.deepEqual(schema.required,['schemaVersion','evidenceHash','verdict','findings','charts']);
+ assert.equal(schema.properties.findings.maxItems,3);
+ assert.deepEqual(JSON.parse(request.input).comparisons,pack.content.comparisons);
+ assert.deepEqual(request.response_format,coachingRequest(pack,'gemini-3.6-flash').response_format);
  const result=value=>({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(value)}]}]});
- assert.deepEqual(extractCoaching(result({choice:'pace'}),pack,model).charts,[]);
- assert.throws(()=>extractCoaching(result({choice:'invented'}),pack,model));
+ const independent=report(pack),factId='s01.splitChange';
+ independent.findings.push({kind:'pacing',headline:'Your closing kilometre was slower.',explanation:'The closing split was slower by {'+factId+'}. This shows how the pace changed within that run. It leaves open whether you deliberately eased up or found the effort harder toward the finish.',assessment:'interpretation',factIds:[factId],signal:{factId,direction:'slower'},nextAction:'On a similar run, check whether your effort changes between the opening and closing kilometre.'});
+ assert.deepEqual(extractCoaching(result(independent),pack),independent);
+ assert.throws(()=>extractCoaching(result({choice:'latest'}),pack),/evidence checks/);
 });
 test('affected check-ins replace generated advice and skip Gemini, even without goals',async()=>{
  const data=library(),date='2026-10-17',a=data.activities.a7;
@@ -55,16 +61,17 @@ test('affected check-ins replace generated advice and skip Gemini, even without 
  assert.deepEqual(paused.content.goalContext,{weekly:null,time:null});
  assert.ok(!paused.content.facts.some(f=>f.id.startsWith('goal.')));
  assert.deepEqual(pack.content.facts.find(f=>f.id==='safety.affected').sessionIds,['s01']);
- const model='gemini-3.1-flash-lite',request=coachingRequest(pack,model),result={status:'completed',steps:[{type:'model_output',content:[{type:'text',text:'{"choice":"latest"}'}]}]};
- const safe=extractCoaching(result,pack,model);
- assert.match(safe.verdict.explanation,/hold off on adding distance or intensity/);
- assert.throws(()=>validateCoaching({...safe,verdict:{...safe.verdict,nextAction:'Go hard and extend the run.'}},pack),/discomfort/);
+ const request=coachingRequest(pack,'gemini-3.1-flash-lite');
  assert.doesNotMatch(JSON.stringify(request),/private check-in|2026-10-17|"lat"/);
  let claims=0,calls=0;
  const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v2',revision:1}]:[],request:async()=>{claims++;}};
  const engine=new TrainingIntelligence(api,{read:async()=>data},{wholeTraining:true,env:{},fetcher:async()=>{calls++;}});
  assert.equal((await engine.status()).review.fallback,'discomfort');
- assert.equal((await engine.generate()).fallback,'discomfort');
+ const safe=await engine.generate();
+ assert.equal(safe.fallback,'discomfort');
+ assert.match(safe.report.verdict.explanation,/hold off on adding distance or intensity/);
+ const context=await engine.context();
+ assert.throws(()=>validateCoaching({...safe.report,verdict:{...safe.report.verdict,nextAction:'Go hard and extend the run.'}},context.pack),/discomfort/);
  assert.equal(claims+calls,0);
 });
 test('no recent outdoor run gets a recorded brief; journal discomfort is scoped and private',async()=>{
