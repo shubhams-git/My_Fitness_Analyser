@@ -10,9 +10,22 @@ import { GeminiReviews,demoEvidence,buildRequest,extractReport } from '../analys
 import publicData from '../api/data.mjs';
 import publicTraining from '../api/training.mjs';
 import { fieldNotesView } from '../prototypes/field-notes.js';
+import { progressModel } from '../prototypes/progress-model.js';
 
 function session(extra={}){return {id:'sample',title:'Private title',date:'2026-10-20',sport:'Run',source:'Garmin Connect',synthetic:false,provider:{id:'provider-sample',detail:{activityTypeDTO:{typeKey:'running'}}},distance:5000,timer:1800,moving:1780,elapsed:1820,hr:145,records:[{t:0,hr:140,lat:-37,lon:145},{t:1800,hr:150,lat:-37.01,lon:145.01}],...extra};}
 const dataset=(a,options={})=>trainingDataset(a,{}, {anchor:'2026-11-01',window:'all',...options});
+test('monthly progress includes imported Nike runs without treating them as GPS efforts',()=>{
+ const historical=(id,date)=>session({id,date,source:'Nike Run Club',sourceFile:'Owner-supplied screenshots',provider:null,distance:2190,timer:null,moving:null,running:825,displayedPace:376,records:[],hr:null});
+ const road=session({date:'2026-11-01'});
+ const treadmill=session({id:'treadmill',provider:{id:'treadmill',detail:{activityTypeDTO:{typeKey:'treadmill_running'}}}});
+ const data=dataset([road,treadmill,historical('sep','2026-09-20'),historical('oct','2026-10-04')],{outdoorGarminOnly:true,includeImportedRuns:true});
+ const progress=progressModel(data.sessions,data.anchor);
+ assert.deepEqual(progress.monthly.map(m=>[m.key,m.count,m.totalM,m.totalS]),[
+  ['2026-09',1,2190,825],['2026-10',1,2190,825],['2026-11',1,5000,1800]
+ ]);
+ assert.equal(data.sessions.find(s=>s.id==='oct').paceSPerKm,376);
+ assert.ok(progress.efforts.every(e=>e.results.every(r=>r.id!=='sep'&&r.id!=='oct')));
+});
 test('stationary sessions never render route or run analysis, even with GPS samples',()=>{
  const render=activity=>fieldNotesView({activity,icon:()=>'',logo:'',dateText:()=>'',escape:x=>x,routePanel:()=>'ROUTE MARKER',stats:()=>'SUMMARY MARKER',observationPanel:()=>'',analysisPanel:()=>'CHART MARKER',blocksPanel:()=>'',sourceNote:()=>'',inlineCheckin:()=>'',distance:()=>'',miniRoute:''});
  const road=session(),treadmill=session({id:'treadmill',provider:{id:'treadmill',detail:{activityTypeDTO:{typeKey:'treadmill_running'}}}});

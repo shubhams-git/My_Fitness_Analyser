@@ -14,9 +14,10 @@ const dateMs=date=>Date.parse(date+'T12:00:00Z');
 const monday=date=>{const d=new Date(date);d.setUTCHours(0,0,0,0);d.setUTCDate(d.getUTCDate()-(d.getUTCDay()+6)%7);return d.toISOString().slice(0,10);};
 export function mergeTrainingActivities(seeds,saved){const map=new Map(seeds.filter(a=>!a.synthetic).map(a=>[a.id,a]));for(const a of saved){for(const [id,b]of map)if(id!==a.id&&(a.sourceHash&&a.sourceHash===b.sourceHash||a.provider&&a.provider.id===b.garminActivityId))map.delete(id);map.set(a.id,a);}return [...map.values()];}
 
-export function trainingDataset(activities,feedback={}, {window='90',anchor=calendarDay(),synthetic=false,outdoorGarminOnly=false,zoneVersions=[],goalVersions=[]}={}){
+export function trainingDataset(activities,feedback={}, {window='90',anchor=calendarDay(),synthetic=false,outdoorGarminOnly=false,includeImportedRuns=false,zoneVersions=[],goalVersions=[]}={}){
   const seen=new Set();let sessions=[];
-  const sorted=[...activities].filter(a=>Boolean(a.synthetic)===synthetic&&(!outdoorGarminOnly||isGarminOutdoorRun(a))).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||a.id.localeCompare(b.id));
+  const eligible=a=>!outdoorGarminOnly||isGarminOutdoorRun(a)||(includeImportedRuns&&a.sourceFile==='Owner-supplied screenshots'&&activityKind(a)==='run');
+  const sorted=[...activities].filter(a=>Boolean(a.synthetic)===synthetic&&eligible(a)).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||a.id.localeCompare(b.id));
   for(const a of sorted){
     const identity=a.provider?.id||a.sourceHash||a.id;if(seen.has(identity))continue;seen.add(identity);
     if(!Number.isFinite(dateMs(a.date))||dateMs(a.date)>dateMs(anchor)+day)continue;
