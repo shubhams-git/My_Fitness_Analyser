@@ -9,11 +9,57 @@ import { REVIEW_VERSION,TOOL_NAME,validateReview } from '../analysis/contract.mj
 import { GeminiReviews,demoEvidence,buildRequest,extractReport } from '../analysis/gemini.mjs';
 import publicData from '../api/data.mjs';
 import publicTraining from '../api/training.mjs';
+import { privateHandler } from '../cloud/handler.mjs';
 import { fieldNotesView } from '../prototypes/field-notes.js';
 import { progressModel } from '../prototypes/progress-model.js';
 
 function session(extra={}){return {id:'sample',title:'Private title',date:'2026-10-20',sport:'Run',source:'Garmin Connect',synthetic:false,provider:{id:'provider-sample',detail:{activityTypeDTO:{typeKey:'running'}}},distance:5000,timer:1800,moving:1780,elapsed:1820,hr:145,records:[{t:0,hr:140,lat:-37,lon:145},{t:1800,hr:150,lat:-37.01,lon:145.01}],...extra};}
 const dataset=(a,options={})=>trainingDataset(a,{}, {anchor:'2026-11-01',window:'all',...options});
+test('running windows report measured volume, frequency and longest runs without goals',()=>{
+ const run=(id,date,extra={})=>session({id,date,provider:{id},...extra});
+ const screenshot=run('history','2026-10-25',{provider:null,source:'Strava',sourceFile:'Owner-supplied screenshots',distance:6500,timer:null,moving:null,elapsed:null,records:[],hr:null});
+ const rows=[run('today','2026-11-01'),run('today-again','2026-11-01',{distance:null,timer:null,moving:null,elapsed:null}),screenshot,
+  run('prior-28','2026-10-04',{distance:6000}),run('outside','2026-09-06',{distance:7000}),run('tomorrow','2026-11-02',{distance:8000}),
+  run('bike','2026-10-30',{distance:20000,provider:{id:'bike',detail:{activityTypeDTO:{typeKey:'cycling'}}}}),
+  run('treadmill','2026-10-30',{distance:9000,provider:{id:'treadmill',detail:{activityTypeDTO:{typeKey:'treadmill_running'}}}}),
+  run('row','2026-10-30',{provider:{id:'row',detail:{activityTypeDTO:{typeKey:'indoor_rowing'}}}})];
+ const data=dataset(rows),[week,month]=data.summary.periods;
+ assert.equal(data.goals.weekly.status,'unset');
+ assert.deepEqual([week.recent.runs,week.recent.days,week.recent.distance,week.recent.duration],[2,1,{value:5000,count:1},{value:1800,count:1}]);
+ assert.deepEqual([week.previous.distance,week.previous.duration],[{value:6500,count:1},{value:null,count:0}]);
+ assert.equal(month.recent.longest.id,'history');assert.equal(month.previous.longest.id,'prior-28');assert.equal(data.summary.longest.id,'outside');
+ assert.deepEqual(data.summary.modalities.map(r=>[r.kind,r.sessions]),[['run',3],['cycling',1],['rowing',1],['treadmill',1]]);
+ assert.deepEqual(progressModel(data.sessions,data.anchor,'walk').sessions,[]);
+ const paused=dataset(rows,{goalVersions:[{kind:'weekly-distance',effectiveFrom:'2026-10-26',revision:1,target:null}]});
+ assert.equal(paused.goals.weekly.status,'paused');assert.deepEqual(paused.summary,data.summary);
+ assert.deepEqual(dataset([]).summary.periods[0].recent.distance,{value:null,count:0});
+});
+test('comparisons stay within a source and time basis, and screenshot summaries never produce sensor streams',()=>{
+ const run=(id,date,timer,extra={})=>session({id,date,timer,provider:{id},...extra});
+ const screenshot=run('summary','2026-10-31',1200,{source:'Strava',sourceFile:'Owner-supplied screenshots',provider:null});
+ const sourceHash='fit-revision',sameFit=run('local','2026-10-29',1900,{sourceHash,source:'Original FIT',provider:null});
+ const data=dataset([run('latest','2026-11-01',1700),screenshot,run('mid','2026-10-29',1900,{sourceHash}),sameFit,
+  run('early','2026-10-24',2000),run('trail','2026-10-23',4000,{fitSubSport:'trail_running'}),
+  run('manual','2026-10-22',1000,{provider:null,source:'Original FIT'})]);
+ assert.deepEqual(data.summary.pace,{id:'latest',date:'2026-11-01',earlierIds:['mid','early'],pace:340,baseline:390,change:-50});
+ const imported=data.sessions.find(s=>s.id==='summary');
+ assert.equal(imported.sourceKind,'screenshot');assert.equal(imported.gpsSamples,0);assert.equal(imported.zones,null);assert.deepEqual(imported.sparkline,[]);
+ assert.equal(data.sessions.some(s=>s.id==='local'),false);
+ assert.equal(dataset([screenshot,sameFit]).summary.pace,null);
+});
+test('signed-in training includes workout modalities and strength context with no goal rows',async()=>{
+ const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Australia/Sydney',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ const road=session({date:today}),bike=session({id:'bike',date:today,provider:{id:'ride',detail:{activityTypeDTO:{typeKey:'indoor_cycling'}}}});
+ const api={config:{owner:'member'},json:async path=>path.includes('strength_entries_latest')?[{date_key:today,focus:'Legs',minutes:'30',note:'not public'}]:[]};
+ const response={setHeader(){},end(value){this.value=JSON.parse(value);}};
+ await privateHandler({method:'GET',url:'/api/training?view=progress'},response,'training',{env:{FITNESS_CLOUD_ENABLED:'1'},configReader:()=>({}),auth:async()=>api,
+  libraryFactory:()=>({read:async()=>({activities:{sample:road,bike},feedback:{}})})});
+ assert.equal(response.statusCode,200);
+ assert.equal(response.value.goals.weekly.status,'unset');
+ assert.deepEqual(response.value.sessions.map(s=>s.kind).sort(),['run','stationary-bike']);
+ assert.deepEqual(response.value.journalStrength,{sessions:1,days:1});
+ assert.doesNotMatch(JSON.stringify(response.value),/not public/);
+});
 test('monthly progress includes imported Nike runs without treating them as GPS efforts',()=>{
  const historical=(id,date)=>session({id,date,source:'Nike Run Club',sourceFile:'Owner-supplied screenshots',provider:null,distance:2190,timer:null,moving:null,running:825,displayedPace:376,records:[],hr:null});
  const road=session({date:'2026-11-01'});

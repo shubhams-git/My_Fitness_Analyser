@@ -1,5 +1,12 @@
 # Decision register
 
+D43 — Goal-independent training intelligence, 12 November 2026. Keep one
+recorded activity model for recent volume, workout mix and comparable pace.
+Treat optional goals as an overlay, with race objectives deferred. Preserve
+source coverage and the current AI sharing scope. Use deterministic recorded
+advice when discomfort affected a workout or recent running evidence is absent.
+See [F21](features/F21_CORE_TRAINING_INTELLIGENCE.md).
+
 D42 — Explicit goals and routed coaching, 11 November 2026. Keep goal progress
 deterministic and effective-dated. Share only relevant measured facts through
 existing separate consent scopes. Route by task and rotate confirmed Free keys;

@@ -1,16 +1,22 @@
 # Current state
 
-Updated: 11 November 2026 (Australia/Sydney)
-Completed increment: F20 goals and goal-aware coaching
+Updated: 12 November 2026 (Australia/Sydney)
+Completed local increment: F21 core training intelligence, Release 1
 
 ## Implemented
+
+- F21: Training and Progress show recent running, coverage, comparable pace
+  and workout context without a goal or AI consent. Goals remain optional.
+  Coaching uses recorded advice when discomfort affected a workout or recent
+  outdoor-run evidence is absent. Full local tests and foundation checks pass;
+  independent Impeccable and synthetic Chromium review completed. This change
+  has not been deployed. See [F21](features/F21_CORE_TRAINING_INTELLIGENCE.md).
 
 - Coaching refresh recovery: replaced the three-request daily database cap with
   a short cooldown, added bounded key retries, and return a labelled run-record
   brief during provider outages. Production reached Gemini, and the app showed
   the run-record brief after two provider 503s and a rejected Flash-Lite response.
   Flash-Lite now receives a verdict-only schema. All 128 tests passed.
-  Next action: verify the latest brief refresh in production.
 
 - F20: weekly distance, benchmark time and weight goals; dated revisions,
   progress and zone-aware Gemini evidence. Bounded free-model fallback with
@@ -258,4 +264,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Build reviewed Strava backfill and canonical duplicate reconciliation.
+Review Release 1 on physical iPhone Safari using the local synthetic fixture.

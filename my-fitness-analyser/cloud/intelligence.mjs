@@ -4,17 +4,17 @@ import {CloudZones} from './zones.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
 import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/coaching-evidence.mjs';
-import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,signalDirection,validateCoaching } from '../analysis/coaching-contract.mjs';
+import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,discomfortVerdict,signalDirection,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
 export const TRAINING_DISCLOSURE='gemini-training-v2';
 export async function aiPreference(api,disclosure=DISCLOSURE){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===disclosure?r.enabled:r?.enabled===false?false:null,revision:r?Number(r.revision):0,disclosureVersion:disclosure,updatedAt:r?.updated_at||null};}
 export async function setAiPreference(api,enabled,disclosure=DISCLOSURE){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure}});}
-async function recentStrength(api,anchor){
+export async function recentStrength(api,anchor){
  const start=new Date(Date.parse(anchor)-13*86400000).toISOString().slice(0,10);
  const filter=`owner_id=eq.${api.config.owner}&deleted=eq.false&date_key=gte.${start}&date_key=lte.${anchor}`;
  const [manual,imported]=await Promise.all([
-  api.json(`/rest/v1/strength_entries_latest?${filter}&select=date_key,focus:data->>focus,minutes:data->>mins`),
+  api.json(`/rest/v1/strength_entries_latest?${filter}&select=date_key,focus:data->>focus,minutes:data->>mins,discomfort:data->checkin->>discomfort`),
   api.json(`/rest/v1/journal_sessions_latest?${filter}&select=date_key,focus,minutes`)
  ]);
  const manualDays=new Set(manual.map(row=>row.date_key));
@@ -24,12 +24,13 @@ const compactModel=model=>model==='gemini-3.1-flash-lite';
 function compactVerdicts(pack){
  const baseline=recordedBrief({pack},'provider').report.verdict;
  const choices={latest:baseline};
+ if(discomfortVerdict(pack))return choices;
  const comparison=pack.content.facts.find(f=>f.id.startsWith('comparison.')&&f.id.endsWith('.paceChange')&&f.value!==0);
  if(comparison){
   const factId=comparison.id,direction=signalDirection(factId,comparison.value),difference=factId.replace('paceChange','paceDifference');
   choices.pace={
-   text:'You ran '+direction+' by {'+difference+'} compared with earlier similar runs.',
-   explanation:'The comparison uses runs with the same source, timing basis and environment.',
+   text:'A recorded run was '+direction+' by {'+difference+'} compared with earlier similar runs.',
+   explanation:'The runs used the same source and timing basis. Effort and conditions may differ.',
    nextAction:'Repeat a familiar route at a similar effort to see whether the pace difference holds.',
    factIds:[factId,difference],signal:{factId,direction}
   };
@@ -41,7 +42,7 @@ function compactVerdicts(pack){
   choices.strength={
    text:'You logged lower-body strength work close to your next run.',
    explanation:'Your recent log includes {'+factId+'} strength sessions, with lower-body work in the last few days.',
-   nextAction:'Start your next easy run conversationally. Let how your legs feel guide any pickup.',
+   nextAction:'If you run next, start conversationally and note how your legs feel.',
    factIds:[factId],signal:{factId,direction:'none'}
   };
  }
@@ -80,15 +81,21 @@ function recordedBrief(context,reason){
  const factId=distance?.id||'history.runs';
  const paceId=distance?.id.replace('distanceM','paceSPerKm');
  const hasPace=pack.content.facts.some(f=>f.id===paceId);
- const report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{
+ const coverage={text:'There is no recent outdoor Garmin run in your record.',
+  explanation:'Recent workout summaries can show what you recorded. There is too little running evidence here to judge a change in pace.',
+  nextAction:'If you run next, choose a familiar effort and note how it felt.',
+  factIds:['volume.28d.recent.runs'],signal:{factId:'volume.28d.recent.runs',direction:'none'}};
+ const report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:discomfortVerdict(pack)||(reason==='coverage'?coverage:{
   text:distance?'You covered {'+factId+'} in your latest recorded run over a kilometre.':'You have {'+factId+'} runs in your log.',
-  explanation:hasPace?'Your recorded pace for that run was {'+paceId+'}.':'Your run log gives you a baseline for your next session.',
-  nextAction:'If your next run is an easy one, settle into a conversational pace early.',
+  explanation:hasPace?'Your recorded pace was {'+paceId+'}. This run on its own does not show a trend.':'There is too little comparable detail here to judge a change in performance.',
+  nextAction:'If you run next, keep the effort familiar and record how it felt.',
   factIds:hasPace?[factId,paceId]:[factId],signal:{factId,direction:'none'}
- },findings:[],charts:[]};
+ }),findings:[],charts:[]};
  validateCoaching(report,pack);
  return {report,evidence:pack.content,mapping:pack.mapping,generatedAt:new Date().toISOString(),model:null,stale:false,fallback:reason};
 }
+const recordedReason=context=>discomfortVerdict(context.pack)?'discomfort'
+ :context.pack.content.workouts&&context.pack.content.facts.some(f=>f.id==='volume.28d.recent.runs'&&f.value===0)?'coverage':null;
 export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
  preference(){return aiPreference(this.api,this.disclosure);}
@@ -98,18 +105,20 @@ export class TrainingIntelligence {
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
   const exact=await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
   const valid=rows.filter(r=>{try{
-   if(r.schema_version!==COACH_SCHEMA||![COACH_PROMPT,'runner-coach-v4'].includes(r.prompt_version)||!r.evidence)return false;
+   if(r.schema_version!==COACH_SCHEMA||![COACH_PROMPT,'runner-coach-v5','runner-coach-v4'].includes(r.prompt_version)||!r.evidence)return false;
    const canonical=evidenceHash(r.evidence.content),legacy=canonical!==r.evidence.hash&&legacyEvidenceHash(r.evidence.content)===r.evidence.hash;
    if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy&&r.evidence_key===context.legacyKey&&canonical===context.pack.hash&&r.model_id===context.model)r.evidence_key=context.key;return true;
   }catch{return false;}});
   return valid.find(r=>r.evidence_key===context.key)||valid[0]||null;
  }
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key}:null;}
- async status(){const consent=await this.preference(),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model,minRuns:this.wholeTraining?1:2};if(consent.enabled!==true)return {...base,review:null};const context=await this.context();return {...base,runs:context.pack.content.sessions.length,review:this.item(await this.saved(context),context.key)};}
+ async status(){const consent=await this.preference(),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model,minRuns:this.wholeTraining?1:2};if(consent.enabled!==true)return {...base,review:null};const context=await this.context(),reason=recordedReason(context);return {...base,runs:context.pack.content.sessions.length,review:reason?recordedBrief(context,reason):this.item(await this.saved(context),context.key)};}
  async generate(){
   const pref=await this.preference();if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');
+  const context=await this.context();
+  const reason=recordedReason(context);if(reason)return recordedBrief(context,reason);
   if(!this.configured())throw new CloudError(409,'Gemini is unavailable. The server needs a supported Flash model and a confirmed Free-tier project.');
-  const context=await this.context();if(context.pack.content.sessions.length<(this.wholeTraining?1:2))throw new CloudError(409,this.wholeTraining?'Sync an outdoor Garmin run before requesting your brief.':'Import at least two runs before requesting a history briefing.');
+  if(context.pack.content.sessions.length<(this.wholeTraining?1:2))throw new CloudError(409,this.wholeTraining?'Sync an outdoor Garmin run before requesting your brief.':'Import at least two runs before requesting a history briefing.');
   const cached=await this.saved(context);if(cached?.evidence_key===context.key)return this.item(cached,context.key);
   const claim=await this.api.request('/rest/v1/rpc/begin_training_review',{method:'POST',body:{evidence_key:context.key,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
   if(claim.status===429)return recordedBrief(context,'cooldown');
@@ -128,7 +137,8 @@ export class TrainingIntelligence {
    console.warn('Gemini coaching attempts exhausted',JSON.stringify(error.attempts));
    const latestPref=await this.preference();
    if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');
-   return recordedBrief(await this.context(),'provider');
+   const latest=await this.context();
+   return recordedBrief(latest,recordedReason(latest)||'provider');
   }
  }
 }

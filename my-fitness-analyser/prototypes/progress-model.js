@@ -1,5 +1,5 @@
 // Original, deterministic analytics. No Strava scores or inferred sensor samples.
-export const PROGRESS_VERSION = 'recorded-progress-v4';
+export const PROGRESS_VERSION = 'recorded-progress-v5';
 export const BENCHMARKS = [400, 804.672, 1000, 1609.344, 2000, 3218.688, 5000, 10000, 21097.5, 42195];
 const finite = Number.isFinite;
 const dayMs = 86400000;
@@ -51,15 +51,51 @@ export function bestEfforts(activity) {
   });
 }
 
+export function comparableRunPaces(sessions,{allowScreenshot=false,max=6}={}){
+  const eligible=s=>s.comparable||allowScreenshot&&s.sourceKind==='screenshot'&&s.run&&s.environment!=='indoor'&&s.paceSPerKm!==null&&s.distanceM>=1000&&s.durationS>=300;
+  const runs=sessions.filter(eligible),results=[];
+  for(const [i,run] of runs.entries()){
+    const earlier=runs.slice(i+1).filter(s=>s.date<run.date&&s.sourceKind===run.sourceKind&&s.source===run.source
+      &&s.terrain===run.terrain&&s.environment===run.environment&&s.durationBasis===run.durationBasis&&s.paceBasis===run.paceBasis
+      &&Math.abs(s.distanceM/run.distanceM-1)<=.2).slice(0,5);
+    if(earlier.length<2)continue;
+    const paces=earlier.map(s=>s.paceSPerKm).sort((a,b)=>a-b),middle=Math.floor(paces.length/2);
+    const baseline=(paces[middle]+paces[Math.floor((paces.length-1)/2)])/2;
+    results.push({id:run.id,date:run.date,earlierIds:earlier.map(s=>s.id),pace:run.paceSPerKm,baseline,change:run.paceSPerKm-baseline});
+    if(results.length>=max)break;
+  }
+  return results;
+}
+
+export function recordedTraining(sessions,anchor){
+  const age=s=>(Date.parse(anchor)-Date.parse(s.date))/dayMs;
+  const window=(rows,from,to)=>rows.filter(s=>age(s)>=from&&age(s)<to);
+  const total=(rows,key)=>{const values=rows.map(s=>s[key]).filter(finite);return {value:values.length?values.reduce((a,b)=>a+b,0):null,count:values.length};};
+  const longest=rows=>{
+    const s=rows.filter(s=>s.distanceM>0).toSorted((a,b)=>b.distanceM-a.distanceM||b.date.localeCompare(a.date))[0];
+    return s?{id:s.id,date:s.date,distanceM:s.distanceM,sourceKind:s.sourceKind}:null;
+  };
+  const describe=rows=>({runs:rows.length,days:new Set(rows.map(s=>s.date)).size,distance:total(rows,'distanceM'),duration:total(rows,'durationS'),longest:longest(rows),
+    sources:Object.fromEntries([...new Set(rows.map(s=>s.sourceKind))].map(key=>[key,rows.filter(s=>s.sourceKind===key).length]))});
+  const runs=sessions.filter(s=>s.run),recent=window(sessions,0,28);
+  const modalities=Object.entries(Object.groupBy(recent,s=>s.kind)).map(([kind,rows])=>({kind,sessions:rows.length,days:new Set(rows.map(s=>s.date)).size,duration:total(rows,'durationS')}))
+    .sort((a,b)=>b.sessions-a.sessions||a.kind.localeCompare(b.kind));
+  return {version:PROGRESS_VERSION,periods:[7,28].map(days=>({days,recent:describe(window(runs,0,days)),previous:describe(window(runs,days,days*2))})),
+    activeDays:new Set(recent.map(s=>s.date)).size,modalities,longest:longest(runs),
+    pace:comparableRunPaces(runs,{max:1})[0]||null};
+}
+
 export function progressModel(sessions, anchor, sport='run') {
-  const selected=sessions.filter(s=>sport==='all'||(sport==='run'?s.run:!s.run));
+  const selected=sessions.filter(s=>sport==='all'||(sport==='run'?s.run:(s.kind??(!s.run?'walk':null))===sport));
   const months=new Map();
   for(const s of selected){const key=monthKey(s.date);if(!months.has(key))months.set(key,[]);months.get(key).push(s);}
   const current=monthKey(anchor);if(!months.has(current))months.set(current,[]);
   const monthly=[...months].sort(([a],[b])=>a.localeCompare(b)).map(([key,rows])=>{
     const [year,month]=key.split('-').map(Number),days=new Date(Date.UTC(year,month,0)).getUTCDate(),through=key===current?Number(anchor.slice(8)):days;
-    let distanceM=0,durationS=0;
-    const daily=Array.from({length:days},(_,i)=>{const date=key+'-'+String(i+1).padStart(2,'0'),items=rows.filter(s=>s.date===date);distanceM+=items.reduce((n,s)=>n+(s.distanceM??0),0);durationS+=items.reduce((n,s)=>n+(s.durationS??0),0);return {date,day:i+1,distanceM,durationS,sessionIds:items.map(s=>s.id),sessions:items};});
+    let distanceM=0,durationS=0,distanceCount=0,durationCount=0;
+    const daily=Array.from({length:days},(_,i)=>{const date=key+'-'+String(i+1).padStart(2,'0'),items=rows.filter(s=>s.date===date);
+      for(const s of items){if(finite(s.distanceM)){distanceM+=s.distanceM;distanceCount++;}if(finite(s.durationS)){durationS+=s.durationS;durationCount++;}}
+      return {date,day:i+1,distanceM,durationS,distanceCount,durationCount,sessionIds:items.map(s=>s.id),sessions:items};});
     return {key,days,through,daily,totalM:distanceM,totalS:durationS,count:rows.length,activeDays:daily.filter(d=>d.sessionIds.length).length};
   });
   const efforts=BENCHMARKS.map(distanceM=>({distanceM,results:selected.filter(s=>s.run).flatMap(s=>(s.bestEfforts||[]).filter(e=>e.distanceM===distanceM).map(e=>({...e,id:s.id,date:s.date,title:s.title}))).sort((a,b)=>a.elapsedS-b.elapsedS||a.date.localeCompare(b.date))}));

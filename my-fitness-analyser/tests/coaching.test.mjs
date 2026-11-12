@@ -45,11 +45,47 @@ test('Flash-Lite returns one verdict and still must pass the full evidence check
  assert.deepEqual(extractCoaching(result({choice:'pace'}),pack,model).charts,[]);
  assert.throws(()=>extractCoaching(result({choice:'invented'}),pack,model));
 });
+test('affected check-ins replace generated advice and skip Gemini, even without goals',async()=>{
+ const data=library(),date='2026-10-17',a=data.activities.a7;
+ Object.assign(a,{source:'Garmin Connect',sourceFile:'Garmin API + original FIT',provider:{id:'road'},timer:950,records:[{t:0,lat:-37,lon:145}]});
+ data.feedback.a7={answers:{effort:'8',discomfort:'affected',note:'private check-in'}};
+ const pack=coachingEvidence(data,{anchor:date,strengthEntries:[]});
+ assert.ok(!pack.content.facts.some(f=>f.id.startsWith('goal.')));
+ const paused=coachingEvidence(data,{anchor:date,strengthEntries:[],goalVersions:[{kind:'weekly-distance',revision:2,effectiveFrom:'2026-10-12',target:null}]});
+ assert.deepEqual(paused.content.goalContext,{weekly:null,time:null});
+ assert.ok(!paused.content.facts.some(f=>f.id.startsWith('goal.')));
+ assert.deepEqual(pack.content.facts.find(f=>f.id==='safety.affected').sessionIds,['s01']);
+ const model='gemini-3.1-flash-lite',request=coachingRequest(pack,model),result={status:'completed',steps:[{type:'model_output',content:[{type:'text',text:'{"choice":"latest"}'}]}]};
+ const safe=extractCoaching(result,pack,model);
+ assert.match(safe.verdict.explanation,/hold off on adding distance or intensity/);
+ assert.throws(()=>validateCoaching({...safe,verdict:{...safe.verdict,nextAction:'Go hard and extend the run.'}},pack),/discomfort/);
+ assert.doesNotMatch(JSON.stringify(request),/private check-in|2026-10-17|"lat"/);
+ let claims=0,calls=0;
+ const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v2',revision:1}]:[],request:async()=>{claims++;}};
+ const engine=new TrainingIntelligence(api,{read:async()=>data},{wholeTraining:true,env:{},fetcher:async()=>{calls++;}});
+ assert.equal((await engine.status()).review.fallback,'discomfort');
+ assert.equal((await engine.generate()).fallback,'discomfort');
+ assert.equal(claims+calls,0);
+});
+test('no recent outdoor run gets a recorded brief; journal discomfort is scoped and private',async()=>{
+ const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v2',revision:1}]:[]};
+ const engine=new TrainingIntelligence(api,{read:async()=>library()},{wholeTraining:true,env:{}});
+ const brief=(await engine.status()).review;
+ assert.equal(brief.fallback,'coverage');assert.match(brief.report.verdict.explanation,/too little running evidence/);
+ const pack=coachingEvidence(library(),{anchor:'2026-10-17',strengthEntries:[
+  {date_key:'2026-10-17',focus:'Legs',discomfort:'affected',note:'private note'},
+  {date_key:'2026-09-17',focus:'Legs',discomfort:'affected'},
+  {date_key:'2026-10-18',focus:'Legs',discomfort:'affected'}]});
+ assert.equal(pack.content.facts.find(f=>f.id==='safety.affected').value,1);
+ assert.doesNotMatch(JSON.stringify(pack.content),/private note|2026-10-17/);
+ assert.ok(!pack.content.facts.some(f=>f.id==='week.distanceChange'||f.id==='week.recent.distance'));
+});
 test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports remain cache hits',async()=>{
  const api={config:{owner},json:async()=>[]},engine=new TrainingIntelligence(api,{read:async()=>library()},{env:{GEMINI_MODEL:'gemini-3.6-flash'}}),context=await engine.context(),pack=context.pack;
  const reordered=JSON.parse(canonicalJson(pack.content));assert.equal(evidenceHash(reordered),pack.hash);
  const legacyPack={...pack,hash:pack.legacyHash,content:reordered},legacyReport=report(legacyPack);const row={id:'legacy',evidence:legacyPack,report:legacyReport,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA,evidence_key:context.legacyKey};api.json=async()=>[structuredClone(row)];
  assert.equal((await engine.saved(context)).evidence_key,context.key);assert.equal(engine.item(await engine.saved(context),context.key).stale,false);
+ api.json=async()=>[{...structuredClone(row),prompt_version:'runner-coach-v5',evidence_key:'a'.repeat(64)}];assert.equal(engine.item(await engine.saved(context),context.key).stale,true);
  const later={...context,key:'b'.repeat(64),legacyKey:'c'.repeat(64)};assert.equal(engine.item(await engine.saved(later),later.key).stale,true);
  reordered.facts[0].value=999;assert.notEqual(evidenceHash(reordered),pack.hash);
 });
@@ -115,7 +151,7 @@ test('a main verdict must carry its own explanation and actionable advice even w
 });
 
 test('zone-aware coaching cites measured per-run zones and owned running goals without leaking weight goals',()=>{
- const data=library();data.activities.a7.records=[{t:0,hr:150,speed:3},{t:10,hr:155,speed:3}];
+ const data=library();for(const a of Object.values(data.activities))Object.assign(a,{source:'Original FIT',sourceFile:'Original FIT',timer:a.running,records:[{t:0,hr:150,speed:3,lat:-37,lon:145},{t:10,hr:155,speed:3,lat:-37,lon:145}]});
  const zoneVersions=[{kind:'heart',revision:1,effectiveFrom:'2026-07-01',boundaries:[120,140,160,180]}],goalVersions=[{kind:'weekly-distance',revision:1,effectiveFrom:'2026-10-12',target:10000,deadline:null},{kind:'weight',revision:1,effectiveFrom:'2026-10-12',target:87.3}];
  const pack=coachingEvidence(data,{anchor:'2026-10-17',zoneVersions,goalVersions});assert.ok(pack.content.facts.some(f=>f.id==='s01.zones.heart.zone3Seconds'&&f.value===10));assert.equal(pack.content.facts.find(f=>f.id==='goal.weekly.target').value,10000);assert.ok(!JSON.stringify(pack.content).includes('87.3'));
  const r=report(pack),id='s01.zones.heart.zone3Share';r.findings=[{kind:'zones',headline:'You spent {'+id+'} in your heart-rate zone three.',explanation:'That was your dominant recorded zone.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'none'},nextAction:'Keep your next easy run conversational.'}];validateCoaching(r,pack);

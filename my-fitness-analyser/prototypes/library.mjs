@@ -29,7 +29,7 @@ export function decodeActivity(bytes) {
   if(messages.sessionMesgs?.length!==1)throw new Error('Import one activity session at a time. Multisport files are not supported yet.');
   const s=messages.sessionMesgs[0];
   if(!['running','walking','hiking','cycling','training','fitnessEquipment','generic'].includes(s.sport))throw new Error('This FIT sport is outside the supported activities.');
-  const sport=activityLabels[activityKind({sport:{running:'Run',walking:'Walk',hiking:'Walk',cycling:'Ride'}[s.sport],fitSubSport:s.subSport})];
+  const sport=activityLabels[activityKind({sport:s.sport,fitSubSport:s.subSport})];
   const start=new Date(s.startTime),base=start.getTime()/1000;
   if(!Number.isFinite(base))throw new Error('The activity has no valid start timestamp.');
   const coordinate=(v,limit)=>{const n=finite(v)==null?null:v*180/2**31;return n!==null&&Math.abs(n)<=limit?n:null;};
