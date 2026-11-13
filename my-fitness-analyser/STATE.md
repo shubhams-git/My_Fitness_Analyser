@@ -5,6 +5,12 @@ Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
 
+- Satellite replay follows closer on MapTiler imagery, with subtle pace-driven
+  sway and turn banking. The orange trace shows the latest part of the route
+  during the chase and reveals the full route on pullback. Reduced motion
+  retains top-down manual inspection. Chromium checked live tiles with a
+  synthetic route, turn framing, playback controls and imagery fallback.
+
 - Route replay can use higher-resolution MapTiler Cloud Free imagery with an
   origin-restricted `MAPTILER_BROWSER_KEY` on the deployment. EOxCloudless
   remains the fallback. Central Melbourne tiles were checked in MapTiler's

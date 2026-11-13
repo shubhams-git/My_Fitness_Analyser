@@ -69,3 +69,25 @@ stage/visual-viewport sizing and model v3. Actual signed-in root replay loads a
 ~538 px desktop map stage, updates recorded stats and finishes at 32:55 / 5.01 km
 with Play again. Closing restores the Replay route focus and clears body locking.
 No captured warning/error logs. Temporary review tabs and preview server cleaned up.
+
+
+## Pace and turn cues
+
+Satellite replay v5 moves the camera nearer on MapTiler and eases back as
+recorded speed rises or a turn approaches. The camera follows within the same
+continuous GPS segment. A small sway is timed in playback seconds, with banking
+driven by the local change in heading. Missing speed and GPS gaps settle the
+added motion. EOxCloudless uses the existing wider zoom when it supplies imagery.
+
+The chase shows a short, thinner recent trace. It blends into the recorded route
+as the camera pulls back. The final overhead view shows all GPS segments without
+bridging gaps. Motion-off keeps pitch and roll at zero and preserves the
+cumulative route for manual inspection. Playback duration and readout timing
+continue to use the same recorded elapsed time.
+
+Phone-width Chromium verification used live MapTiler tiles on a synthetic
+Melbourne route, inspected banking at a right-angle turn, and checked the full
+route, reduced motion and imagery fallback.
+
+- [Optic flow and steering study](https://pmc.ncbi.nlm.nih.gov/articles/PMC4892451/)
+- [W3C guidance on animation from interactions](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions)

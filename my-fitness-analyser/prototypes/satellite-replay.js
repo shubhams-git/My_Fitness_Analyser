@@ -1,4 +1,4 @@
-import { replayModel,replayPhase,followCamera,replayMetrics,replayFraming,replayPullback,angleDelta } from './replay-model.js';
+import { replayModel,replayPhase,followCamera,replayMetrics,replayFraming,replayPullback,angleDelta,chaseMotion } from './replay-model.js';
 import { loadMapLibrary } from './route-maps.js';
 
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -14,7 +14,7 @@ const mapTilerCredit='<a class="satellite-provider-logo" href="https://www.mapti
 
 export function openSatelliteReplay({activity,mapTilerBrowserKey,reduced=false,onClose}){
   const model=replayModel(activity.records);if(!model.available)return null;
-  const opener=document.activeElement,abort=new AbortController();let map,marker,raf=0,generation=0,dead=false,ready=false,playing=false,clock=0,last=0,lastData=-1,camera=null,overview=null,framing=null,loaded=false,terrainFailed=false,imageryFailed=false,imageryLoaded=false,useMapTiler=Boolean(mapTilerBrowserKey),resumeOnLoad=true;
+  const opener=document.activeElement,abort=new AbortController();let map,marker,raf=0,generation=0,dead=false,ready=false,playing=false,clock=0,last=0,lastData=-1,lastPhase=null,lastTrailMix=null,camera=null,motionState=null,overview=null,framing=null,loaded=false,terrainFailed=false,imageryFailed=false,imageryLoaded=false,useMapTiler=Boolean(mapTilerBrowserKey),resumeOnLoad=true;
   const dialog=document.createElement('dialog');dialog.className='satellite-replay';dialog.setAttribute('aria-labelledby','satellite-title');dialog.dataset.phase='loading';
   const controlIcon=(path)=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="${path}"/></svg>`;
   dialog.innerHTML=`<div class="satellite-hud"><header class="satellite-header"><div><h2 id="satellite-title">${escape(activity.title)}</h2><p>Route replay <span>· Satellite</span></p></div><button type="button" class="satellite-close" aria-label="Close route replay">${controlIcon('m6 6 12 12M6 18 18 6')}</button></header><dl class="satellite-metrics"><div><dt>Pace <span>/km</span></dt><dd data-replay-metric="pace">—</dd></div><div><dt>Elevation <span>m</span></dt><dd data-replay-metric="elevation">—</dd></div><div><dt>Distance <span>km</span></dt><dd data-replay-metric="distance">—</dd></div></dl></div><div class="satellite-stage"><div class="satellite-canvas"></div><div class="satellite-shade" aria-hidden="true"></div><div class="satellite-message" role="status"><strong>Finding your start.</strong><span>Loading satellite imagery…</span><button type="button" data-replay-retry hidden>Retry imagery</button></div><span class="satellite-credit"><span data-imagery-credit></span> · Terrain <a href="https://mapterhorn.com/attribution/" target="_blank" rel="noopener noreferrer">© Mapterhorn &amp; sources</a></span></div><footer class="satellite-footer"><div class="satellite-position"><span data-replay-phase>Satellite overview</span><span><output data-replay-elapsed aria-live="off">0:00</output> elapsed</span></div><label class="sr-only" for="satellite-time">Replay position</label><input id="satellite-time" type="range" min="0" max="${model.duration}" step=".05" value="0" disabled><div class="satellite-controls"><button type="button" data-replay-restart disabled>${controlIcon('M3 10a9 9 0 1 1 1 8M3 4v6h6')}<span>Restart</span></button><button type="button" data-replay-play disabled>${controlIcon('m9 5 11 7-11 7V5Z')}<span>Loading…</span></button></div></footer>`;
@@ -35,18 +35,49 @@ export function openSatelliteReplay({activity,mapTilerBrowserKey,reduced=false,o
   function frame(){framing=replayFraming($('.satellite-stage').clientHeight,0,$('.satellite-credit').offsetHeight);map.setPadding({top:0,bottom:0,left:0,right:0});overview=map.cameraForBounds(model.route.bounds,{padding:framing.fit,maxZoom:13.2});}
   function draw(dt=0,seek=false){
     if(!ready||dead)return;
-    const phase=replayPhase(clock,model.end,model.duration),first=model.route.points[0],sample=model.sample(phase.time),anchor=sample.coordinate?sample:{...sample,coordinate:first.coordinate,heading:model.sample(first.row.t).heading};
-    if(phase.name==='overview')camera={center:overview.center.toArray(),bearing:0};
-    else if(phase.name==='descent')camera={center:overview.center.toArray().map((v,n)=>v+(first.coordinate[n]-v)*phase.descent),bearing:anchor.heading*phase.descent};
+    const phase=replayPhase(clock,model.end,model.duration),first=model.route.points[0],sample=model.sample(phase.time);
+    const overviewCenter=overview.center.toArray();
+    if(phase.name==='overview')camera={center:overviewCenter,bearing:0};
+    else if(phase.name==='descent')camera={
+      center:overviewCenter.map((v,n)=>v+(first.coordinate[n]-v)*phase.descent),
+      bearing:(model.sample(first.row.t).heading??0)*phase.descent
+    };
+    else if(seek&&sample.gap)camera=followCamera(null,model.sample(model.lastFixAt(phase.time).row.t),0)||{center:first.coordinate,bearing:0};
     else camera=followCamera(seek?null:camera,sample,dt)||camera;
-    const exit=replayPullback(clock,model.duration),followPitch=76-7*Math.min(1,Math.max(0,(clock-3.8)/1.4));
-    const closeZoom=14.8,zoom=phase.name==='overview'?overview.zoom:phase.name==='descent'?overview.zoom+(closeZoom-overview.zoom)*phase.descent:closeZoom+(overview.zoom-closeZoom)*exit;
-    const center=camera.center.map((v,n)=>v+(overview.center.toArray()[n]-v)*exit),heading=camera.bearing+angleDelta(camera.bearing,0)*exit;
+
+    const exit=replayPullback(clock,model.duration);
+    const motionSample=phase.name==='descent'?model.sample(first.row.t):sample;
+    const following=phase.name==='following';
+    motionState=chaseMotion(seek||phase.name==='overview'?null:motionState,motionSample,dt,{reduced,sharpImagery:useMapTiler});
+    const zoom=overview.zoom+(motionState.zoom-overview.zoom)*phase.descent*(1-exit);
+    const center=camera.center.map((v,n)=>v+(overviewCenter[n]-v)*exit);
+    const heading=camera.bearing+angleDelta(camera.bearing,0)*exit;
     const padding=Object.fromEntries(Object.entries(framing.chase).map(([key,v])=>[key,v*phase.descent*(1-exit)]));
-    map.jumpTo({center,bearing:heading,zoom,pitch:reduced?0:(phase.name==='descent'?76:followPitch)*phase.descent*(1-exit),padding});
-    if(sample.coordinate&&phase.name!=='overview'&&phase.name!=='descent'){marker.setLngLat(sample.coordinate);marker.getElement().hidden=false;}else marker.getElement().hidden=true;
-    if(seek||Math.abs(clock-lastData)>=.09||phase.name==='finished'){map.getSource('replay-trail').setData(sample.trail);lastData=clock;
-      const metrics=replayMetrics(sample.row);for(const [key,value]of Object.entries(metrics)){const out=$(`[data-replay-metric="${key}"]`);if(out)out.textContent=value;} $('[data-replay-elapsed]').textContent=metrics.elapsed;slider.value=clock;slider.setAttribute('aria-valuetext',`${metrics.elapsed} recorded time; ${phase.name}`);
+    map.jumpTo({center,bearing:heading,zoom,
+      pitch:motionState.pitch*phase.descent*(1-exit),
+      roll:motionState.roll*phase.descent*(1-exit),padding});
+
+    if(sample.coordinate&&(following||phase.name==='finished')){
+      marker.setLngLat(sample.coordinate);marker.getElement().hidden=false;
+    }else marker.getElement().hidden=true;
+    if(seek||Math.abs(clock-lastData)>=.09||phase.name!==lastPhase||clock===model.duration){
+      const trail=map.getSource('replay-trail');
+      const wholeTrail=reduced?1:exit;
+      const recent=!reduced&&wholeTrail<1&&(following||phase.name==='finished')?sample.recentTrail().features:[];
+      const history=wholeTrail>0?sample.trail.features:[];
+      if(seek||phase.name!=='finished'||lastPhase!=='finished'||clock===model.duration){
+        trail.setData({type:'FeatureCollection',features:[...history,...recent]});
+      }
+      if(wholeTrail!==lastTrailMix){
+        const opacity=['case',['boolean',['get','recent'],false],1-wholeTrail,wholeTrail];
+        for(const layer of ['trail-casing','trail'])map.setPaintProperty(layer,'line-opacity',opacity);
+        lastTrailMix=wholeTrail;
+      }
+      lastData=clock;lastPhase=phase.name;
+      const metrics=replayMetrics(sample.row);
+      for(const [key,value]of Object.entries(metrics)){const out=$(`[data-replay-metric="${key}"]`);if(out)out.textContent=value;}
+      $('[data-replay-elapsed]').textContent=metrics.elapsed;
+      slider.value=clock;slider.setAttribute('aria-valuetext',`${metrics.elapsed} recorded time; ${phase.name}`);
     }
     dialog.dataset.phase=phase.name;$('[data-replay-phase]').textContent=phase.name==='overview'?'Your route, from above':phase.name==='descent'?'Descending to your start':phase.name==='finished'?'Your complete route':exit>0?'Bringing your route into view':sample.gap?'GPS gap · waiting for next fix':'Following your run';
   }
@@ -72,7 +103,7 @@ export function openSatelliteReplay({activity,mapTilerBrowserKey,reduced=false,o
     $('.satellite-canvas').removeAttribute('aria-description');
     ready=false;
     map?.remove();marker?.remove();map=null;marker=null;
-    loaded=false;terrainFailed=false;imageryFailed=false;imageryLoaded=false;
+    loaded=false;terrainFailed=false;imageryFailed=false;imageryLoaded=false;lastTrailMix=null;
     useMapTiler=preferMapTiler;
     showCredits();
     dialog.dataset.phase='loading';message.hidden=false;
@@ -107,7 +138,7 @@ export function openSatelliteReplay({activity,mapTilerBrowserKey,reduced=false,o
     map.getCanvas().setAttribute('aria-label','Satellite route replay. Use the playback controls to play, pause or inspect your run.');map.getCanvas().tabIndex=-1;
     frame();map.jumpTo(overview);
     map.on('load',()=>{if(dead||attempt!==generation)return;loaded=true;map.addSource('replay-trail',{type:'geojson',data:{type:'FeatureCollection',features:[]},tolerance:0});
-      for(const [id,color,width]of [['trail-casing','#17212b',9],['trail','#ff793e',5]])map.addLayer({id,type:'line',source:'replay-trail',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':color,'line-width':width}});
+      for(const [id,color,width]of [['trail-casing','#17212b',9],['trail','#ff793e',5]])map.addLayer({id,type:'line',source:'replay-trail',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':color,'line-width':['case',['boolean',['get','recent'],false],width-1.5,width],'line-opacity-transition':{duration:0,delay:0}}});
       if(!terrainFailed)map.setTerrain({source:'terrain',exaggeration:1});
     });
     map.on('sourcedata',e=>{if(attempt===generation&&e.sourceId==='satellite'&&e.tile?.state==='loaded')imageryLoaded=true;});

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {satelliteStyle} from '../prototypes/satellite-replay.js';
-import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,replayPullback,followCamera,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
+import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,replayPullback,followCamera,chaseMotion,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
 const fix=(t,lon=145+t/10000,extra={})=>({t,lat:-37.8,lon,distance:t*3,speed:3,elevation:27,...extra});
 test('cinematic sequence holds the city, descends, traverses elapsed time, then finishes exactly',()=>{
   assert.equal(replayPhase(.5,1000).name,'overview');assert.equal(replayPhase(2,1000).name,'descent');assert.equal(replayPhase(3.8,1000).time,0);
@@ -73,4 +73,42 @@ test('sharper replay imagery uses native tiles and retains the existing terrain'
  assert.ok(fallback.sources.satellite.tiles[0].startsWith('https://tiles.maps.eox.at/'));
  assert.deepEqual(sharp.sources.terrain,fallback.sources.terrain);
  assert.deepEqual(sharp.layers,fallback.layers);
+});
+
+
+test('close chase banks at turns, relaxes at higher speed and keeps optional motion bounded',()=>{
+ const slow=chaseMotion(null,{speed:1.2,turn:0},0),fast=chaseMotion(null,{speed:4.5,turn:0},0);
+ assert.ok(slow.zoom>fast.zoom&&fast.zoom>15.8);
+ assert.ok(chaseMotion(null,{speed:4,turn:90},0).roll>2);
+ assert.ok(chaseMotion(null,{speed:4,turn:-90},0).roll< -2);
+ assert.equal(chaseMotion(null,{speed:3,turn:0},0,{sharpImagery:false}).zoom,14.8);
+ const still=chaseMotion(fast,{speed:4,turn:90},.016,{reduced:true});
+ assert.deepEqual([still.pitch,still.roll],[0,0]);
+ const quiet=chaseMotion(null,{speed:null,turn:90},.1);
+ assert.equal(quiet.roll,0);
+ let motion=fast;
+ for(let i=0;i<60;i++){
+  const next=chaseMotion(motion,{speed:1,turn:90},.016);
+  assert.ok(Math.abs(next.roll-motion.roll)<.3);
+  motion=next;
+ }
+ assert.ok(motion.speed<1.2);
+});
+
+test('chase only traces the latest continuous GPS segment and finish preserves the complete route',()=>{
+ const rows=Array.from({length:182},(_,t)=>t===80?fix(t,null,{lat:null}):fix(t,145+t/40000,{
+  speed:3,lat:t<110?-37.8:-37.8+(t-110)/40000
+ }));
+ const model=replayModel(rows);
+ assert.equal(model.sample(80).recentTrail().features.length,0);
+ assert.equal(model.lastFixAt(80).row.t,79);
+ const sample=model.sample(150.5),[tail]=sample.recentTrail().features;
+ assert.ok(tail.properties.recent);
+ assert.ok(tail.geometry.coordinates[0][0]>rows[81].lon);
+ assert.deepEqual(tail.geometry.coordinates.at(-1),sample.coordinate);
+ assert.equal(model.sample(181).trail.features.length,2);
+ const turnModel=replayModel(Array.from({length:31},(_,t)=>fix(t,145+Math.min(t,15)/30000,{
+  lat:-37.8+Math.max(t-15,0)/30000
+ })));
+ assert.ok(turnModel.sample(15).turn< -60);
 });
