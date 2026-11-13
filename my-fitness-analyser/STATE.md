@@ -5,6 +5,10 @@ Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
 
+- Training's Coaching brief leads with the verdict and highlights the next-run
+  recommendation. Supporting numbers, cited runs, findings and comparisons
+  open on demand. Verified in Chromium with synthetic brief and job states.
+
 - Journal weight insights include a “Worth knowing” note when Gemini supplies a
   valid one. The note teaches a specific mechanism or research takeaway.
   Refresh an older insight to get the revised note, which is saved with

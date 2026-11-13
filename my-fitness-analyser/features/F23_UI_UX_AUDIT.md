@@ -50,3 +50,15 @@ No live provider, actual iPhone Safari or hosted backup was tested in this pass.
 Follow-up: measure first load and a timed check-in on iPhone Safari, then profile
 maps and calendar interaction on the device. A hosted per-activity evidence
 viewer remains separate work.
+
+
+### Coaching brief refinement
+
+Impeccable review found a flat reading hierarchy and a next-run recommendation
+buried after evidence, findings and comparisons. In a populated 390px
+fixture, the action started 785px below the top of the brief. The revised brief
+uses a Field Notes surface, a display headline and an accented next-run action
+directly after the verdict. Native disclosures keep the supporting numbers,
+cited runs, findings and comparisons available. UI/UX Pro Max informed heading
+wrap, touch targets and interactive feedback. Chromium checked the populated
+brief from 320px to 1280px and exercised stale, failed, queued and AI-off states.

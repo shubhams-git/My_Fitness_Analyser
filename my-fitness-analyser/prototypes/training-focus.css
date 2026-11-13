@@ -39,8 +39,15 @@
 .td-latest-actions .text-button{min-height:44px;display:inline-flex;align-items:center}
 .td-home-grid>.td-empty{grid-column:1/-1;max-width:48rem}
 .td-home-grid>.td-empty p{max-width:45ch}
-.td-home-grid>.td-coach.ai-space{padding:16px 0 0;min-height:0;background:transparent;border:0;border-top:1px solid var(--color-divider);border-radius:0;box-shadow:none}
-.td-home-grid>.td-coach .ai-actions .primary-button{background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border);box-shadow:none}
+.td-home-grid>.td-coach.ai-space{
+ padding:clamp(18px,3vw,32px);
+ min-height:0;
+ background:var(--color-surface);
+ border:1px solid var(--color-divider);
+ border-radius:16px;
+ box-shadow:none;
+}
+.td-home-grid>.td-coach.ai-space::before{content:none}
 @media(max-width:800px){
  .td-home-grid{grid-template-columns:minmax(0,1fr);gap:24px}
  .td-home-grid>.td-latest,.td-home-grid>.td-coach,.td-home-grid>aside{grid-column:auto;grid-row:auto}

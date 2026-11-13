@@ -29,17 +29,20 @@ export function coachingContent(review){
   }).join('')}</tbody></table></details>`;
  return `<div class="ai-verdict">
    <h3 tabindex="-1">${prose(verdict.text)}</h3><p class="ai-explanation">${prose(verdict.explanation)}</p>
-   ${proof(verdict.factIds,verdict.text)}
   </div>
-  ${findings.length?`<section class="ai-analysis" aria-labelledby="ai-analysis-heading">
-   <h3 id="ai-analysis-heading">Training findings</h3>
+  <div class="ai-next">
+   <h4><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17 17 5M7 5h10v10"/></svg>For your next run</h4>
+   <p>${prose(verdict.nextAction)}</p>
+  </div>
+  ${proof(verdict.factIds,verdict.text)}
+  ${findings.length?`<details class="ai-analysis ai-evidence">
+   <summary>Training findings</summary>
    ${findings.map(f=>`<article><h4>${prose(f.headline)}</h4>
     <p>${prose(f.explanation)}</p><p class="ai-action-line">${prose(f.nextAction)}</p>
     ${proof(f.factIds,f.headline)}</article>`).join('')}
-  </section>`:''}
+  </details>`:''}
   ${charts.map(comparison).join('')}
-  <div class="ai-next"><h3>For your next run</h3><p>${prose(verdict.nextAction)}</p></div>
-  <p class="ai-fine">Updated ${esc(new Date(review.generatedAt).toLocaleDateString('en-AU'))} · ${review.fallback?'Run record':esc(review.model)}</p>`;
+  <p class="ai-fine ai-credit">Updated ${esc(new Date(review.generatedAt).toLocaleDateString('en-AU',{day:'numeric',month:'short',year:'numeric'}))} · ${review.fallback?'Run record':esc(review.model)}</p>`;
 }
 
 export async function mountCoaching(root,{settings=false,signal}={}){
