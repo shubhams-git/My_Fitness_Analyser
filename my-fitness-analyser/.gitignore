@@ -13,4 +13,5 @@ private-data/
 artifacts/private/
 playwright-report/
 test-results/
+supabase/.temp/
 .DS_Store

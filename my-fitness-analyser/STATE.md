@@ -10,7 +10,8 @@ Completed local increment: task-first Field Notes (F23)
   Account and Progress layouts. Shared writes reach their endpoints again;
   run check-ins guard duplicate submission, and saved Journal entries can retry
   a failed refresh. Verified with synthetic Chromium and local fixtures.
-  Not deployed. See [F23](features/F23_UI_UX_AUDIT.md).
+  The hosted Activity endpoint sends the selected recording and summary rows for
+  the remaining history. See [F23](features/F23_UI_UX_AUDIT.md).
 
 - Training and Journal weight insights share Gemini 3.6 Flash defaults, a
   220-second request timeout, and app-wide rotation across distinct keys.

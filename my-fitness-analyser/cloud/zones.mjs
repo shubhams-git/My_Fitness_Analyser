@@ -4,7 +4,11 @@ import {localDay} from './journal.mjs';
 import {validateZone} from '../prototypes/zone-model.js';
 export class CloudZones{
  constructor(api){this.api=api;}
- async snapshot(){const [rows,profiles]=await Promise.all([ownerRows(this.api,'training_zone_versions','kind,revision,effective_from,boundaries,source,created_at','order=created_at.asc,kind.asc,revision.asc'),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`)]);return {today:localDay(profiles[0]?.timezone||'Australia/Sydney'),versions:rows.map(r=>({kind:r.kind,revision:Number(r.revision),effectiveFrom:r.effective_from,boundaries:r.boundaries,source:r.source,createdAt:r.created_at}))};}
+ async versions(){const rows=await ownerRows(this.api,'training_zone_versions','kind,revision,effective_from,boundaries,source,created_at','order=created_at.asc,kind.asc,revision.asc');return rows.map(r=>({kind:r.kind,revision:Number(r.revision),effectiveFrom:r.effective_from,boundaries:r.boundaries,source:r.source,createdAt:r.created_at}));}
+ async snapshot(){
+  const [versions,profiles]=await Promise.all([this.versions(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`)]);
+  return {today:localDay(profiles[0]?.timezone||'Australia/Sydney'),versions};
+ }
  async save(body){
   const snapshot=await this.snapshot();let value;try{value=validateZone(body,snapshot.today);}catch(e){throw new CloudError(400,e.message);}
   if(!Number.isSafeInteger(body.expectedRevision)||body.expectedRevision<0||!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(body.operationId||''))throw new CloudError(400,'Refresh your settings before saving.');

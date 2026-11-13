@@ -42,8 +42,9 @@ covered archive state and focus, check-in validation and retry, recovery after
 a confirmed weigh-in, strength saving, goal drafts and sign-in deep links.
 Journal used the loopback PGlite fixture; check-in, goal and sign-in used mocked
 responses. Axe reported no matching violations on six exercised fixture pages.
-`npm run test:prototypes` passed 142 tests, including the write regression;
-`npm run check` and `npm run check:cloud` also passed.
+The release suite passed 143 tests with `node --test --test-concurrency=3
+tests/*.test.mjs`, including regressions for the shared write and hosted
+activity deep links. `npm run check` and `npm run check:cloud` also passed.
 No live provider, actual iPhone Safari or hosted backup was tested in this pass.
 
 Follow-up: measure first load and a timed check-in on iPhone Safari, then profile

@@ -32,6 +32,24 @@ test('a second member cannot use the bootstrap Garmin key and hosted requests fa
   const noSession=response();await privateHandler({method:'GET',headers:{}},noSession,'data',{env:{VERCEL:'1'},configReader:()=>config});assert.equal(noSession.statusCode,401);assert.equal(JSON.parse(noSession.body).activities,undefined);
 });
 
+test('hosted activity links return one full recording and reject IDs outside the signed-in record',async()=>{
+  const run={id:activity,title:'Synthetic run',sport:'Run',date:'2026-11-13',records:[{t:1,hr:140}]};
+  const earlier={id:'earlier',title:'Earlier synthetic run',sport:'Run',date:'2026-11-12',records:[{t:2,hr:145}]};
+  const library={activities:{[run.id]:run,[earlier.id]:earlier},activityAliases:{'legacy-run':run.id},feedback:{[run.id]:{note:'Selected'},[earlier.id]:{note:'Other'}}};
+  const deps={env:{VERCEL:'1'},configReader:()=>config,auth:async()=>({config:{...config,owner:other},user:{id:other},json:async()=>[]}),libraryFactory:()=>({read:async()=>library})};
+  const get=async url=>{const out=response();await privateHandler({method:'GET',url,headers:{}},out,'data',deps);return {status:out.statusCode,body:JSON.parse(out.body)};};
+  const selected=await get('/api/data?activity=legacy-run');
+  assert.equal(selected.status,200);
+  assert.deepEqual(selected.body.activity.records,run.records);
+  assert.equal(selected.body.viewer.id,other);
+  assert.deepEqual(selected.body.activities.map(row=>row.id),[run.id,earlier.id]);
+  assert.ok(selected.body.activities.every(row=>!('records' in row)));
+  assert.deepEqual(Object.keys(selected.body.feedback),[run.id]);
+  assert.equal((await get('/api/data?activity=')).body.activity.id,run.id);
+  assert.equal((await get('/api/data?activity=unknown')).status,404);
+  assert.deepEqual((await get('/api/data')).body.activities[1].records,earlier.records);
+});
+
 test('screenshot intake uses the signed-in namespace and idempotent evidence queue, never creates a run',async()=>{
   const bytes=Buffer.from([255,216,255,0,1,2]),hash=createHash('sha256').update(bytes).digest('hex'),calls=[];
   const api={config:{...config,owner:other},user:{id:other},request:async(path,options={})=>{calls.push({path,options});if(path.includes('/storage/'))return options.method==='POST'?new Response('{}',{status:409}):new Response(bytes);return new Response(null,{status:201});}};

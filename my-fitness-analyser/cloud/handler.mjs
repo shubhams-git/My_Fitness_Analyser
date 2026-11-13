@@ -5,6 +5,7 @@ import { CloudLibrary,CloudError,cloudConfig } from './supabase.mjs';
 import { authorize,requireOrigin,signIn,signOut } from './auth.mjs';
 import { GarminSync } from '../prototypes/garmin.mjs';
 import { trainingDataset } from '../prototypes/training-data.mjs';
+import { activityKind } from '../prototypes/activity-kind.js';
 import { CloudJournal,journalProjection,localDay } from './journal.mjs';
 import { WeightIntelligence } from './weight-intelligence.mjs';
 import { TrainingIntelligence,aiPreference,setAiPreference,recentStrength,TRAINING_DISCLOSURE } from './intelligence.mjs';
@@ -14,7 +15,9 @@ export async function readBody(request,limit=3.5*1024*1024){
   let size=0;const parts=[];for await(const chunk of request){size+=chunk.length;if(size>limit)throw new CloudError(413,'Choose a file smaller than 3.5 MB.');parts.push(Buffer.from(chunk));}return Buffer.concat(parts);
 }
 export async function privateHandler(request,response,route,{configReader=cloudConfig,auth=authorize,libraryFactory=api=>new CloudLibrary(api),env=process.env}={}){
-  const send=(status,value)=>{const body=JSON.stringify(value);if(Buffer.byteLength(body)>4000000)throw new CloudError(413,'This library exceeds the current online alpha size limit. Your data is preserved.');response.statusCode=status;response.setHeader('Content-Type','application/json');response.end(body);};
+  const started=performance.now();
+  let authTime;
+  const send=(status,value)=>{const body=JSON.stringify(value);if(Buffer.byteLength(body)>4000000)throw new CloudError(413,'This library exceeds the current online alpha size limit. Your data is preserved.');response.statusCode=status;response.setHeader('Content-Type','application/json');response.setHeader('Server-Timing',authTime===undefined?'app;dur='+Math.round(performance.now()-started):'auth;dur='+authTime+', view;dur='+Math.max(0,Math.round(performance.now()-started-authTime)));response.end(body);};
   response.setHeader('Cache-Control','private, no-store');response.setHeader('Referrer-Policy','no-referrer');response.setHeader('X-Content-Type-Options','nosniff');response.setHeader('Content-Security-Policy',"default-src 'none'; frame-ancestors 'none'");
   try{
     if(env.FITNESS_CLOUD_ENABLED!=='1'&&!env.VERCEL)throw new CloudError(503,'Private hosting is not enabled. Use the local app.');
@@ -22,6 +25,7 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     if(route==='login'&&request.method==='POST'){await signIn(request,response,config,JSON.parse((await readBody(request,16384)).toString()));send(200,{signedIn:true});return;}
     if(route==='logout'&&request.method==='POST'){await signOut(request,response,config);send(200,{signedOut:true});return;}
     const api=await auth(request,response,config),library=libraryFactory(api);
+    authTime=Math.round(performance.now()-started);
     const garminConfigured=Boolean(env.GARMIN_PERSONAL_API_KEY&&config.owner===api.config.owner);
     if(request.method==='POST')requireOrigin(request,config);
     if(route==='goals'&&['GET','POST'].includes(request.method)){const goals=new CloudGoals(api);send(200,request.method==='GET'?await goals.snapshot():await goals.save(JSON.parse((await readBody(request,8192)).toString())));return;}
@@ -61,28 +65,41 @@ export async function privateHandler(request,response,route,{configReader=cloudC
       send(200,{saved:true,status:'pending_review'});return;
     }
     if(route==='profile'&&request.method==='GET'){
-      const profiles=await api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=display_name,timezone`);
-      const submissions=await api.json(`/rest/v1/screenshot_submissions?owner_id=eq.${api.config.owner}&select=id,provider,original_name,status,created_at&order=created_at.desc&limit=50`);
+      const [profiles,submissions]=await Promise.all([
+        api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=display_name`),
+        api.json(`/rest/v1/screenshot_submissions?owner_id=eq.${api.config.owner}&select=id,provider,original_name,status,created_at&order=created_at.desc&limit=50`)
+      ]);
       send(200,{user:{...api.user,displayName:profiles[0]?.display_name||api.user.displayName||'Athlete'},garmin:{configured:garminConfigured},submissions,historyFrom:'2026-07-01'});return;
     }
-    if(route==='journal'&&request.method==='GET'){const [snapshot,goals]=await Promise.all([new CloudJournal(api).snapshot(),new CloudGoals(api).snapshot()]);send(200,{...journalProjection(snapshot,{window:new URL(request.url,'http://localhost').searchParams.get('window')||'90',goalVersions:goals.versions}),local:false,cloud:true,viewer:api.user});return;}
+    if(route==='journal'&&request.method==='GET'){const [snapshot,goalVersions]=await Promise.all([new CloudJournal(api).snapshot(),new CloudGoals(api).versions()]);send(200,{...journalProjection(snapshot,{window:new URL(request.url,'http://localhost').searchParams.get('window')||'90',goalVersions}),local:false,cloud:true,viewer:api.user});return;}
     if(route==='weigh-in'&&request.method==='POST'){send(200,await new CloudJournal(api).save(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='strength-entry'&&request.method==='POST'){send(200,await new CloudJournal(api).saveStrength(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='mass-preview'&&request.method==='POST'){send(200,await new CloudJournal(api).preview(await readBody(request)));return;}
     if(route==='mass-commit'&&request.method==='POST'){send(200,await new CloudJournal(api).commit(await readBody(request),{head:Number(request.headers['x-journal-revision']),hash:request.headers['x-import-hash'],confirmSameDay:request.headers['x-confirm-same-day']==='1'}));return;}
     if(route==='training'&&request.method==='GET'){
       const profile=api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=timezone`);
-      const [data,profiles,goals,zones,strength]=await Promise.all([library.read(),profile,new CloudGoals(api).snapshot(),new CloudZones(api).snapshot(),
+      const [data,profiles,goalVersions,zoneVersions,strength]=await Promise.all([library.read(),profile,new CloudGoals(api).versions(),new CloudZones(api).versions(),
         profile.then(rows=>recentStrength(api,localDay(rows[0]?.timezone||'Australia/Sydney'))).catch(()=>null)]);
       const timezone=profiles[0]?.timezone||'Australia/Sydney',anchor=localDay(timezone);
-      const dataset=trainingDataset(Object.values(data.activities),data.feedback,{goalVersions:goals.versions,zoneVersions:zones.versions,
+      const dataset=trainingDataset(Object.values(data.activities),data.feedback,{goalVersions,zoneVersions,
         window:new URL(request.url,'http://localhost').searchParams.get('window')==='all'?'all':'90',garminGoals:true,anchor});
       send(200,{...dataset,journalStrength:strength&&{sessions:strength.length,days:new Set(strength.map(s=>s.date_key)).size},
         timezone,lastSync:data.garminSync?.lastSuccessAt||null,local:false,cloud:true,viewer:api.user,garminConfigured});return;
     }
     if(route==='data'&&request.method==='GET'){
-      const data=await library.read(),activities=Object.values(data.activities).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.time||'').localeCompare(a.time||'')||a.id.localeCompare(b.id));
-      send(200,{zoneVersions:(await new CloudZones(api).snapshot()).versions,activities,activityAliases:data.activityAliases,defaultId:activities[0]?.id||null,feedback:data.feedback,viewer:api.user,mode:'private-training-record',localLibrary:true,cloudLibrary:true,importLimitMB:3.5,garmin:{...data.garminSync,configured:garminConfigured,running:false}});return;
+      const params=new URL(request.url,'http://localhost').searchParams;
+      const [data,zoneVersions]=await Promise.all([library.read(),new CloudZones(api).versions()]);
+      const full=Object.values(data.activities).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.time||'').localeCompare(a.time||'')||a.id.localeCompare(b.id));
+      const defaultId=full[0]?.id||null,requested=params.get('activity');
+      const id=(data.activityAliases&&Object.hasOwn(data.activityAliases,requested)?data.activityAliases[requested]:requested)||defaultId;
+      const activity=params.has('activity')?(Object.hasOwn(data.activities,id)?data.activities[id]:null):undefined;
+      if(requested&&!activity)throw new CloudError(404,'This activity isn’t in your record.');
+      const activities=params.has('activity')?full.map(row=>{
+        const {id,title,date,sport,source,distance,timer,moving,elapsed,running}=row;
+        return {id,title,date,sport,source,kind:activityKind(row),distance,timer,moving,elapsed,running};
+      }):full;
+      const feedback=activity?{[id]:data.feedback[id]}:data.feedback;
+      send(200,{zoneVersions,activities,activity,activityAliases:data.activityAliases,defaultId,feedback,viewer:api.user,mode:'private-training-record',localLibrary:true,cloudLibrary:true,importLimitMB:3.5,garmin:{...data.garminSync,configured:garminConfigured,running:false}});return;
     }
     if(route==='feedback'&&request.method==='POST'){const body=JSON.parse((await readBody(request)).toString()),data=await library.read();send(200,await library.save(body.id,body.draft,Object.keys(data.activities)));return;}
     if(route==='import'&&request.method==='POST'){send(200,await library.import(await readBody(request)));return;}
