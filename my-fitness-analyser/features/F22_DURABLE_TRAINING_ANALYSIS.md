@@ -90,8 +90,10 @@ PGlite executes the migrations, with stand-ins for `pg_net`/`pg_cron`; the worke
 test covers duplicate enqueue, anonymous capability denial, cross-member read
 denial, lease recovery, pacing shared with weight, fallback persistence and
 revocation. The current primary model completed a validated two-finding synthetic
-brief in 7.58s, with 1,758 thinking tokens. Flash-Lite 3.1 medium responded in
-4.04s but its brief failed validation. The older Interactions route returned HTTP 503 on 3.8 high (2.45s),
+brief in 7.58s, with 1,758 thinking tokens. A repeat primary call returned HTTP
+503 in 3.21s. Flash-Lite 3.1 on low returned a validated verdict in 30.45s,
+with 96 thinking tokens. On medium its brief failed validation after 4.04s.
+The older Interactions route returned HTTP 503 on 3.8 high (2.45s),
 3.6 medium (38.00s), 3.1 Flash-Lite medium (3.83s), and 3.8 medium (1.72s).
 These are failure latencies; no thought-token count was returned. The probe
 uses synthetic data and waits at least 65 seconds between requests. To repeat:
