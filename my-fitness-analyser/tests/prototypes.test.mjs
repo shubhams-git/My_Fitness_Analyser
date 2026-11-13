@@ -76,14 +76,16 @@ test('local preview serves its UI while denying credential/source paths and fore
     });
     const base=`http://127.0.0.1:${port}`;
     assert.equal((await fetch(base)).status,200);
-    const activityShell=await fetch(base+'/app.html').then(r=>r.text());
-    for(const path of ['/','/index.html','/app.html']){
+    const shell=await fetch(base+'/training').then(r=>r.text());
+    for(const path of ['/','/index.html','/app.html','/training','/journal','/account']){
       const response=await fetch(base+path);assert.equal(response.status,200);
-      const html=await response.text();assert.equal(html,activityShell,`${path} must use the canonical activity shell`);
-      for(const css of ['interface.css','activity-visuals.css','satellite-replay.css','real-map.css','assets/vendor/maplibre-gl.css']){
-        assert.ok(html.includes(`href="/${css}"`),`${path} is missing ${css}`);
-        const asset=await fetch(base+'/'+css);assert.equal(asset.status,200);assert.match(asset.headers.get('content-type'),/text\/css/);
-      }
+      assert.equal(await response.text(),shell,`${path} must use the shared navigation shell`);
+    }
+    assert.match(shell,/<script type="module" src="\/navigation\.js">/);
+    const navigation=await fetch(base+'/navigation.js').then(r=>r.text());
+    for(const stylesheet of ['activity-visuals','satellite-replay','real-map','assets/vendor/maplibre-gl','journal-capture']){
+      assert.ok(navigation.includes(`'${stylesheet}'`),`navigation is missing ${stylesheet}`);
+      const asset=await fetch(base+'/'+stylesheet+'.css');assert.equal(asset.status,200);assert.match(asset.headers.get('content-type'),/text\/css/);
     }
     const data=await fetch(base+'/api/data');assert.equal(data.status,200);
     assert.match(data.headers.get('content-security-policy'),/connect-src 'self'/);
@@ -96,7 +98,6 @@ test('local preview serves its UI while denying credential/source paths and fore
     assert.ok(!JSON.stringify(payload).includes('API_KEY'));
     assert.equal((await fetch(base+'/training')).status,200);
     assert.equal((await fetch(base+'/training.js')).status,200);
-    assert.match(await fetch(base+'/journal').then(r=>r.text()),/href="\/journal-capture.css"/);
     for(const path of ['/journal-entry.js','/journal-view.js','/journal-capture.css','/journal-chart.js','/strength-entry.js','/weight-trend.js','/weight-insight.js'])assert.equal((await fetch(base+path)).status,200);
     const training=await fetch(base+'/api/training?window=all').then(r=>r.json());assert.equal(training.dataset,'personal');assert.equal(training.window,'all');assert.ok(training.sessions.every(s=>!s.synthetic));
     const analysis=await fetch(base+'/api/analysis/status').then(r=>r.json());assert.equal(analysis.dataMode,'synthetic-only');assert.equal(analysis.evidence.dataset,'synthetic');assert.ok(!JSON.stringify(analysis).includes('GEMINI_API_KEY'));

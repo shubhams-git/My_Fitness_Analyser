@@ -1,6 +1,6 @@
 # Field Notes: selected design direction
 
-Updated 9 November 2026. The owner selected Prototype B for all future work.
+Updated 14 November 2026. The owner selected Prototype B for all future work.
 The owner liked the premium finish but requested a stronger active fitness
 identity. Refine one Field Notes application; Trackside remains historical.
 The latest athletic treatment awaits owner visual review.
@@ -133,11 +133,16 @@ separate-workout acknowledgement. See F11 for implementation and verification.
 
 ## Daily decisions and deeper inspection
 
-Training leads with one current coaching conclusion, the latest run and a direct
-check-in, then a seven-day summary and four recent sessions. Progress is a
-dedicated view. Dates and filters persist in its URL. Keep exact values, provenance
+Training leads with the latest run and its next action. An available coaching
+brief follows the run. Seven-day running totals and workout mix provide context.
+Sessions is the main activity archive, with dated rows and URL-backed filters.
+Progress starts with the monthly chart and calendar, then offers comparisons,
+best efforts and zones. Dates and filters persist in its URL. Keep exact values, provenance
 and methods available through disclosures; do not place repeated qualifications
-between a runner and the next action. Journal names weight and gym sessions.
+between a runner and the next action. Journal gives weight and strength logging
+equal visibility at the top. Account starts with Garmin and imports. Sign-in
+starts with the form. Use plain task names, quiet rules, and signal orange for
+decisions and data that need attention. See [F23](features/F23_UI_UX_AUDIT.md).
 
 Insight voice: address you/your, lead with the decisive pattern and measured
 numbers, finish with a practical action. Reason extensively and display briefly.

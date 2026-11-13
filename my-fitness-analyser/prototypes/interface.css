@@ -1,4 +1,13 @@
 /* Shared refinement layer. Field Notes remains the product's visual identity. */
+.fn-app .primary-button{background:var(--color-accent);box-shadow:none}
+.fn-app :is(a,button,summary,input,select,textarea):focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
+#route-outlet .activity-tools{justify-content:space-between}
+.fn-back-sessions{display:inline-flex;align-items:center;min-height:44px;gap:8px}
+.fn-back-sessions svg{width:16px;height:16px;transform:rotate(180deg)}
+.fn-app .fn-details.fn-summary-only{grid-template-columns:minmax(0,1fr)}
+.fn-app .fn-summary-only .fn-detail-content{max-width:52rem}
+.fn-app .question-error{color:var(--color-danger);font-size:.875rem;margin:8px 0 0}
+.fn-app .question-error:empty{display:none}
 .fn-app{--font-body:var(--font-display)}
 .fn-app{caret-color:var(--color-accent);accent-color:var(--color-accent)}
 .fn-app ::selection{background:var(--color-accent);color:var(--color-onAccent)}

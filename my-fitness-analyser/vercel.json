@@ -1,4 +1,5 @@
 {
+  "regions": ["sin1"],
   "functions": { "api/private.mjs": { "maxDuration": 300 }, "api/training-worker.mjs": { "maxDuration": 300 } },
   "rewrites": [
     { "source": "/arrival.css", "destination": "/prototypes/arrival.css" },
@@ -13,7 +14,7 @@
     { "source": "/satellite-replay.js", "destination": "/prototypes/satellite-replay.js" },
     { "source": "/satellite-replay.css", "destination": "/prototypes/satellite-replay.css" },
     { "source": "/replay-model.js", "destination": "/prototypes/replay-model.js" },
-    { "source": "/index.html", "destination": "/prototypes/app.html" },
+    { "source": "/index.html", "destination": "/prototypes/shell.html" },
     { "source": "/activity-analysis.js", "destination": "/prototypes/activity-analysis.js" },
     { "source": "/activity-visuals.js", "destination": "/prototypes/activity-visuals.js" },
     { "source": "/activity-visuals.css", "destination": "/prototypes/activity-visuals.css" },
@@ -43,18 +44,20 @@
 
     { "source": "/coaching.js", "destination": "/prototypes/coaching.js" },
     { "source": "/coaching.css", "destination": "/prototypes/coaching.css" },
-    { "source": "/account", "destination": "/prototypes/account.html" },
-    { "source": "/account.html", "destination": "/prototypes/account.html" },
+    { "source": "/account", "destination": "/prototypes/shell.html" },
+    { "source": "/account.html", "destination": "/prototypes/shell.html" },
     { "source": "/account.css", "destination": "/prototypes/account.css" },
     { "source": "/account.js", "destination": "/prototypes/account.js" },
+    { "source": "/navigation.js", "destination": "/prototypes/navigation.js" },
+    { "source": "/navigation.css", "destination": "/prototypes/navigation.css" },
     { "source": "/session.js", "destination": "/prototypes/session.js" },
     { "source": "/sign-in", "destination": "/prototypes/sign-in.html" },
-    { "source": "/journal", "destination": "/prototypes/journal.html" },
-    { "source": "/journal.html", "destination": "/prototypes/journal.html" },
+    { "source": "/journal", "destination": "/prototypes/shell.html" },
+    { "source": "/journal.html", "destination": "/prototypes/shell.html" },
     { "source": "/journal.js", "destination": "/prototypes/journal.js" },
     { "source": "/journal.css", "destination": "/prototypes/journal.css" },
-    { "source": "/training", "destination": "/prototypes/training.html" },
-    { "source": "/training.html", "destination": "/prototypes/training.html" },
+    { "source": "/training", "destination": "/prototypes/shell.html" },
+    { "source": "/training.html", "destination": "/prototypes/shell.html" },
     { "source": "/training.js", "destination": "/prototypes/training.js" },
     { "source": "/training.css", "destination": "/prototypes/training.css" },
     { "source": "/api/analysis/status", "destination": "/api/review" },
@@ -69,11 +72,11 @@
     { "source": "/route-view.js", "destination": "/prototypes/route-view.js" },
     {
       "source": "/",
-      "destination": "/prototypes/app.html"
+      "destination": "/prototypes/shell.html"
     },
     {
       "source": "/app.html",
-      "destination": "/prototypes/app.html"
+      "destination": "/prototypes/shell.html"
     },
     {
       "source": "/app.js",

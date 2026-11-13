@@ -1,5 +1,12 @@
 # Decision register
 
+D48 — Task-first Field Notes, 14 November 2026. Four independent UI and UX
+audits found a shared save blocker and misplaced primary actions. Keep the
+athletic identity and existing data contracts. Promote the latest run,
+Sessions archive, direct Journal actions and Garmin imports; simplify sign-in
+and keep coaching consent in a named setting. Fix write and retry states,
+missing values and Back focus in the same increment. See [F23](features/F23_UI_UX_AUDIT.md).
+
 D47 — Free training analysis, 13 November 2026. Use Gemini 3.5 Flash-Lite with
 medium thinking after a successful synthetic comparison on the Generate Content
 API. Keep the full evidence input and reduce the model's output to prose and fact

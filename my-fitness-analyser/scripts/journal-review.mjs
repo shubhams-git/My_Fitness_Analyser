@@ -47,7 +47,7 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/mass/commit'){json(200,await journal.commit(Buffer.from(body),{head:Number(req.headers['x-journal-revision']),hash:req.headers['x-import-hash'],confirmSameDay:req.headers['x-confirm-same-day']==='1'}));return;}
   }
   if(url.pathname.startsWith('/api/')){json(409,{error:'Only synthetic journal QA is enabled.'});return;}
-  const path=url.pathname==='/journal'?'/journal.html':url.pathname;
+  const path=url.pathname==='/journal'?'/shell.html':url.pathname;
   const file=path==='/design/tokens.css'?fileURLToPath(new URL('../design/tokens.css',import.meta.url)):resolve(root,'.'+decodeURIComponent(path));
   if(path!=='/design/tokens.css'&&(relative(root,file).startsWith('..')||!/\.(js|css|html|ttf|svg)$/.test(file)))throw new Error('Not served');
   const types={'.js':'text/javascript','.css':'text/css','.html':'text/html','.ttf':'font/ttf','.svg':'image/svg+xml'};res.setHeader('Content-Type',types[extname(file)]);res.end(await readFile(file));

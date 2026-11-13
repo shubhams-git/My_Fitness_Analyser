@@ -1,19 +1,44 @@
 <!doctype html>
 <html lang="en">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><meta name="theme-color" content="#080E16"><title>Sign in — My Fitness Analyser</title><link rel="stylesheet" href="/design/tokens.css"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/field-notes.css"><link rel="stylesheet" href="/sign-in.css"><link rel="stylesheet" href="/interface.css"></head>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#080E16">
+  <title>Sign in — My Fitness Analyser</title>
+  <link rel="stylesheet" href="/design/tokens.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/field-notes.css">
+  <link rel="stylesheet" href="/sign-in.css">
+</head>
 <body data-theme="field-notes" class="fn-app sign-in-page">
-<a class="skip-link" href="#sign-in-form">Skip to sign in</a>
-<main class="sign-in-shell">
-  <header class="sign-in-masthead"><a class="sign-in-brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 25 11 7h5L8 25m9 0 8-18h4l-8 18"/></svg><span>MY FITNESS<br><strong>ANALYSER</strong></span></a><span class="sign-in-private"><i></i> A private training space</span></header>
-  <section class="sign-in-story" aria-labelledby="story-title"><p class="sign-in-kicker">THE WORK IS YOURS. SO IS THE RECORD.</p><h1 id="story-title">EVERY<br>EFFORT.<br><em>ALL YOURS.</em></h1><p class="sign-in-caption">The runs. The details. The way it felt.<br>Your training, brought into focus.</p>
-    <div class="sign-in-course" aria-hidden="true"><svg viewBox="0 0 720 330"><defs><linearGradient id="course-light" x1="0" y1="1" x2="1" y2="0"><stop stop-color="var(--color-accent)"/><stop offset="1" stop-color="var(--color-heartRate)"/></linearGradient></defs><g><path d="M-80 285H210c105 0 110-230 215-230H800"/><path d="M-80 305H225c110 0 110-230 215-230H800"/><path d="M-80 325H240c110 0 110-230 215-230H800"/><path d="M-80 345H255c110 0 110-230 215-230H800"/></g><path class="sign-in-line" d="M-80 285H210c105 0 110-230 215-230H800"/></svg></div>
-    <div class="sign-in-footnotes"><span>01 / YOUR SESSIONS</span><span>02 / YOUR PERSPECTIVE</span><span>03 / YOUR PROGRESS</span></div>
-  </section>
-  <section class="sign-in-panel" aria-labelledby="signin-title"><div class="sign-in-panel-top"><span class="section-caption">WELCOME TO YOUR RECORD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path d="M5 18 19 4M5 4h14v14"/></svg></div><h2 id="signin-title">Pick up<br>where you left off.</h2><p>Sign in to your training space.</p>
-    <form id="sign-in-form"><label for="email">Email address</label><input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" placeholder="you@example.com" required>
-      <label for="password">Password</label><div class="password-field"><input id="password" name="password" type="password" autocomplete="current-password" required><button id="show-password" class="password-visibility" type="button" aria-controls="password" aria-pressed="false">Show</button></div>
-      <p id="sign-in-status" role="status" aria-live="polite"></p><button class="primary-button sign-in-submit" type="submit">Open my training <span aria-hidden="true">↗</span></button>
-    </form><p class="sign-in-help"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10V7a5 5 0 0 1 10 0v3M5 10h14v11H5z"/></svg>Stay signed in on this browser.<br>Sign out when using a shared device.</p><div class="sign-in-invite">Private access · invited accounts only</div>
-  </section>
-  <footer class="sign-in-footer"><span>MAKE THE WORK COUNT.</span><span>My Fitness Analyser</span></footer>
-</main><script type="module" src="/sign-in.js"></script></body></html>
+  <a class="skip-link" href="#sign-in-form">Skip to sign in</a>
+  <main class="sign-in-shell">
+    <header class="sign-in-masthead">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 25 11 7h5L8 25m9 0 8-18h4l-8 18"/></svg>
+      <span>My Fitness Analyser</span>
+    </header>
+    <section class="sign-in-panel" aria-labelledby="signin-title">
+      <h1 id="signin-title">Sign in</h1>
+      <p>Use the email address on your invitation.</p>
+      <form id="sign-in-form" tabindex="-1">
+        <label for="email">Email address</label>
+        <input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required>
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+          <button id="show-password" class="password-visibility" type="button" aria-controls="password" aria-pressed="false" aria-label="Show password"><span aria-hidden="true">Show</span></button>
+        </div>
+        <p id="sign-in-status" role="alert"></p>
+        <button class="primary-button sign-in-submit" type="submit">Sign in</button>
+      </form>
+      <p class="sign-in-help">This browser stays signed in. Sign out on a shared device.</p>
+    </section>
+    <svg class="sign-in-track" viewBox="0 0 330 400" fill="none" aria-hidden="true">
+      <path d="M12 400V143a143 143 0 0 1 286 0v164m-34 0V143a109 109 0 0 0-218 0v257m34 0V143a75 75 0 0 1 150 0v164m-34 0V143a41 41 0 0 0-82 0v257"/>
+      <path class="sign-in-start" d="M8 305h110m79-69h105"/>
+    </svg>
+  </main>
+  <script type="module" src="/sign-in.js"></script>
+</body>
+</html>

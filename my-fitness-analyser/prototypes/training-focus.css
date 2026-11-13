@@ -21,3 +21,28 @@
 .pr-recent th,.pr-recent td{padding:9px 8px 9px 0;border-bottom:1px solid var(--color-divider);vertical-align:top}
 .pr-recent td small{display:block;color:var(--color-muted)}
 .pr-recent p{margin:12px 0}
+
+.td-main[data-view="today"] .td-page-heading{margin-bottom:24px}
+.td-home-grid{grid-template-columns:minmax(0,1.25fr) minmax(0,.85fr);grid-template-rows:auto;align-items:start;gap:26px 44px}
+.td-home-grid>.td-latest{grid-column:1;grid-row:1;padding:20px 0 4px;border-block-start:2px solid var(--color-accent);border-radius:0;background:none}
+.td-home-grid>.td-coach{grid-column:1;grid-row:2}
+.td-home-grid>aside{grid-column:2;grid-row:1/span 2;display:block}
+.td-home-grid .td-week:first-child{border-block-start:1px solid var(--color-divider);padding-top:20px}
+.td-latest .td-section-top :is(h2,time){font:550 .875rem/1.5 var(--font-body);color:var(--color-muted)}
+.td-latest .td-section-top time{white-space:nowrap}
+.td-latest-title{margin:14px 0 18px;justify-content:start;min-height:44px}
+.td-latest-title h3{font-size:clamp(2.35rem,5vw,4.5rem);overflow-wrap:anywhere;max-width:20ch}
+.td-latest-title:hover h3{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:.12em}
+.td-latest-metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,5.5rem),1fr));gap:12px 20px;margin:0 0 22px}
+.td-latest-metrics dt{margin-bottom:3px}
+.td-latest-metrics dd{font:700 clamp(1.5rem,3vw,2.25rem)/1.1 var(--font-editorial)}
+.td-latest-actions .text-button{min-height:44px;display:inline-flex;align-items:center}
+.td-home-grid>.td-empty{grid-column:1/-1;max-width:48rem}
+.td-home-grid>.td-empty p{max-width:45ch}
+.td-home-grid>.td-coach.ai-space{padding:16px 0 0;min-height:0;background:transparent;border:0;border-top:1px solid var(--color-divider);border-radius:0;box-shadow:none}
+.td-home-grid>.td-coach .ai-actions .primary-button{background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border);box-shadow:none}
+@media(max-width:800px){
+ .td-home-grid{grid-template-columns:minmax(0,1fr);gap:24px}
+ .td-home-grid>.td-latest,.td-home-grid>.td-coach,.td-home-grid>aside{grid-column:auto;grid-row:auto}
+ .td-home-grid>.td-latest{padding-top:16px}
+}

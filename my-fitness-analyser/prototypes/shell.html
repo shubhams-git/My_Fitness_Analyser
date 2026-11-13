@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#080E16">
+  <meta name="referrer" content="no-referrer">
+  <title>My Fitness Analyser</title>
+  <link rel="stylesheet" href="/design/tokens.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/field-notes.css">
+  <link rel="stylesheet" href="/training.css">
+  <link rel="stylesheet" href="/interface.css">
+  <link rel="stylesheet" href="/navigation.css">
+  <link rel="modulepreload" href="/session.js">
+</head>
+<body data-theme="field-notes" class="fn-app training-app">
+  <a class="skip-link" href="#route-outlet">Skip to content</a>
+  <header class="tr-header mfa-shell">
+    <a class="tr-brand" href="/training" aria-label="My Fitness Analyser training">
+      <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 25 11 7h5L8 25m9 0 8-18h4l-8 18"/></svg>
+      <span>My Fitness<br><strong>Analyser</strong></span>
+    </a>
+    <nav aria-label="Main">
+      <a href="/training" data-page="today">Training</a>
+      <a href="/training?view=sessions" data-page="sessions">Sessions</a>
+      <a href="/training?view=progress" data-page="progress">Progress</a>
+      <a href="/journal" data-page="journal">Journal</a>
+      <a href="/account" data-page="account">Account</a>
+    </nav>
+  </header>
+  <div id="route-outlet" tabindex="-1">
+    <main class="td-main route-preview">
+      <div class="td-page-heading"><div><h1>My Fitness Analyser</h1></div></div>
+      <div class="route-preview-grid" aria-hidden="true">
+        <div class="route-placeholder"><i></i><div></div><i></i><i></i></div>
+        <div class="route-placeholder"><i></i><div></div><i></i></div>
+      </div>
+    </main>
+  </div>
+  <template id="account-controls">
+    <button class="secondary-button" id="motion" type="button" aria-pressed="true">Visual motion <span>on</span></button>
+    <button class="text-button" id="logout" type="button">Sign out</button>
+  </template>
+  <p id="route-announcement" class="sr-only" role="status"></p>
+  <script type="module" src="/navigation.js"></script>
+</body>
+</html>

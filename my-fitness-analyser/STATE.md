@@ -1,9 +1,16 @@
 # Current state
 
-Updated: 13 November 2026 (Australia/Sydney)
-Completed local increment: durable training analysis (F22)
+Updated: 14 November 2026 (Australia/Sydney)
+Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
+
+- Four independent UI and UX audits led to a runner-first Training view, a
+  Sessions archive, shorter sign-in, clearer Journal actions, and task-based
+  Account and Progress layouts. Shared writes reach their endpoints again;
+  run check-ins guard duplicate submission, and saved Journal entries can retry
+  a failed refresh. Verified with synthetic Chromium and local fixtures.
+  Not deployed. See [F23](features/F23_UI_UX_AUDIT.md).
 
 - Training and Journal weight insights share Gemini 3.6 Flash defaults, a
   220-second request timeout, and app-wide rotation across distinct keys.
@@ -301,4 +308,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Measure the signed-in first load on iPhone Safari over a mobile connection.
+Review F23 on physical iPhone Safari, including first load and a timed run check-in.

@@ -122,3 +122,15 @@
 @media(max-width:450px){.jr-v2 .jr-chart-section{padding:22px 18px 14px}.jr-v2 .jr-chart-heading{gap:16px;margin-bottom:24px}.jr-v2 .jr-selected-value strong{font-size:52px}.jr-v2 .jr-chart-frame{margin-top:22px}.jr-v2 .jr-chart-top p{font-size:11px}.wi-panel{padding:22px 20px}.wi-explanation{font-size:13px}.wi-panel h3{font-size:21px}.wi-actions .secondary-button{width:100%}.wi-heading{gap:7px}}
 
 .jr-held-line{fill:none;stroke:var(--color-text);stroke-width:2;stroke-dasharray:4 5;opacity:.55;vector-effect:non-scaling-stroke}
+
+.journal-app .jr-title h1{font-style:normal;text-transform:none}
+.jr-quick-actions{display:flex;flex-wrap:wrap;gap:8px 12px}
+.jr-quick-actions :is(a,button){min-height:44px}
+.jr-v2 .jr-chart-section{background:var(--color-surface);border-radius:12px}
+.jr-v2 .jr-entry-panel{top:var(--shell-clearance,90px);padding:20px;background:var(--color-surface);border-radius:12px;box-shadow:none;scroll-margin-top:8px}
+.jr-v2 .je-intro h2{font:650 1.25rem/1.35 var(--font-body)}
+.jr-v2 .jr-facts p,.jr-v2 .jr-chart-top p,.jr-v2 .jr-chart-note{font-size:.8125rem}
+.jr-v2 .jr-chart-heading .tr-window{flex:0 1 auto;max-width:100%;flex-wrap:wrap;border:0;padding:0}
+.jr-v2 .jr-chart-heading .tr-window button{min-height:44px;font-size:.8125rem}
+#mass-review{overscroll-behavior:contain}
+@media(max-width:740px){.jr-v2 .jr-title{align-items:start;gap:14px}.jr-v2 .jr-entry-panel{position:static}.jr-v2 .jr-quick-actions{margin:0 0 4px}}
