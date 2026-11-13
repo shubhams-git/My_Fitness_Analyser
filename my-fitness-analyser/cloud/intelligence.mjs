@@ -40,7 +40,7 @@ export function coachingRequest(pack,model,thinking='high',maxOutput=16384){
   generation_config:generationConfig(model,thinking,maxOutput)
  };
 }
-export function coachingGenerationRequest(pack,entry){
+export function coachingGenerationRequest(pack){
  const schema=providerSchema(coachingSchema(pack));
  for(const name of ['schemaVersion','evidenceHash','charts'])delete schema.properties[name];
  schema.required=['verdict','findings'];
@@ -59,8 +59,7 @@ export function coachingGenerationRequest(pack,entry){
  return {
   systemInstruction:{parts:[{text:systemInstruction}]},
   contents:[{parts:[{text:JSON.stringify(pack.content)}]}],
-  generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema,maxOutputTokens:entry.maxOutput,
-   thinkingConfig:{thinkingLevel:entry.thinking.toUpperCase()}}
+  generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema}
  };
 }
 
@@ -119,7 +118,7 @@ const recordedReason=context=>discomfortVerdict(context.pack)?'discomfort'
 export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false,durable=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.durable=durable;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
  preference(){return aiPreference(this.api,this.disclosure);}
- configured(){return geminiConfigured(this.env);}
+ configured(){return geminiConfigured(this.env)&&(!this.durable||geminiKeys(this.env).length>=2);}
  async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;

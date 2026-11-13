@@ -9,8 +9,8 @@ Completed local increment: durable training analysis (F22)
   model timing/usage details. A synthetic 3.5 Flash-Lite Generate Content brief
   passed validation, and a recorded brief covers exhausted provider attempts.
   141 tests and foundation/config checks passed;
-  the hosted Supabase dispatcher and an end-to-end production job are still
-  unverified. See [F22](features/F22_DURABLE_TRAINING_ANALYSIS.md). Garmin
+  the hosted Supabase dispatcher and a saved production report were verified.
+  The current route prefers 3.6 Flash with default thinking, then 3.5 Flash-Lite. See [F22](features/F22_DURABLE_TRAINING_ANALYSIS.md). Garmin
   Personal API is pull-only; the automatic sync design is documented there.
 
 - Satellite route replay now runs for 20–24.5 seconds after imagery loads.

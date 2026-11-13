@@ -1,10 +1,9 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
 
-export const TRAINING_JOB_POLICY='durable-coach-v2';
+export const TRAINING_JOB_POLICY='durable-coach-v3';
 export const TRAINING_ROUTE=Object.freeze([
- {model:'gemini-3.5-flash-lite',thinking:'medium',timeout:90000,maxOutput:16384,endpoint:'generateContent'},
- {model:'gemini-3.6-flash',thinking:'medium',timeout:100000,maxOutput:24576,endpoint:'generateContent'},
- {model:'gemini-3.1-flash-lite',thinking:'low',timeout:75000,maxOutput:16384,endpoint:'generateContent'}
+ {model:'gemini-3.6-flash',timeout:220000,endpoint:'generateContent'},
+ {model:'gemini-3.5-flash-lite',timeout:220000,endpoint:'generateContent'}
 ]);
 
 // The worker trusts only evidence built by the app server, even if a member

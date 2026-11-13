@@ -34,11 +34,14 @@ permission clears pending evidence and prevents publication. Changes to the
 training record make an earlier snapshot stale when the report is read. The
 latest successful report remains owner-scoped in `analysis_reports`.
 
-| Training attempt | Thinking | Request timeout | Output cap incl. thinking |
-| --- | --- | ---: | ---: |
-| Gemini 3.5 Flash-Lite | Medium | 90s | 16,384 |
-| Gemini 3.6 Flash | Medium | 100s | 24,576 |
-| Gemini 3.1 Flash-Lite | Low | 75s | 16,384 |
+| Training attempt | Thinking | Request timeout |
+| --- | --- | ---: |
+| Gemini 3.6 Flash | Model default | 220s |
+| Gemini 3.5 Flash-Lite | Model default | 220s |
+
+Training sends no thinking configuration or output token override. It requires
+two distinct configured Free-tier keys and reserves the next key for each
+provider attempt using the shared Supabase budget.
 
 Training uses Gemini's `generateContent` API for single requests with structured
 JSON. The model writes the verdict and findings from the full evidence packet.
@@ -89,7 +92,7 @@ matching database rollback plan; toggling the dispatcher alone stops processing.
 PGlite executes the migrations, with stand-ins for `pg_net`/`pg_cron`; the worker
 test covers duplicate enqueue, anonymous capability denial, cross-member read
 denial, lease recovery, pacing shared with weight, fallback persistence and
-revocation. The current primary model completed a validated two-finding synthetic
+revocation. The earlier 3.5 Flash-Lite route completed a validated two-finding synthetic
 brief in 7.58s, with 1,758 thinking tokens. A repeat primary call returned HTTP
 503 in 3.21s. Flash-Lite 3.1 on low returned a validated verdict in 30.45s,
 with 96 thinking tokens. On medium its brief failed validation after 4.04s.
@@ -100,7 +103,7 @@ uses synthetic data and waits at least 65 seconds between requests. To repeat:
 
 ```sh
 node scripts/check-coach-live.mjs --route
-node scripts/check-coach-live.mjs gemini-3.5-flash-lite medium
+node scripts/check-coach-live.mjs gemini-3.6-flash
 ```
 
 A one-word 3.8 Flash/low request also received HTTP 503 on Interactions

@@ -10,7 +10,7 @@ import {COACH_PROMPT,COACH_SCHEMA} from '../analysis/coaching-contract.mjs';
 import {syntheticHistory} from '../prototypes/training-data.mjs';
 
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
-const key='synthetic-key',env={GEMINI_API_KEY:key,GEMINI_FREE_TIER_CONFIRMED:'1'};
+const key='synthetic-key',env={GEMINI_API_KEY:key,GEMINI_API_KEY_2:'synthetic-second-key',GEMINI_KEY_POOL_FREE_CONFIRMED:'1',GEMINI_FREE_TIER_CONFIRMED:'1'};
 const pack=coachingEvidence({activities:Object.fromEntries(syntheticHistory().map(a=>[a.id,{...a,synthetic:false}])),feedback:{}},{anchor:'2026-11-07'});
 const evidenceKey='a'.repeat(64);
 const report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your log contains {history.runs} recorded runs.',explanation:'Your log gives you a baseline for comparing familiar efforts.',nextAction:'Keep your next run at a familiar effort.',factIds:['history.runs'],signal:{factId:'history.runs',direction:'none'}},findings:[],charts:[]};
@@ -34,7 +34,7 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
  const rpc={claim_training_job:['job_id','job_capability'],reserve_training_gemini:['job_id','job_capability','job_lease','key_ids','target_model'],finish_training_job:['job_id','job_capability','job_lease','attempt','result_report','retry_seconds','failure_code']};
  const api={json:async(path,{body})=>{const name=path.split('/').at(-1),args=rpc[name].map(field=>body[field]);return sql(`select ${name}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args);}};
  let calls=0;
- const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.equal(body.generationConfig.thinkingConfig.thinkingLevel,TRAINING_ROUTE[calls-1].thinking.toUpperCase());
+ const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],calls===1?key:env.GEMINI_API_KEY_2);
   if(calls===1)return Response.json({error:{message:'unavailable'}},{status:503});
   const {factIds,signal,...prose}=report.verdict;
   return Response.json({usageMetadata:{promptTokenCount:600,thoughtsTokenCount:500,candidatesTokenCount:350},candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({verdict:{...prose,signalFactId:signal.factId},findings:[]})}]}}]});};

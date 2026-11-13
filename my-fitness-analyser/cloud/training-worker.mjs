@@ -19,17 +19,17 @@ export async function runTrainingJob(api,{id,capability},{env=process.env,fetche
   ...lease,attempt,result_report:report,retry_seconds:retrySeconds,failure_code:failure
  });
  const keys=geminiKeys(env),entry=TRAINING_ROUTE[job.step];
- if(!geminiConfigured(env))return finish({failure:'configuration'});
+ if(!geminiConfigured(env)||keys.length<2)return finish({failure:'configuration'});
  if(!entry||job.promptVersion!==COACH_PROMPT||job.schemaVersion!==COACH_SCHEMA||!job.pack?.content||
   !validJobSignature(keys,job)||evidenceHash(job.pack.content)!==job.pack.hash)return finish({failure:'evidence'});
- const body=coachingGenerationRequest(job.pack,entry);
+ const body=coachingGenerationRequest(job.pack);
  const saveRecorded=result=>finish({...result,report:recordedTrainingReport(job.pack),failure:RECORDED_COACH});
  const finishAttempt=result=>!result.report&&job.step===TRAINING_ROUTE.length-1?saveRecorded(result):finish(result);
  // Consent is checked inside this reservation, immediately before transmission.
  const budget=await rpc('reserve_training_gemini',{...lease,key_ids:geminiKeyIds(keys),target_model:entry.model});
  if(!budget)return finish({failure:'cancelled'});
- if(budget.dailyLimit)return saveRecorded({attempt:{model:entry.model,thinking:entry.thinking,outcome:'quota',httpStatus:null,elapsedMs:0}});
- if(budget.modelBlocked)return finishAttempt({attempt:{model:entry.model,thinking:entry.thinking,outcome:'quota',httpStatus:null,elapsedMs:0}});
+ if(budget.dailyLimit)return saveRecorded({attempt:{model:entry.model,thinking:'default',outcome:'quota',httpStatus:null,elapsedMs:0}});
+ if(budget.modelBlocked)return finishAttempt({attempt:{model:entry.model,thinking:'default',outcome:'quota',httpStatus:null,elapsedMs:0}});
  if(budget.retryAt)return true; // Database released the lease and scheduled the next eligible time.
  if(!Number.isInteger(budget.slot)||!keys[budget.slot-1])return finish({failure:'configuration'});
  const result=await geminiAttempt({entry,apiKey:keys[budget.slot-1],body,validate:json=>extractCoaching(json,job.pack,{compact:true}),fetcher});
