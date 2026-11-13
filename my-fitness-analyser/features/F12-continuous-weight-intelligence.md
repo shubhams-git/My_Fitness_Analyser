@@ -113,3 +113,7 @@ response. It can share a practical habit or established research takeaway
 separately from the evidence-linked trend and advice. The existing report
 JSON stores the note. Older reports remain readable and can be refreshed.
 Invalid note text is omitted independently of the main report.
+
+Prompt weight-coach-v6 asks for a specific mechanism, measurement concept or
+counterintuitive finding and why it matters. It excludes generic reminders.
+Older reports remain available with a refresh action and omit the earlier note.

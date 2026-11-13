@@ -34,8 +34,10 @@ export class WeightIntelligence {
  async context(){const [data,goals]=await Promise.all([this.journal.dataset({window:'all'}),this.goals.snapshot()]),pack=weightEvidence(data,{goalVersions:goals.versions}),model=PRIMARY_GEMINI_MODEL.model;return {pack,model,key:createHash('sha256').update(JSON.stringify([this.api.config.owner,pack.hash,WEIGHT_MODEL_POLICY,WEIGHT_PROMPT,WEIGHT_SCHEMA])).digest('hex')};}
  async saved(context){const rows=await this.api.json(`/rest/v1/weight_analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc&limit=5`);return rows.flatMap(row=>{
   try{
-   if(row.schema_version!==WEIGHT_SCHEMA||![WEIGHT_PROMPT,'weight-coach-v4','weight-coach-v3'].includes(row.prompt_version)||evidenceHash(row.evidence.content)!==row.evidence.hash)return [];
-   return [{...row,report:validateWeightReport(row.report,row.evidence)}];
+   if(row.schema_version!==WEIGHT_SCHEMA||![WEIGHT_PROMPT,'weight-coach-v5','weight-coach-v4','weight-coach-v3'].includes(row.prompt_version)||evidenceHash(row.evidence.content)!==row.evidence.hash)return [];
+   const report=validateWeightReport(row.report,row.evidence);
+   if(row.prompt_version!==WEIGHT_PROMPT)delete report.worthKnowing;
+   return [{...row,report}];
   }catch{return [];}
  }).sort((a,b)=>(b.evidence_key===context.key)-(a.evidence_key===context.key))[0]||null;}
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.evidence_key===key?WEIGHT_MODEL_POLICY:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key}:null;}

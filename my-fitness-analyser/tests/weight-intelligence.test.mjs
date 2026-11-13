@@ -31,10 +31,11 @@ test('weight evidence excludes identities, notes and dates; schema rejects inven
  assert.equal(weightRequest(p).generationConfig.thinkingConfig,undefined);assert.equal(weightRequest(p).generationConfig.maxOutputTokens,undefined);
 });
 test('the provider is asked for a separate note and malformed notes never discard a valid report',()=>{
- const p=weightEvidence(data),base=report(p),note='Leave the scale where you will see it if you want a reminder to log.';
+ const p=weightEvidence(data),base=report(p),note='A moving average keeps earlier readings in the calculation. It can lag when a trend changes direction.';
  const request=JSON.stringify(weightRequest(p));
  assert.match(request,/"required":\[[^\]]*"worthKnowing"/);
- assert.match(request,/add something beyond the advice already given/);
+ assert.match(request,/teach one specific, non-obvious idea/);
+ assert.match(request,/Skip reminders, habit stacking/);
  assert.deepEqual(validateWeightReport(base,p),base);
  assert.deepEqual(validateWeightReport({...base,worthKnowing:' '+note+' '},p),{...base,worthKnowing:note});
  for(const value of [{text:note},'x'.repeat(281),'word '.repeat(43),'<b>tip</b>','See https://example.test','Use {latest.scale}.']) {
@@ -48,10 +49,15 @@ const providerResult=value=>Response.json({
 test('weight AI is explicit and consent-scoped, caches valid reports and never retries quota on a paid fallback',async()=>{
  let enabled=false,calls=0,reads=0,saved=null,status=200;
  const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_weight_gemini'))return {slot:calls%2+1};if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async path=>Response.json(path.includes('training_worker_ready')?true:'saved')};
- const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:async(url,options)=>{calls++;assert.match(url,/gemini-3\.6-flash:generateContent$/);assert.equal(options.headers['x-goog-api-key'],calls===1?keyEnv.GEMINI_API_KEY:keyEnv.GEMINI_API_KEY_2);return status===200?providerResult({...report((await engine.context()).pack),worthKnowing:'Pair a weigh-in with an existing morning habit.'}):new Response('private body test-secret',{status});}});
+ const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:async(url,options)=>{calls++;assert.match(url,/gemini-3\.6-flash:generateContent$/);assert.equal(options.headers['x-goog-api-key'],calls===1?keyEnv.GEMINI_API_KEY:keyEnv.GEMINI_API_KEY_2);return status===200?providerResult({...report((await engine.context()).pack),worthKnowing:'A moving average keeps earlier readings in the calculation. It can lag when a trend changes direction.'}):new Response('private body test-secret',{status});}});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
- enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);assert.equal((await engine.status()).review.report.worthKnowing,'Pair a weigh-in with an existing morning habit.');
- saved.prompt_version='weight-coach-v4';saved.evidence_key='older-prompt';delete saved.report.worthKnowing;assert.equal((await engine.status()).review.stale,true);
+ enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);assert.equal((await engine.status()).review.report.worthKnowing,'A moving average keeps earlier readings in the calculation. It can lag when a trend changes direction.');
+ saved.prompt_version='weight-coach-v5';saved.evidence_key='older-prompt';
+ saved.report.worthKnowing='Pair a weigh-in with an existing morning habit.';
+ const previous=(await engine.status()).review;
+ assert.equal(previous.stale,true);assert.equal(previous.report.worthKnowing,undefined);
+ saved.prompt_version='weight-coach-v4';delete saved.report.worthKnowing;
+ assert.equal((await engine.status()).review.stale,true);
  saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,2);
  enabled=false;assert.equal((await engine.status()).review,null);
 });
