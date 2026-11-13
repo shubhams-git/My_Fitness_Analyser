@@ -59,7 +59,9 @@ request. Stuck jobs expire after 30 minutes or repeated worker interruptions.
 Journal requests one 3.6 Flash attempt through Generate Content with default
 thinking and the same 220-second timeout as Training. Both flows require two
 distinct Free-tier keys and rotate through the same app-wide database
-budget: one request start every 65 seconds, at most 20 per Pacific day. Optional
+budget. Training enforces a 65-second interval and a 20-request Pacific-day
+cap. Journal can retry as soon as its previous review ends, subject to Gemini
+backoff. Optional
 confirmed Free credentials rotate within the same budget. Google measures quota
 by project and model; additional keys do not raise this app's budget. A 429
 backs off the affected model for at least 65 seconds, or for Google's longer

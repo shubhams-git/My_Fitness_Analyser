@@ -5,6 +5,9 @@ Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
 
+- Journal weight insights no longer have an app-imposed daily cap or a
+  cooldown. Requests still share key rotation and Gemini backoff with Training.
+
 - Four independent UI and UX audits led to a runner-first Training view, a
   Sessions archive, shorter sign-in, clearer Journal actions, and task-based
   Account and Progress layouts. Shared writes reach their endpoints again;

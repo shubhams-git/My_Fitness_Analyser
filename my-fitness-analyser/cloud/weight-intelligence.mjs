@@ -42,12 +42,17 @@ export class WeightIntelligence {
   if(context.pack.content.observations.length<4||span<14)throw new CloudError(409,'Record at least four days spanning two weeks before asking for a weight insight.');
   const saved=await this.saved(context);if(saved?.evidence_key===context.key)return this.item(saved,context.key);
   const claim=await this.api.request('/rest/v1/rpc/begin_weight_review',{method:'POST',body:{evidence_key:context.key,model_id:context.model,prompt_version:WEIGHT_PROMPT,schema_version:WEIGHT_SCHEMA}});
-  if(!claim.ok)throw new CloudError(claim.status===429?429:409,claim.status===429?'Your weight-insight limit is reached. Try tomorrow.':'A weight insight is already running, or your sharing choice changed. Try again shortly.');
+  if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===409?409:503,
+   claim.status===403?'Your weight sharing choice changed. Check your AI settings.':
+   claim.status===409?'A weight insight is already running. Try again shortly.':'Couldn’t start the weight insight. Try again shortly.');
   const id=await claim.json(),keys=geminiKeys(this.env);
   let trace=[];try{
    const entry=PRIMARY_GEMINI_MODEL;
    const budget=await this.api.json('/rest/v1/rpc/reserve_weight_gemini',{method:'POST',body:{target_id:id,key_ids:geminiKeyIds(keys),target_model:entry.model}});
-   if(budget.retryAt)throw new CloudError(429,'Gemini is busy. Try again after '+new Date(budget.retryAt).toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'numeric',minute:'2-digit'})+' Sydney time.');
+   if(budget.retryAt){
+    const retry=new Date(budget.retryAt).toLocaleString('en-AU',{timeZone:'Australia/Sydney',weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+    throw new CloudError(429,'Gemini asked us to wait before retrying. Try again after '+retry+' Sydney time.');
+   }
    if(!keys[budget.slot-1])throw new CloudError(503,'The Gemini request could not start.');
    const {attempt,report,retrySeconds}=await geminiAttempt({entry,apiKey:keys[budget.slot-1],body:weightRequest(context.pack),validate:json=>extractWeight(json,context.pack),fetcher:this.fetcher});
    console.info('Weight Gemini attempt',JSON.stringify(attempt));

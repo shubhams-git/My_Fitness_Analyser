@@ -14,7 +14,7 @@ const key='synthetic-key',env={GEMINI_API_KEY:key,GEMINI_API_KEY_2:'synthetic-se
 const pack=coachingEvidence({activities:Object.fromEntries(syntheticHistory().map(a=>[a.id,{...a,synthetic:false}])),feedback:{}},{anchor:'2026-11-07'});
 const evidenceKey='a'.repeat(64);
 const report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your log contains {history.runs} recorded runs.',explanation:'Your log gives you a baseline for comparing familiar efforts.',nextAction:'Keep your next run at a familiar effort.',factIds:['history.runs'],signal:{factId:'history.runs',direction:'none'}},findings:[],charts:[]};
-const migrations=['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql','20261112_whole_training_disclosure.sql','20261112120000_gemini_key_rotation.sql','20261113190000_durable_training_jobs.sql','20261113190100_training_job_dispatch.sql'];
+const migrations=['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql','20261112_whole_training_disclosure.sql','20261112120000_gemini_key_rotation.sql','20261113190000_durable_training_jobs.sql','20261113190100_training_job_dispatch.sql','20261114120000_remove_weight_insight_caps.sql'];
 
 test('the worker classifies timeout, quota and incomplete output without leaking provider bodies',async()=>{
  const request={entry:TRAINING_ROUTE[0],apiKey:key,body:{},validate:()=>{throw new Error('should not validate');}};
@@ -67,12 +67,17 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
   assert.deepEqual(await sql('select report from analysis_reports where id=$1',[queued.id]),report);
   await assert.rejects(db.query("select finish_training_review($1,'failed',null,null)",[queued.id]),e=>e.code==='42501');
   await db.query("select set_weight_ai_preference(true,'gemini-weight-v1')");
-  const weight=await sql('select begin_weight_review($1,$2,$3,$4)',[evidenceKey,'gemini-3.6-flash','weight-prompt','weight-schema']);
+  const beginWeight=()=>sql('select begin_weight_review($1,$2,$3,$4)',[evidenceKey,'gemini-3.6-flash','weight-prompt','weight-schema']);
+  for(let index=0;index<3;index++){
+   const failed=await beginWeight();
+   assert.equal(await sql("select finish_weight_review($1,'failed',null,null)",[failed]),true);
+  }
+  const weight=await beginWeight();
+  await assert.rejects(beginWeight(),error=>error.code==='PT409');
   const reserveWeight=()=>sql('select reserve_weight_gemini($1,$2,$3)',[weight,geminiKeyIds([key,env.GEMINI_API_KEY_2]),'gemini-3.6-flash']);
-  assert.ok((await reserveWeight()).retryAt,'weight shares the same app-wide minute budget');
-  await admin();await db.exec('update gemini_request_budget set next_request_at=now()');
+  await admin();await db.exec("update gemini_request_budget set next_request_at=now()+interval '65 seconds',used=20");
   await as('authenticated',owner);
-  assert.equal((await reserveWeight()).slot,1,'weight rotates away from the last Training key');
+  assert.equal((await reserveWeight()).slot,1,'weight rotates away from the last Training key even at the app caps');
   await admin();assert.equal(await sql('select pack from training_analysis_jobs where id=$1',[queued.id]),null);
   await db.query("update analysis_reports set created_at=now()-interval '31 seconds'");
   await as('authenticated',owner);const second=await enqueue();await db.query("select set_ai_preference(false,'gemini-training-v2')");
