@@ -13,7 +13,7 @@ export function weightRequest(pack){
  return structuredGeminiRequest({
   instruction:WEIGHT_SYSTEM,
   input:{schemaVersion:WEIGHT_SCHEMA,evidenceHash:pack.hash,...pack.content},
-  schema:providerSchema(weightSchema(pack))
+  schema:providerSchema(weightSchema(pack,{includeNote:true}))
  });
 }
 export function extractWeight(result,pack){
@@ -32,7 +32,12 @@ export class WeightIntelligence {
   return response.ok&&await response.json()===true;
  }
  async context(){const [data,goals]=await Promise.all([this.journal.dataset({window:'all'}),this.goals.snapshot()]),pack=weightEvidence(data,{goalVersions:goals.versions}),model=PRIMARY_GEMINI_MODEL.model;return {pack,model,key:createHash('sha256').update(JSON.stringify([this.api.config.owner,pack.hash,WEIGHT_MODEL_POLICY,WEIGHT_PROMPT,WEIGHT_SCHEMA])).digest('hex')};}
- async saved(context){const rows=await this.api.json(`/rest/v1/weight_analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc&limit=5`);return rows.filter(r=>{try{if(r.schema_version!==WEIGHT_SCHEMA||![WEIGHT_PROMPT,'weight-coach-v3'].includes(r.prompt_version)||evidenceHash(r.evidence.content)!==r.evidence.hash)return false;validateWeightReport(r.report,r.evidence);return true;}catch{return false;}}).sort((a,b)=>(b.evidence_key===context.key)-(a.evidence_key===context.key))[0]||null;}
+ async saved(context){const rows=await this.api.json(`/rest/v1/weight_analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc&limit=5`);return rows.flatMap(row=>{
+  try{
+   if(row.schema_version!==WEIGHT_SCHEMA||![WEIGHT_PROMPT,'weight-coach-v4','weight-coach-v3'].includes(row.prompt_version)||evidenceHash(row.evidence.content)!==row.evidence.hash)return [];
+   return [{...row,report:validateWeightReport(row.report,row.evidence)}];
+  }catch{return [];}
+ }).sort((a,b)=>(b.evidence_key===context.key)-(a.evidence_key===context.key))[0]||null;}
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.evidence_key===key?WEIGHT_MODEL_POLICY:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key}:null;}
  async status(){const consent=await this.preference(),base={consent,configured:this.configured()};if(consent.enabled!==true)return {...base,review:null};const [context,configured]=await Promise.all([this.context(),this.providerReady()]);return {...base,configured,eligible:context.pack.content.observations.length>=4&&(context.pack.content.facts.find(f=>f.id==='period.span')?.value||0)>=14,recordedDays:context.pack.content.observations.length,review:this.item(await this.saved(context),context.key)};}
  async generate(){

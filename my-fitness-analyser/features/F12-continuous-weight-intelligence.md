@@ -106,3 +106,10 @@ Screenshot: private-data/journal-qa/f12-trend-and-insight.png. Final page has ze
 range sliders and no captured console errors. Temporary preview/SQL tabs are
 closed, viewport override reset, Chrome zoom restored to 75%, and the verified
 production journal tab is retained. The loopback fixture is stopped at handover.
+
+
+Prompt weight-coach-v5 adds a short “Worth knowing” note to the same Gemini
+response. It can share a practical habit or established research takeaway
+separately from the evidence-linked trend and advice. The existing report
+JSON stores the note. Older reports remain readable and can be refreshed.
+Invalid note text is omitted independently of the main report.

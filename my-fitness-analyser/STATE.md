@@ -5,6 +5,10 @@ Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
 
+- Journal weight insights include a “Worth knowing” note when Gemini supplies a
+  valid one. Refresh an older insight to get the note. The note is saved with
+  the private report and needs no additional Gemini request or database migration.
+
 - Journal weight insights no longer have an app-imposed daily cap or a
   cooldown. Requests still share key rotation and Gemini backoff with Training.
 
