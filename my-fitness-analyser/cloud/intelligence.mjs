@@ -55,7 +55,7 @@ export function coachingGenerationRequest(pack,{includeNote=true}={}){
   .replace(/Use the direction supported by signal\.factId:.*?Other facts use none\. /,'')
   .replace('Use at most one optional comparison chart with recorded values from the listed sessions.','')
   .replace('Use the exact schemaVersion and evidenceHash.','')+
-  '\nReturn the required fields only. Each claim uses signalFactId for its main supporting fact. The app assembles citations from signalFactId and the exact {fact.id} placeholders in the prose. Cite at most six facts per claim. Put no numbers or zone labels outside placeholders.'+(includeNote?'\n\n'+COACH_KNOWLEDGE:'');
+  '\nReturn the required fields only. Each claim uses signalFactId for its main supporting fact. The app assembles citations from signalFactId and the exact {fact.id} placeholders in the prose. Cite at most six facts per claim. Put no numbers or zone labels outside placeholders.'+(includeNote?'\n\nFor a faster or slower headline, signalFactId must be the signed paceChange or splitChange fact for that comparison. Use paceDifference only as the magnitude in prose. If no signed comparison exists, use a non-comparative headline. Never append a unit after a placeholder.\n\n'+COACH_KNOWLEDGE:'');
  return structuredGeminiRequest({instruction:systemInstruction,input:pack.content,schema});
 }
 
