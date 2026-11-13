@@ -1,5 +1,10 @@
 # Decision register
 
+D49 — Higher-resolution route replay imagery, 14 November 2026. Use MapTiler
+Cloud Free satellite tiles for this private app when an origin-restricted browser
+key is configured. Retain EOxCloudless on imagery failure. Keep the existing
+Mapterhorn terrain and cinematic camera. See F16 for evidence and attribution.
+
 D48 — Task-first Field Notes, 14 November 2026. Four independent UI and UX
 audits found a shared save blocker and misplaced primary actions. Keep the
 athletic identity and existing data contracts. Promote the latest run,

@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {satelliteStyle} from '../prototypes/satellite-replay.js';
 import {replayModel,replayPhase,replayDuration,travelProgress,replayFraming,replayPullback,followCamera,replayMetrics,angleDelta,bearing,REPLAY_SECONDS} from '../prototypes/replay-model.js';
 const fix=(t,lon=145+t/10000,extra={})=>({t,lat:-37.8,lon,distance:t*3,speed:3,elevation:27,...extra});
 test('cinematic sequence holds the city, descends, traverses elapsed time, then finishes exactly',()=>{
@@ -61,4 +62,15 @@ test('pullback begins before the finish, stays continuous, and reveals the compl
   let previous=0;
   for(let t=0;t<=duration;t+=.025){const next=replayPullback(t,duration);assert.ok(next>=previous&&next<=1);assert.ok(next-previous<.02);previous=next;}
  }
+});
+
+
+test('sharper replay imagery uses native tiles and retains the existing terrain',()=>{
+ const fallback=satelliteStyle(),sharp=satelliteStyle('browser+key');
+ assert.equal(sharp.sources.satellite.tileSize,512);
+ assert.equal(sharp.sources.satellite.maxzoom,22);
+ assert.equal(sharp.sources.satellite.tiles[0],'https://api.maptiler.com/tiles/satellite-v2/{z}/{x}/{y}?key=browser%2Bkey');
+ assert.ok(fallback.sources.satellite.tiles[0].startsWith('https://tiles.maps.eox.at/'));
+ assert.deepEqual(sharp.sources.terrain,fallback.sources.terrain);
+ assert.deepEqual(sharp.layers,fallback.layers);
 });

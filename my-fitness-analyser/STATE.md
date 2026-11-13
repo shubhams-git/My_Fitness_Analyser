@@ -5,6 +5,12 @@ Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
 
+- Route replay can use higher-resolution MapTiler Cloud Free imagery with an
+  origin-restricted `MAPTILER_BROWSER_KEY` on the deployment. EOxCloudless
+  remains the fallback. Central Melbourne tiles were checked in MapTiler's
+  official viewer, and the replay switch and quota fallback passed a synthetic
+  Chromium test. See F16.
+
 - Gemini training briefs include a “Worth knowing” note when the model supplies
   a usable explanation. It is saved with the existing report and appears beneath
   the next-run recommendation.

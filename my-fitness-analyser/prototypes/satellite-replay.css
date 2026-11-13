@@ -77,6 +77,8 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
 .satellite-credit{position:absolute;bottom:6px;left:12px;right:12px;z-index:1;width:fit-content;max-width:calc(100% - 24px);padding:3px 6px;color:#e5e9ed;background:rgb(5 12 20 / .84);font:400 10px/1.4 var(--font-display);overflow-wrap:anywhere}
 .satellite-credit a{color:inherit;text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
 .satellite-credit a:hover{color:#fff}
+.satellite-credit .satellite-provider-logo{display:inline-flex;vertical-align:middle;margin-inline-end:6px}
+.satellite-provider-logo img{display:block;width:72px;height:auto;aspect-ratio:67 / 20}
 .satellite-message{
   position:absolute;z-index:2;top:50%;left:50%;transform:translate(-50%,-50%);
   width:min(calc(100% - 40px),400px);max-height:100%;overflow:auto;

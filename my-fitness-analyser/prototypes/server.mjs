@@ -24,7 +24,7 @@ const server=http.createServer(async(req,res)=>{
   res.setHeader('Cache-Control','no-store');
   res.setHeader('X-Content-Type-Options','nosniff');
   res.setHeader('Referrer-Policy','no-referrer');
-  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org https://tiles.maps.eox.at https://tiles.mapterhorn.com; connect-src 'self' https://tiles.openfreemap.org https://tiles.maps.eox.at https://tiles.mapterhorn.com; worker-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'");
+  res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data: blob: https://tiles.openfreemap.org https://tiles.maps.eox.at https://tiles.mapterhorn.com https://api.maptiler.com; connect-src 'self' https://tiles.openfreemap.org https://tiles.maps.eox.at https://tiles.mapterhorn.com https://api.maptiler.com; worker-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'none'");
   if(!['127.0.0.1:'+port,'localhost:'+port].includes(req.headers.host)){res.writeHead(403);res.end('Local access only');return;}
   const pathname=new URL(req.url,`http://127.0.0.1:${port}`).pathname;
   const json=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
@@ -62,7 +62,7 @@ const server=http.createServer(async(req,res)=>{
   if(req.method!=='GET'){json(403,{error:'Unsupported action'});return;}
   if(pathname==='/api/data'||pathname==='/api/export'){
     try{const saved=await library.read();if(pathname==='/api/export'){res.setHeader('Content-Disposition','attachment; filename="fitness-library.json"');json(200,{...saved,exportedAt:new Date().toISOString()});}
-      else{const merged=new Map(data.activities.map(a=>[a.id,a]));Object.values(saved.activities).forEach(a=>{for(const [id,seed]of merged)if(id!==a.id&&(seed.sourceHash===a.sourceHash||a.provider&&seed.garminActivityId===a.provider.id))merged.delete(id);merged.set(a.id,a);});const latest=Object.values(saved.activities).filter(a=>a.provider).sort((a,b)=>b.startInstant.localeCompare(a.startInstant))[0];json(200,{...data,defaultId:latest?.id||data.defaultId,activities:[...merged.values()],feedback:saved.feedback,localLibrary:true,garmin:await garmin.status()});}
+      else{const merged=new Map(data.activities.map(a=>[a.id,a]));Object.values(saved.activities).forEach(a=>{for(const [id,seed]of merged)if(id!==a.id&&(seed.sourceHash===a.sourceHash||a.provider&&seed.garminActivityId===a.provider.id))merged.delete(id);merged.set(a.id,a);});const latest=Object.values(saved.activities).filter(a=>a.provider).sort((a,b)=>b.startInstant.localeCompare(a.startInstant))[0];json(200,{...data,mapTilerBrowserKey:process.env.MAPTILER_BROWSER_KEY?.trim()||null,defaultId:latest?.id||data.defaultId,activities:[...merged.values()],feedback:saved.feedback,localLibrary:true,garmin:await garmin.status()});}
     }catch{json(500,{error:'The saved library could not be read. Restore its backup before continuing.'});}return;
   }
   try {

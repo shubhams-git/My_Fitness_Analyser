@@ -83,3 +83,34 @@ design debt. A forced local all-404 imagery test exposed MapLibre's completion o
 errored tile loads: replay now requires a successfully loaded satellite tile in
 addition to source readiness. The observed timeout shows Retry, disables replay
 controls, recreates one canvas on retry, and closes back to the street map/focus.
+
+
+## Higher-resolution imagery
+
+14 November 2026. The deployed camera follows at zoom 14.8 and high pitch.
+EOxCloudless imagery is nominally 10 m per pixel and its source stops at z14.
+Enlarging those tiles during the chase amplifies the softness. Changing their
+display size or increasing their zoom cap cannot add native detail.
+
+Use MapTiler Cloud Free's satellite-v2 raster tiles (native 512 px) with an
+origin-restricted MAPTILER_BROWSER_KEY set in the Vercel Production environment
+or local .env. The private activity response gives the browser this restricted
+public-use key. Requests go straight to MapTiler only on explicit replay. Free
+plan usage through MapLibre is metered in requests and pauses at the quota. Keep
+the visible logo and text credit. EOxCloudless is the fallback for missing
+configuration or imagery failures, including quota. Mapterhorn continues to
+supply terrain. The camera, HUD, recorded route and controls retain their
+existing behavior. No database migration is needed.
+
+MapTiler documents about 1 m per pixel in much of populated coastal Australia.
+Its official browser demo rendered central Melbourne using real z15/z16 tiles
+with visible roof and street detail, and tile bodies decoded at 512 px. The
+app's Chromium test used fixture responses to confirm z15 requests, timeline
+inspection, close, HTTP 429 fallback and correct attribution. The exact
+activity's imagery and physical iPhone Safari require the deployed browser key.
+
+- [MapTiler satellite dataset](https://docs.maptiler.com/schema-raster/satellite/)
+- [Official satellite preview](https://docs.maptiler.com/sdk-js/examples/satellite-map/)
+- [Free plan pricing](https://www.maptiler.com/cloud/pricing/)
+- [Free plan attribution](https://docs.maptiler.com/guides/map-design/attribution/add-attribution/)
+- [Browser-key origin restrictions](https://docs.maptiler.com/guides/developer/credentials/api-key/)

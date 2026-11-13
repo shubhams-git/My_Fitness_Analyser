@@ -208,7 +208,7 @@ root.addEventListener('click',async event=>{
       if(signal.aborted||!target.isConnected)return;
       satelliteReplay?.destroy();
       routeMaps?.suspend();
-      satelliteReplay=openSatelliteReplay({activity,reduced:reducedMotion(),onClose:()=>routeMaps?.resume()});
+      satelliteReplay=openSatelliteReplay({activity,mapTilerBrowserKey:payload.mapTilerBrowserKey,reduced:reducedMotion(),onClose:()=>routeMaps?.resume()});
       if(!satelliteReplay)routeMaps?.resume();
     }catch{if(!signal.aborted)openDetail('Replay unavailable','<p>Check your connection, then try Replay route again.</p>');}
     finally{target.disabled=false;}

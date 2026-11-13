@@ -99,7 +99,7 @@ export async function privateHandler(request,response,route,{configReader=cloudC
         return {id,title,date,sport,source,kind:activityKind(row),distance,timer,moving,elapsed,running};
       }):full;
       const feedback=activity?{[id]:data.feedback[id]}:data.feedback;
-      send(200,{zoneVersions,activities,activity,activityAliases:data.activityAliases,defaultId,feedback,viewer:api.user,mode:'private-training-record',localLibrary:true,cloudLibrary:true,importLimitMB:3.5,garmin:{...data.garminSync,configured:garminConfigured,running:false}});return;
+      send(200,{mapTilerBrowserKey:env.MAPTILER_BROWSER_KEY?.trim()||null,zoneVersions,activities,activity,activityAliases:data.activityAliases,defaultId,feedback,viewer:api.user,mode:'private-training-record',localLibrary:true,cloudLibrary:true,importLimitMB:3.5,garmin:{...data.garminSync,configured:garminConfigured,running:false}});return;
     }
     if(route==='feedback'&&request.method==='POST'){const body=JSON.parse((await readBody(request)).toString()),data=await library.read();send(200,await library.save(body.id,body.draft,Object.keys(data.activities)));return;}
     if(route==='import'&&request.method==='POST'){send(200,await library.import(await readBody(request)));return;}
