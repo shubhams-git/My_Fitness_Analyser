@@ -1,1 +1,35 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>Training — My Fitness Analyser</title><link rel="stylesheet" href="/design/tokens.css"><link rel="stylesheet" href="/app.css"><link rel="stylesheet" href="/field-notes.css"><link rel="stylesheet" href="/training.css"><link rel="stylesheet" href="/coaching.css"><link rel="stylesheet" href="/interface.css"><link rel="stylesheet" href="/progress.css"><link rel="stylesheet" href="/training-focus.css"><link rel="stylesheet" href="/activity-visuals.css"><link rel="stylesheet" href="/zones.css"></head><body data-theme="field-notes" class="fn-app training-app"><a class="skip-link" href="#training-main">Skip to training</a><div id="training-root"><header class="tr-header"><a class="tr-brand" href="/training"><span>My Fitness<br><strong>Analyser</strong></span></a><nav aria-label="Main"><a href="/training" aria-current="page">Training</a><a href="/training?view=progress">Progress</a><a href="/journal">Journal</a><a href="/account">Account</a></nav></header><main id="training-main" class="td-main"><div class="td-page-heading"><h1>Training</h1></div><div class="tr-loading-line" role="status" aria-label="Loading training"></div></main></div><script type="module" src="/training.js"></script></body></html>
+<!doctype html><html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  <title>Training — My Fitness Analyser</title>
+  <link rel="stylesheet" href="/design/tokens.css">
+  <link rel="stylesheet" href="/app.css">
+  <link rel="stylesheet" href="/field-notes.css">
+  <link rel="stylesheet" href="/training.css">
+  <link rel="stylesheet" href="/coaching.css" media="print" data-arrival-style>
+  <link rel="stylesheet" href="/interface.css" media="print" data-arrival-style>
+  <link rel="stylesheet" href="/progress.css" media="print" data-arrival-style>
+  <link rel="stylesheet" href="/training-focus.css" media="print" data-arrival-style>
+  <link rel="stylesheet" href="/activity-visuals.css" media="print" data-arrival-style>
+  <link rel="stylesheet" href="/zones.css" media="print" data-arrival-style>
+  <link rel="stylesheet" href="/arrival.css">
+  <script type="module" async src="/arrival.js"></script>
+</head>
+<body data-theme="field-notes" class="fn-app training-app"><a class="skip-link" href="#training-main">Skip to training</a><div id="training-root">
+  <header class="arrival-nav"><a class="arrival-brand" href="/training"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 25 11 7h5L8 25m9 0 8-18h4l-8 18"/></svg><span>My Fitness<br><strong>Analyser</strong></span></a><nav aria-label="Main"><a href="/training" data-arrival-nav="training" aria-current="page">Training</a><a href="/training?view=progress" data-arrival-nav="progress">Progress</a><a href="/journal" data-arrival-nav="journal">Journal</a><a href="/account" data-arrival-nav="account">Account</a></nav>
+  </header>
+  <main id="training-main" class="arrival-main" data-arrival="training"><div class="arrival-lead"><div><h1>Training</h1><p class="arrival-status" role="status"><span aria-hidden="true"></span><b>Loading your training record…</b></p></div><div class="arrival-mark" aria-hidden="true"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M3 25 11 7h5L8 25m9 0 8-18h4l-8 18"/></svg></div></div>
+    <div class="arrival-grid" data-arrival-panels="training">
+      <section class="arrival-panel"><h2>Running this week</h2><ul class="arrival-rows"><li><span>Runs logged</span><i aria-hidden="true"></i></li><li><span>Distance</span><i aria-hidden="true"></i></li><li><span>Recorded time</span><i aria-hidden="true"></i></li></ul></section>
+      <section class="arrival-panel"><h2>Recent activities</h2><ul class="arrival-rows"><li><span>Latest activity</span><i aria-hidden="true"></i></li><li><span>Workout mix</span><i aria-hidden="true"></i></li></ul></section>
+    </div>
+    <div class="arrival-grid" data-arrival-panels="progress" hidden>
+      <section class="arrival-panel"><h2>Monthly training</h2><div class="arrival-chart" aria-hidden="true"><span>Recorded distance by week</span><div></div><div></div><div></div></div></section>
+      <section class="arrival-panel"><h2>Training comparisons</h2><ul class="arrival-rows"><li><span>Distance</span><i aria-hidden="true"></i></li><li><span>Pace</span><i aria-hidden="true"></i></li><li><span>Session count</span><i aria-hidden="true"></i></li></ul></section>
+    </div>
+  </main></div>
+  <script type="module" src="/training.js"></script>
+</body>
+</html>

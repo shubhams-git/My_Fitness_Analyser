@@ -1,3 +1,4 @@
+import {arrivalRead,arrivalStyles,arrivalFailure} from './arrival.js';
 import {goalMarkup} from './goals-view.js';
 import { privateJson,viewSnapshot,refreshView } from './session.js';
 import { mountCoaching } from './coaching.js';
@@ -46,13 +47,13 @@ function bind(){document.querySelectorAll('[data-window]').forEach(b=>b.addEvent
  document.querySelector('#motion').addEventListener('click',()=>{motion=!motion;try{localStorage.setItem('mfa-visual-motion',motion?'on':'off');}catch{}document.querySelector('#motion').setAttribute('aria-pressed',String(motion&&!reduced.matches));document.querySelector('#motion span').textContent=motion&&!reduced.matches?'on':'off';});
  document.querySelector('#sync')?.addEventListener('click',async e=>{const b=e.currentTarget;b.disabled=true;document.querySelector('#sync-status').textContent='Syncing your recordings…';try{const result=await privateJson('/api/garmin/sync',{method:'POST'});await load(windowChoice);document.querySelector('#sync-status').textContent=`${result.imported||0} added · ${result.updated||0} updated`;}catch(e){b.disabled=false;document.querySelector('#sync-status').textContent=e.message;}});
 }
-async function load(choice=windowChoice){
+async function load(choice=windowChoice,initialRead=null){
  const version=++loadVersion;
  const endpoint='/api/training?window='+choice;
  const cached=viewSnapshot(endpoint)?.value;
  if(cached){data=cached;windowChoice=choice;render();}
  try{
-  const next=await refreshView(endpoint);
+  const next=await (initialRead||refreshView(endpoint));
   if(version!==loadVersion)return;
   if(!cached||JSON.stringify(cached)!==JSON.stringify(next)){
    data=next;windowChoice=choice;render();
@@ -84,9 +85,4 @@ addEventListener('popstate',()=>{
  if(data){const choice=params.get('window')==='all'?'all':'90';if(choice!==windowChoice)void load(choice).catch(e=>{document.querySelector('#notice').textContent=e.message;});else render();}
 });
 reduced.addEventListener('change',()=>{const b=document.querySelector('#motion');if(b){b.setAttribute('aria-pressed',String(motion&&!reduced.matches));b.querySelector('span').textContent=motion&&!reduced.matches?'on':'off';}});
-const initialHeading=root.querySelector('h1');
-if(initialHeading){initialHeading.textContent=view==='progress'?'Progress':view==='sessions'?'Sessions':'Training';if(view==='progress'){
- root.querySelector('nav [aria-current]')?.removeAttribute('aria-current');
- root.querySelector('nav a[href="/training?view=progress"]')?.setAttribute('aria-current','page');
-}}
-try{await load();}catch(e){root.innerHTML=`<main class="training-loading"><h1>Your training couldn’t load.</h1><p>${esc(e.message)}</p><button class="primary-button" id="retry">Try again</button></main>`;document.querySelector('#retry').addEventListener('click',()=>location.reload());}
+try{await arrivalStyles;await load(windowChoice,arrivalRead);}catch{arrivalFailure(root,'Your training record couldn’t load.');}

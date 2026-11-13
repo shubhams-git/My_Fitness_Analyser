@@ -5,6 +5,12 @@ Completed local increment: durable training analysis (F22)
 
 ## Implemented
 
+- Cold Activity, Training, Progress and Journal visits show a branded first
+  paint with working navigation and page-specific loading content. Initial reads
+  start alongside page assets. Slow and failed requests retain the shell.
+  Verified at phone width in Chromium with delayed and failed API responses.
+
+
 - Training and Progress switch within one document. Training and Journal reuse a
   short-lived tab snapshot during a background refresh. The first visit shows
   navigation while data loads, and independent Supabase reads run in parallel.
@@ -291,5 +297,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Apply the F22 migrations and dispatcher origin to Supabase, then release and
-verify one consented Training job after leaving the page.
+Measure the signed-in first load on iPhone Safari over a mobile connection.

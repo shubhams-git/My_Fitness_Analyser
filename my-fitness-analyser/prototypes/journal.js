@@ -1,3 +1,4 @@
+import {arrivalRead,arrivalStyles,arrivalFailure} from './arrival.js';
 import {privateJson,viewSnapshot,refreshView} from './session.js';
 import { entryMarkup,mountWeightEntry,clearWeightDraft,editWeight } from './journal-entry.js';
 import { journalView } from './journal-view.js';
@@ -74,13 +75,14 @@ async function commitImport(){
   const changed=Object.values(result.counts).reduce((n,c)=>n+c.added+c.updated+c.deleted,0);const message=result.duplicate||!changed?'Already up to date. No duplicate records added.':'MASS history saved '+(data.cloud?'to your private account.':'on this computer.');document.querySelector('#import-status').textContent=message;notice(message);
  }catch(e){busy=false;if(preview)renderReview(e.message);else error(e.message);}
 }
+await arrivalStyles;
 const endpoint='/api/journal?window='+windowChoice;
 const cached=viewSnapshot(endpoint)?.value;
 if(cached){data=cached;selection=Math.max(0,(data.trend?.points||data.points).length-1);render(false);}
 try{
- const next=await refreshView(endpoint);
+ const next=await (arrivalRead||refreshView(endpoint));
  // Leave active forms and chart selections in place while refreshing the cache.
  if(!cached||(!busy&&!writingWeight&&!root.contains(document.activeElement)&&data===cached&&JSON.stringify(cached)!==JSON.stringify(next))){
   data=next;selection=Math.max(0,(next.trend?.points||next.points).length-1);render(false);
  }
-}catch(e){if(cached){document.querySelector('#journal-status').textContent='Showing saved journal data. Refresh to try again.';}else{root.innerHTML=`<main class="training-loading"><h1>Your journal couldn’t load.</h1><p>${escape(e.message)}</p><button class="primary-button" id="retry">Retry</button><a href="/training" class="text-button">Back to training</a></main>`;document.querySelector('#retry').addEventListener('click',()=>location.reload());}}
+}catch(e){if(cached){document.querySelector('#journal-status').textContent='Showing saved journal data. Refresh to try again.';}else arrivalFailure(root,'Your journal couldn’t load.');}

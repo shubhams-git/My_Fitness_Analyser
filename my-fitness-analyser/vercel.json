@@ -1,6 +1,8 @@
 {
   "functions": { "api/private.mjs": { "maxDuration": 300 }, "api/training-worker.mjs": { "maxDuration": 300 } },
   "rewrites": [
+    { "source": "/arrival.css", "destination": "/prototypes/arrival.css" },
+    { "source": "/arrival.js", "destination": "/prototypes/arrival.js" },
     { "source": "/activity-kind.js", "destination": "/prototypes/activity-kind.js" },
     { "source": "/goal-model.js", "destination": "/prototypes/goal-model.js" },
     { "source": "/goals-view.js", "destination": "/prototypes/goals-view.js" },
