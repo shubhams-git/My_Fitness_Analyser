@@ -1,5 +1,12 @@
 # Decision register
 
+D47 — Free training analysis, 13 November 2026. Use Gemini 3.5 Flash-Lite with
+medium thinking after a successful synthetic comparison on the Generate Content
+API. Keep the full evidence input and reduce the model's output to prose and fact
+references. Derive citation metadata from the recorded facts and apply the existing
+validation. Persist a labelled report calculated from recorded data if the model
+sequence fails or the app reaches its daily quota.
+
 D46 — Durable training analysis, 13 November 2026. An explicit request records
 an owner-scoped evidence snapshot and returns immediately. A Supabase dispatch
 trigger and minute scheduler deliver and recover jobs independently of the

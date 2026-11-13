@@ -87,7 +87,7 @@ begin
  if exists(select 1 from public.analysis_reports where owner_id=owner and created_at>now()-interval '30 seconds') then
   raise exception 'Review cooldown.' using errcode='PT429'; end if;
  insert into public.analysis_reports(owner_id,evidence_key,model_id,prompt_version,schema_version,consent_revision,status,model_policy)
- values(owner,evidence_key,'gemini-3.8-flash',prompt_version,schema_version,pref.revision,'generating','durable-coach-v1') returning id into target;
+ values(owner,evidence_key,'gemini-3.5-flash-lite',prompt_version,schema_version,pref.revision,'generating','durable-coach-v2') returning id into target;
  insert into public.training_analysis_jobs(id,owner_id,signature,pack) values(target,owner,job_signature,evidence_pack);
  return jsonb_build_object('id',target,'state','queued');
 end $$;
@@ -140,8 +140,7 @@ begin
  budget:=public.take_gemini_budget(key_ids,target_model);
  if budget ? 'retryAt' and not budget ? 'modelBlocked' then
   if (budget->>'retryAt')::timestamptz>now()+interval '10 minutes' then
-   update public.training_analysis_jobs set lease=null,lease_until=null,pack=null,failure='quota' where id=job_id;
-   update public.analysis_reports set status='failed',finished_at=now() where id=job_id and owner_id=j.owner_id;
+   return budget||jsonb_build_object('dailyLimit',true);
   else
    update public.training_analysis_jobs set lease=null,lease_until=null,available_at=(budget->>'retryAt')::timestamptz where id=job_id;
   end if;
@@ -172,8 +171,11 @@ begin
   end if;
  end if;
  if result_report is not null then
-  if jsonb_typeof(result_report)<>'object' or octet_length(result_report::text)>64000 or attempt->>'outcome' is distinct from 'complete' then raise exception 'Invalid training report.'; end if;
-  update public.analysis_reports set status='complete',finished_at=now(),report=result_report,evidence=j.pack,model_id=attempt->>'model' where id=job_id and owner_id=j.owner_id;
+  if jsonb_typeof(result_report)<>'object' or octet_length(result_report::text)>64000 or
+   (failure_code is distinct from 'recorded-training' and attempt->>'outcome' is distinct from 'complete') then raise exception 'Invalid training report.'; end if;
+  update public.analysis_reports set status='complete',finished_at=now(),report=result_report,evidence=j.pack,
+   model_id=case when failure_code='recorded-training' then failure_code else attempt->>'model' end
+  where id=job_id and owner_id=j.owner_id;
   update public.training_analysis_jobs set pack=null,lease=null,lease_until=null,failure=null where id=job_id;
  elsif failure_code is not null or j.step>=2 then
   update public.analysis_reports set status='failed',finished_at=now() where id=job_id and owner_id=j.owner_id;

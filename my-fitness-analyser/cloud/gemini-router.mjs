@@ -49,9 +49,13 @@ async function boundedJson(response){
 
 export async function geminiAttempt({entry,apiKey,body,validate,fetcher=fetch,clock=Date.now}){
  const start=clock(),signal=AbortSignal.timeout(entry.timeout),attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'network',httpStatus:null,elapsedMs:0};
+ const generateContent=entry.endpoint==='generateContent';
+ const url='https://generativelanguage.googleapis.com/v1beta/'+(generateContent?`models/${entry.model}:generateContent`:'interactions');
+ const headers={'Content-Type':'application/json','x-goog-api-key':apiKey};
+ if(!generateContent)headers['Api-Revision']='2026-05-20';
  let report=null,retrySeconds=0;
  try{
-  const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal,headers:{'Content-Type':'application/json','x-goog-api-key':apiKey,'Api-Revision':'2026-05-20'},body:JSON.stringify(body)});
+  const response=await fetcher(url,{method:'POST',redirect:'error',signal,headers,body:JSON.stringify(body)});
   attempt.httpStatus=response.status;
   if(!response.ok){
    attempt.outcome=response.status===429?'quota':[401,403].includes(response.status)?'key':response.status>=500?'unavailable':'request';
@@ -62,7 +66,8 @@ export async function geminiAttempt({entry,apiKey,body,validate,fetcher=fetch,cl
    }else await response.body?.cancel().catch(()=>{});
   }else{
    attempt.outcome='invalid';
-   const json=await boundedJson(response);
+   const raw=await boundedJson(response);
+   const json=generateContent?normalizeGeneratedContent(raw):raw;
    for(const [source,target] of Object.entries({total_input_tokens:'inputTokens',total_output_tokens:'outputTokens',total_thought_tokens:'thoughtTokens'})){
     if(Number.isSafeInteger(json?.usage?.[source])&&json.usage[source]>=0)attempt[target]=json.usage[source];
    }
@@ -72,6 +77,16 @@ export async function geminiAttempt({entry,apiKey,body,validate,fetcher=fetch,cl
  }catch(error){if(signal.aborted||error?.name==='TimeoutError')attempt.outcome='timeout';}
  attempt.elapsedMs=Math.max(0,clock()-start);
  return {attempt,report,retrySeconds};
+}
+
+function normalizeGeneratedContent(result){
+ const candidate=result.candidates?.[0],usage=result.usageMetadata;
+ return {
+  status:candidate?.finishReason==='STOP'?'completed':'incomplete',
+  steps:[{type:'model_output',content:(candidate?.content?.parts||[])
+   .filter(part=>!part.thought&&typeof part.text==='string').map(part=>({type:'text',text:part.text}))}],
+  usage:{total_input_tokens:usage?.promptTokenCount,total_output_tokens:usage?.candidatesTokenCount,total_thought_tokens:usage?.thoughtsTokenCount}
+ };
 }
 let lastLocalKey;
 export async function routedGemini({task,keys,request,validate,reserveKey,beforeAttempt=async()=>{},fetcher=fetch,totalMs=210000,clock=Date.now}){

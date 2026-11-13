@@ -6,7 +6,9 @@ Completed local increment: durable training analysis (F22)
 ## Implemented
 
 - F22 adds durable, owner-scoped coaching jobs, shared Gemini pacing and
-  model timing/usage details. 141 tests and foundation/config checks passed;
+  model timing/usage details. A synthetic 3.5 Flash-Lite Generate Content brief
+  passed validation, and a recorded brief covers exhausted provider attempts.
+  141 tests and foundation/config checks passed;
   the hosted Supabase dispatcher and an end-to-end production job are still
   unverified. See [F22](features/F22_DURABLE_TRAINING_ANALYSIS.md). Garmin
   Personal API is pull-only; the automatic sync design is documented there.

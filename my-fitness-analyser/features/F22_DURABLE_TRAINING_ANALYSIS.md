@@ -36,12 +36,16 @@ latest successful report remains owner-scoped in `analysis_reports`.
 
 | Training attempt | Thinking | Request timeout | Output cap incl. thinking |
 | --- | --- | ---: | ---: |
-| Gemini 3.8 Flash | High | 150s | 32,768 |
+| Gemini 3.5 Flash-Lite | Medium | 90s | 16,384 |
 | Gemini 3.6 Flash | Medium | 100s | 24,576 |
-| Gemini 3.1 Flash-Lite | Medium | 75s | 16,384 |
+| Gemini 3.1 Flash-Lite | Low | 75s | 16,384 |
 
-The provider endpoint is `POST /v1beta/interactions` with `store:false` and
-structured JSON. The app validates the response and its evidence before saving.
+Training uses Gemini's `generateContent` API for single requests with structured
+JSON. The model writes the verdict and findings from the full evidence packet.
+The app reconstructs citations and direction from fact references and validates
+every claim before saving. If all models fail or the app reaches its daily
+budget, the worker saves a labelled report calculated from recorded training.
+It includes comparable pace, weekly distance, splits and check-ins when present.
 An incomplete response, timeout, capacity error or invalid output can advance
 the job to the next model. No fan-out or paid fallback. Training's Analysis
 details shows the model, requested thinking level, elapsed request time,
@@ -85,14 +89,16 @@ matching database rollback plan; toggling the dispatcher alone stops processing.
 PGlite executes the migrations, with stand-ins for `pg_net`/`pg_cron`; the worker
 test covers duplicate enqueue, anonymous capability denial, cross-member read
 denial, lease recovery, pacing shared with weight, fallback persistence and
-revocation. The live synthetic route returned HTTP 503 on 3.8 high (2.45s),
+revocation. The current primary model completed a validated two-finding synthetic
+brief in 7.58s, with 1,758 thinking tokens. Flash-Lite 3.1 medium responded in
+4.04s but its brief failed validation. The older Interactions route returned HTTP 503 on 3.8 high (2.45s),
 3.6 medium (38.00s), 3.1 Flash-Lite medium (3.83s), and 3.8 medium (1.72s).
 These are failure latencies; no thought-token count was returned. The probe
 uses synthetic data and waits at least 65 seconds between requests. To repeat:
 
 ```sh
 node scripts/check-coach-live.mjs --route
-node scripts/check-coach-live.mjs gemini-3.8-flash medium
+node scripts/check-coach-live.mjs gemini-3.5-flash-lite medium
 ```
 
 A one-word 3.8 Flash/low request also received HTTP 503 on Interactions

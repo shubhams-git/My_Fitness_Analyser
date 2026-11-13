@@ -1,8 +1,9 @@
 import {SupabaseApi,cloudConfig} from './supabase.mjs';
 import {geminiKeys,geminiConfigured,geminiKeyIds,geminiAttempt} from './gemini-router.mjs';
-import {coachingRequest,extractCoaching} from './intelligence.mjs';
+import {coachingGenerationRequest,extractCoaching} from './intelligence.mjs';
 import {COACH_PROMPT,COACH_SCHEMA} from '../analysis/coaching-contract.mjs';
 import {evidenceHash} from '../analysis/coaching-evidence.mjs';
+import {RECORDED_COACH,recordedTrainingReport} from '../analysis/recorded-coaching.mjs';
 import {TRAINING_ROUTE,validJobSignature} from './training-job-policy.mjs';
 
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -21,16 +22,19 @@ export async function runTrainingJob(api,{id,capability},{env=process.env,fetche
  if(!geminiConfigured(env))return finish({failure:'configuration'});
  if(!entry||job.promptVersion!==COACH_PROMPT||job.schemaVersion!==COACH_SCHEMA||!job.pack?.content||
   !validJobSignature(keys,job)||evidenceHash(job.pack.content)!==job.pack.hash)return finish({failure:'evidence'});
- const body=coachingRequest(job.pack,entry.model,entry.thinking,entry.maxOutput);
+ const body=coachingGenerationRequest(job.pack,entry);
+ const saveRecorded=result=>finish({...result,report:recordedTrainingReport(job.pack),failure:RECORDED_COACH});
+ const finishAttempt=result=>!result.report&&job.step===TRAINING_ROUTE.length-1?saveRecorded(result):finish(result);
  // Consent is checked inside this reservation, immediately before transmission.
  const budget=await rpc('reserve_training_gemini',{...lease,key_ids:geminiKeyIds(keys),target_model:entry.model});
  if(!budget)return finish({failure:'cancelled'});
- if(budget.modelBlocked)return finish({attempt:{model:entry.model,thinking:entry.thinking,outcome:'quota',httpStatus:null,elapsedMs:0}});
+ if(budget.dailyLimit)return saveRecorded({attempt:{model:entry.model,thinking:entry.thinking,outcome:'quota',httpStatus:null,elapsedMs:0}});
+ if(budget.modelBlocked)return finishAttempt({attempt:{model:entry.model,thinking:entry.thinking,outcome:'quota',httpStatus:null,elapsedMs:0}});
  if(budget.retryAt)return true; // Database released the lease and scheduled the next eligible time.
  if(!Number.isInteger(budget.slot)||!keys[budget.slot-1])return finish({failure:'configuration'});
- const result=await geminiAttempt({entry,apiKey:keys[budget.slot-1],body,validate:json=>extractCoaching(json,job.pack),fetcher});
+ const result=await geminiAttempt({entry,apiKey:keys[budget.slot-1],body,validate:json=>extractCoaching(json,job.pack,{compact:true}),fetcher});
  console.info('Training Gemini attempt',JSON.stringify(result.attempt));
- return finish(result);
+ return finishAttempt(result);
 }
 
 export async function trainingWorker(request,response,{env=process.env,apiFactory=config=>new SupabaseApi(config,null)}={}){

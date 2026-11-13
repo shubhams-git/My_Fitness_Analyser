@@ -22,7 +22,7 @@ test('the worker classifies timeout, quota and incomplete output without leaking
  assert.equal(timeout.attempt.outcome,'timeout');
  const quota=await geminiAttempt({...request,fetcher:async()=>Response.json({error:{message:'secret',details:[{retryDelay:'87.2s'}]}},{status:429})});
  assert.equal(quota.attempt.outcome,'quota');assert.equal(quota.retrySeconds,88);assert.doesNotMatch(JSON.stringify(quota),/secret|synthetic-key/);
- const incomplete=await geminiAttempt({...request,fetcher:async()=>Response.json({status:'incomplete',usage:{total_thought_tokens:1100}})});
+ const incomplete=await geminiAttempt({...request,fetcher:async()=>Response.json({candidates:[{finishReason:'MAX_TOKENS'}],usageMetadata:{thoughtsTokenCount:1100}})});
  assert.equal(incomplete.attempt.outcome,'incomplete');assert.equal(incomplete.attempt.thoughtTokens,1100);
 });
 
@@ -34,9 +34,10 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
  const rpc={claim_training_job:['job_id','job_capability'],reserve_training_gemini:['job_id','job_capability','job_lease','key_ids','target_model'],finish_training_job:['job_id','job_capability','job_lease','attempt','result_report','retry_seconds','failure_code']};
  const api={json:async(path,{body})=>{const name=path.split('/').at(-1),args=rpc[name].map(field=>body[field]);return sql(`select ${name}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args);}};
  let calls=0;
- const fetcher=async(_,options)=>{calls++;const body=JSON.parse(options.body);assert.equal(body.store,false);assert.equal(body.model,TRAINING_ROUTE[calls-1].model);assert.equal(body.generation_config.thinking_level,TRAINING_ROUTE[calls-1].thinking);
+ const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.equal(body.generationConfig.thinkingConfig.thinkingLevel,TRAINING_ROUTE[calls-1].thinking.toUpperCase());
   if(calls===1)return Response.json({error:{message:'unavailable'}},{status:503});
-  return Response.json({status:'completed',usage:{total_input_tokens:600,total_thought_tokens:500,total_output_tokens:350},steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report)}]}]});};
+  const {factIds,signal,...prose}=report.verdict;
+  return Response.json({usageMetadata:{promptTokenCount:600,thoughtsTokenCount:500,candidatesTokenCount:350},candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({verdict:{...prose,signalFactId:signal.factId},findings:[]})}]}}]});};
  try{
   await db.exec(`create role authenticated;create role anon;create schema auth;create schema cron;create schema net;
    create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;
@@ -75,5 +76,11 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
   await admin();const cancelled=await sql('select body from net.requests where body->>\'id\'=$1',[second.id]);
   assert.equal(await sql('select pack from training_analysis_jobs where id=$1',[second.id]),null);
   await as('anon');assert.equal(await runTrainingJob(api,cancelled,{env,fetcher}),false);assert.equal(calls,2);
+  await admin();await db.exec("update analysis_reports set created_at=now()-interval '31 seconds';update gemini_request_budget set used=20");
+  await as('authenticated',owner);await db.query("select set_ai_preference(true,'gemini-training-v2')");const third=await enqueue(owner,3);
+  await admin();const limited=await sql('select body from net.requests where body->>\'id\'=$1',[third.id]);
+  await as('anon');assert.equal(await runTrainingJob(api,limited,{env,fetcher}),true);assert.equal(calls,2);
+  await as('authenticated',owner);assert.equal((await sql('select training_job_status()')).state,'complete');
+  assert.equal(await sql('select model_id from analysis_reports where id=$1',[third.id]),'recorded-training');
  }finally{await db.close();}
 });
