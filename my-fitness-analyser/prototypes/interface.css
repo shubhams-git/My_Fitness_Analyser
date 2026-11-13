@@ -93,6 +93,24 @@
 }
 .td-coach .ai-next h4 svg{width:16px;height:16px}
 .td-coach.ai-space .ai-next p{margin-top:6px;font-weight:550;line-height:1.5}
+.td-coach .ai-knowledge{
+ margin:0 0 18px;
+ padding:13px 16px;
+ background:var(--color-canvas);
+ border-inline-start:1px solid var(--color-heartRate);
+ overflow-wrap:anywhere;
+}
+.td-coach .ai-knowledge h4{
+ margin:0;
+ color:var(--color-heartRate);
+ font:650 .875rem/1.4 var(--font-body);
+}
+.td-coach.ai-space .ai-knowledge p{
+ margin:5px 0 0;
+ font-size:1rem;
+ line-height:1.55;
+ color:var(--color-text);
+}
 .td-coach .ai-evidence{margin:0;padding:0}
 .td-coach .ai-evidence summary,.td-coach .ai-previous>summary{
  font-size:.875rem;

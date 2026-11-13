@@ -7,7 +7,7 @@ const chartFacts={pace:'paceSPerKm',distance:'distanceM',heart_rate:'hrBpm'};
 
 export function coachingContent(review){
  if(!review||review.stale||!reportHasSupportedLimits(review.report,review.evidence.facts))return '';
- const {verdict,findings,charts}=review.report;
+ const {verdict,findings,charts,worthKnowing}=review.report;
  const facts=new Map(review.evidence.facts.map(f=>[f.id,f]));
  const prose=text=>esc(insightText(text,review.evidence.facts,formatFact));
  const proof=(ids,heading)=>{
@@ -34,6 +34,7 @@ export function coachingContent(review){
    <h4><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 17 17 5M7 5h10v10"/></svg>For your next run</h4>
    <p>${prose(verdict.nextAction)}</p>
   </div>
+  ${worthKnowing?`<div class="ai-knowledge"><h4>Worth knowing</h4><p>${esc(worthKnowing)}</p></div>`:''}
   ${proof(verdict.factIds,verdict.text)}
   ${findings.length?`<details class="ai-analysis ai-evidence">
    <summary>Training findings</summary>
@@ -64,7 +65,7 @@ export async function mountCoaching(root,{settings=false,signal}={}){
  ${enabled&&!settings&&review?.model==='recorded-training'&&!review.stale?'<p class="ai-fine">This brief uses your recorded training. You can request a Gemini review again.</p>':''}
  ${!enabled||settings?`<div class="ai-consent"><h3>${settings?'You choose what gets analysed.':unanswered?'Get advice for your next run.':'Your runs are ready when you are.'}</h3><p>${enabled?'Gemini reviews your outdoor runs and recent workouts when you ask.':unanswered?'Allow Gemini to use your outdoor run data and recent workout summaries, including strength sessions from your Journal.':'Your charts and logging stay available with AI off.'}</p>${notice()}<div class="ai-actions">${enabled?'<button class="secondary-button" data-ai="deny">Turn AI off</button>':`<button class="primary-button" data-ai="allow">Allow training analysis</button>${unanswered?'<button class="text-button" data-ai="deny">Not now</button>':''}`}</div></div>`:''}
  ${enabled&&!settings?(review&&!review.stale?coachingContent(review):`<div class="ai-ready"><h3>${needsRuns?'Start with an outdoor run.':review?'Your training has changed.':'Review your recent training.'}</h3><p>${needsRuns?'Sync an outdoor Garmin run to build your coaching brief.':'Get an evidence-backed analysis of your recent runs and workouts, with a practical next step.'}</p></div>`):''}
- ${enabled&&!settings?`<div class="ai-actions">${recordedOnly?'':needsRuns?'<a class="primary-button" href="/account">Connect Garmin</a>':pending()||!review||review.stale||review.fallback||review.usedFallback||state.job?.state==='failed'?`<button class="primary-button" data-ai="generate">${busy?'Requesting analysis…':pending()?'Analysis in progress':review?'Update analysis':'Analyse my training'}</button>`:''}<a class="text-button" href="/account#ai-settings">AI settings</a></div>${!recordedOnly&&!state.configured?'<p class="ai-fine">Gemini is unavailable here. Your training stays ready to explore.</p>':''}${review?.stale&&!review.unsupported?`<details class="ai-previous"><summary>Previous brief · ${new Date(review.generatedAt).toLocaleDateString('en-AU')}</summary>${coachingContent({...review,stale:false})}</details>`:''}`:''}
+ ${enabled&&!settings?`<div class="ai-actions">${recordedOnly?'':needsRuns?'<a class="primary-button" href="/account">Connect Garmin</a>':pending()||!review||review.stale||review.canRefresh||review.fallback||review.usedFallback||state.job?.state==='failed'?`<button class="primary-button" data-ai="generate">${busy?'Requesting analysis…':pending()?'Analysis in progress':review?'Update analysis':'Analyse my training'}</button>`:''}<a class="text-button" href="/account#ai-settings">AI settings</a></div>${!recordedOnly&&!state.configured?'<p class="ai-fine">Gemini is unavailable here. Your training stays ready to explore.</p>':''}${review?.stale&&!review.unsupported?`<details class="ai-previous"><summary>Previous brief · ${new Date(review.generatedAt).toLocaleDateString('en-AU')}</summary>${coachingContent({...review,stale:false})}</details>`:''}`:''}
  ${enabled&&!settings&&pending()?`<div class="ai-wait"><progress aria-label="Preparing your coaching brief"></progress><div><span role="status">${jobStatus()}</span></div><p>You can leave this page. Your brief will be saved here when it’s ready.</p></div>`:''}
  ${enabled&&!settings&&(pending()||state.job?.attempts?.length)?`<details class="ai-evidence ai-attempts" ${state.job?.attempts?.length?'':'hidden'}><summary>Analysis details</summary><ul>${attemptList()}</ul></details>`:''}
  <p class="ai-message" role="status" aria-live="polite">${esc(message)}</p>`;

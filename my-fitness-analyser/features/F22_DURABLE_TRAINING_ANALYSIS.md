@@ -130,3 +130,9 @@ separate automatic analysis consent, that event can enqueue the same job;
 manual Update analysis remains available. Implementing the poll needs a narrow
 server identity for the bootstrap owner's import without a browser session.
 Neither polling nor automatic Gemini sharing is enabled in this release.
+
+
+Prompt runner-coach-v9 asks for a separate “Worth knowing” note on running or
+training. It travels with the same Gemini request and saved report. Older
+briefs remain readable and can be refreshed. Missing or malformed notes are
+omitted without invalidating an evidence-backed brief.

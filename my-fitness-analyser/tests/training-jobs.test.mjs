@@ -13,7 +13,8 @@ const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-822
 const key='synthetic-key',env={GEMINI_API_KEY:key,GEMINI_API_KEY_2:'synthetic-second-key',GEMINI_KEY_POOL_FREE_CONFIRMED:'1',GEMINI_FREE_TIER_CONFIRMED:'1'};
 const pack=coachingEvidence({activities:Object.fromEntries(syntheticHistory().map(a=>[a.id,{...a,synthetic:false}])),feedback:{}},{anchor:'2026-11-07'});
 const evidenceKey='a'.repeat(64);
-const report={schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your log contains {history.runs} recorded runs.',explanation:'Your log gives you a baseline for comparing familiar efforts.',nextAction:'Keep your next run at a familiar effort.',factIds:['history.runs'],signal:{factId:'history.runs',direction:'none'}},findings:[],charts:[]};
+const worthKnowing='Elapsed pace includes stops, while moving pace omits them. Runs with different stop patterns can rank differently depending on which clock you compare.';
+const report={worthKnowing,schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your log contains {history.runs} recorded runs.',explanation:'Your log gives you a baseline for comparing familiar efforts.',nextAction:'Keep your next run at a familiar effort.',factIds:['history.runs'],signal:{factId:'history.runs',direction:'none'}},findings:[],charts:[]};
 const migrations=['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql','20261112_whole_training_disclosure.sql','20261112120000_gemini_key_rotation.sql','20261113190000_durable_training_jobs.sql','20261113190100_training_job_dispatch.sql','20261114120000_remove_weight_insight_caps.sql'];
 
 test('the worker classifies timeout, quota and incomplete output without leaking provider bodies',async()=>{
@@ -34,10 +35,10 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
  const rpc={claim_training_job:['job_id','job_capability'],reserve_training_gemini:['job_id','job_capability','job_lease','key_ids','target_model'],finish_training_job:['job_id','job_capability','job_lease','attempt','result_report','retry_seconds','failure_code']};
  const api={json:async(path,{body})=>{const name=path.split('/').at(-1),args=rpc[name].map(field=>body[field]);return sql(`select ${name}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args);}};
  let calls=0;
- const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],calls===1?key:env.GEMINI_API_KEY_2);
+ const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.ok(JSON.stringify(body).includes('teach one specific, non-obvious idea'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],calls===1?key:env.GEMINI_API_KEY_2);
   if(calls===1)return Response.json({error:{message:'unavailable'}},{status:503});
   const {factIds,signal,...prose}=report.verdict;
-  return Response.json({usageMetadata:{promptTokenCount:600,thoughtsTokenCount:500,candidatesTokenCount:350},candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({verdict:{...prose,signalFactId:signal.factId},findings:[]})}]}}]});};
+  return Response.json({usageMetadata:{promptTokenCount:600,thoughtsTokenCount:500,candidatesTokenCount:350},candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({verdict:{...prose,signalFactId:signal.factId},findings:[],worthKnowing})}]}}]});};
  try{
   await db.exec(`create role authenticated;create role anon;create schema auth;create schema cron;create schema net;
    create function auth.uid() returns uuid language sql stable as $$select nullif(current_setting('request.jwt.claim.sub',true),'')::uuid$$;

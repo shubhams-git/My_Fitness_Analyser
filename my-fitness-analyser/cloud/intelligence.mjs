@@ -4,7 +4,7 @@ import {CloudZones} from './zones.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
 import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/coaching-evidence.mjs';
-import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,discomfortVerdict,signalDirection,validateCoaching } from '../analysis/coaching-contract.mjs';
+import { COACH_SCHEMA,COACH_PROMPT,PREVIOUS_COACH_PROMPT,COACH_SYSTEM,COACH_KNOWLEDGE,DISCLOSURE,coachingSchema,discomfortVerdict,signalDirection,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
 import {TRAINING_JOB_POLICY,TRAINING_ROUTE,signTrainingJob} from './training-job-policy.mjs';
@@ -23,7 +23,7 @@ export async function recentStrength(api,anchor){
  return [...manual,...imported.filter(row=>!manualDays.has(row.date_key))];
 }
 export function coachingRequest(pack,model,thinking='high',maxOutput=16384){
- const schema=providerSchema(coachingSchema(pack));
+ const schema=providerSchema(coachingSchema(pack,{includeNote:true}));
  const chartOptions=schema.properties.charts.items.anyOf;
  if(chartOptions){
   // Use one provider object. The local contract checks measurements for each selected chart type.
@@ -34,16 +34,16 @@ export function coachingRequest(pack,model,thinking='high',maxOutput=16384){
   };
  }
  return {
-  model,store:false,system_instruction:COACH_SYSTEM,
+  model,store:false,system_instruction:COACH_SYSTEM+'\n\n'+COACH_KNOWLEDGE,
   input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content}),
   response_format:{type:'text',mime_type:'application/json',schema},
   generation_config:generationConfig(model,thinking,maxOutput)
  };
 }
-export function coachingGenerationRequest(pack){
- const schema=providerSchema(coachingSchema(pack));
+export function coachingGenerationRequest(pack,{includeNote=true}={}){
+ const schema=providerSchema(coachingSchema(pack,{includeNote}));
  for(const name of ['schemaVersion','evidenceHash','charts'])delete schema.properties[name];
- schema.required=['verdict','findings'];
+ schema.required=Object.keys(schema.properties);
  for(const claim of [schema.properties.verdict,schema.properties.findings.items]){
   claim.properties.signalFactId=claim.properties.signal.properties.factId;
   delete claim.properties.signal;
@@ -55,7 +55,7 @@ export function coachingGenerationRequest(pack){
   .replace(/Use the direction supported by signal\.factId:.*?Other facts use none\. /,'')
   .replace('Use at most one optional comparison chart with recorded values from the listed sessions.','')
   .replace('Use the exact schemaVersion and evidenceHash.','')+
-  '\nReturn verdict and findings only. Each claim uses signalFactId for its main supporting fact. The app assembles citations from signalFactId and the exact {fact.id} placeholders in the prose. Cite at most six facts per claim. Put no numbers or zone labels outside placeholders.';
+  '\nReturn the required fields only. Each claim uses signalFactId for its main supporting fact. The app assembles citations from signalFactId and the exact {fact.id} placeholders in the prose. Cite at most six facts per claim. Put no numbers or zone labels outside placeholders.'+(includeNote?'\n\n'+COACH_KNOWLEDGE:'');
  return structuredGeminiRequest({instruction:systemInstruction,input:pack.content,schema});
 }
 
@@ -68,9 +68,9 @@ function assembleGeneratedReport(result,pack){
   return {...prose,factIds:[...new Set([signalFactId,...ids])],
    signal:{factId:signalFactId,direction:signalDirection(signalFactId,facts.get(signalFactId)?.value)}};
  }
- if(Object.keys(result).some(key=>!['verdict','findings'].includes(key)))throw new Error('Unexpected report fields.');
+ if(Object.keys(result).some(key=>!['verdict','findings','worthKnowing'].includes(key)))throw new Error('Unexpected report fields.');
  const findings=Array.isArray(result.findings)?result.findings.map(finding=>finding&&typeof finding==='object'?claim(finding):finding):result.findings;
- return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:claim(result.verdict),findings,charts:[]};
+ return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:claim(result.verdict),findings,charts:[],worthKnowing:result.worthKnowing};
 }
 
 export function extractCoaching(result,pack,{compact=false}={}){
@@ -85,7 +85,7 @@ export function extractCoaching(result,pack,{compact=false}={}){
   validateCoaching({...report,findings:[]},pack);
   if(!Array.isArray(report.findings)||report.findings.length>3)throw new Error('Invalid findings');
   report.findings=report.findings.filter(f=>{try{validateCoaching({...report,findings:[f]},pack);return true;}catch{return false;}});
-  validateCoaching(report,pack);
+  report=validateCoaching(report,pack);
  }catch{throw new CloudError(502,'The briefing did not pass its evidence checks. Your training record is unchanged.');}return report;
 }
 function recordedBrief(context,reason){
@@ -115,18 +115,18 @@ export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false,durable=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.durable=durable;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
  preference(){return aiPreference(this.api,this.disclosure);}
  configured(){return geminiConfigured(this.env)&&(!this.durable||geminiKeys(this.env).length>=2);}
- async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
+ async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=(hash,prompt=COACH_PROMPT)=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,prompt,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash),previousPromptKey:fingerprint(pack.hash,PREVIOUS_COACH_PROMPT)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
   const valid=rows=>rows.filter(r=>{try{
-   if(r.schema_version!==COACH_SCHEMA||![COACH_PROMPT,'runner-coach-v7','runner-coach-v6','runner-coach-v5','runner-coach-v4'].includes(r.prompt_version)||!r.evidence)return false;
+   if(r.schema_version!==COACH_SCHEMA||![COACH_PROMPT,PREVIOUS_COACH_PROMPT,'runner-coach-v7','runner-coach-v6','runner-coach-v5','runner-coach-v4'].includes(r.prompt_version)||!r.evidence)return false;
    const canonical=evidenceHash(r.evidence.content),legacy=canonical!==r.evidence.hash&&legacyEvidenceHash(r.evidence.content)===r.evidence.hash;
-   if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy&&r.evidence_key===context.legacyKey&&canonical===context.pack.hash&&r.model_id===context.model)r.evidence_key=context.key;return true;
+   if(canonical!==r.evidence.hash&&!legacy)return false;r.report=validateCoaching(r.report,r.evidence);if(legacy&&r.evidence_key===context.legacyKey&&canonical===context.pack.hash&&r.model_id===context.model)r.evidence_key=context.key;return true;
   }catch{return false;}});
   const exact=valid(await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`));
   return exact.find(r=>r.evidence_key===context.key)||exact[0]||valid(await this.api.json(path+'&limit=5'))[0]||null;
  }
- item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key,fallback:row.model_id===RECORDED_COACH?'provider':null,usedFallback:row.model_id!==(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model}:null;}
+ item(row,key,previousPromptKey){const canRefresh=Boolean(row&&previousPromptKey&&row.evidence_key===previousPromptKey&&row.prompt_version===PREVIOUS_COACH_PROMPT);return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key&&!canRefresh,canRefresh,fallback:row.model_id===RECORDED_COACH?'provider':null,usedFallback:row.model_id!==(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model}:null;}
  async jobStatus({summary}){
   if(!this.durable)return {job:null,ready:true};
   const rpc=name=>this.api.request('/rest/v1/rpc/'+name,{method:'POST',body:{}});
@@ -138,7 +138,7 @@ export class TrainingIntelligence {
   if(summary){const {job}=await this.jobStatus({summary});return {...base,job};}
   const [context,{job,ready}]=await Promise.all([this.context(),this.jobStatus({summary})]),reason=recordedReason(context),saved=reason?null:await this.saved(context);
   base.configured&&=ready;
-  return {...base,runs:context.pack.content.sessions.length,job,review:reason?recordedBrief(context,reason):saved?this.item(saved,context.key):job?.state==='failed'?recordedBrief(context,'provider'):null};
+  return {...base,runs:context.pack.content.sessions.length,job,review:reason?recordedBrief(context,reason):saved?this.item(saved,context.key,context.previousPromptKey):job?.state==='failed'?recordedBrief(context,'provider'):null};
  }
  async enqueue(){
   const pref=await this.preference();if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');

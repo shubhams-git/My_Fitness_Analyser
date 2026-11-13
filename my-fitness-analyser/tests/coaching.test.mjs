@@ -42,7 +42,7 @@ test('schema and semantic gates reject invented numbers, missing evidence and un
 test('Flash-Lite receives full evidence and can return independent, validated findings',()=>{
  const pack=coachingEvidence(library(),{anchor:'2026-11-07'}),model='gemini-3.1-flash-lite';
  const request=coachingRequest(pack,model,'medium'),schema=request.response_format.schema;
- assert.deepEqual(schema.required,['schemaVersion','evidenceHash','verdict','findings','charts']);
+ assert.deepEqual(schema.required,['schemaVersion','evidenceHash','verdict','findings','charts','worthKnowing']);
  assert.equal(schema.properties.findings.maxItems,3);
  assert.deepEqual(JSON.parse(request.input).comparisons,pack.content.comparisons);
  assert.deepEqual(request.response_format,coachingRequest(pack,'gemini-3.6-flash').response_format);
@@ -50,6 +50,7 @@ test('Flash-Lite receives full evidence and can return independent, validated fi
  const independent=report(pack),factId='s01.splitChange';
  independent.findings.push({kind:'pacing',headline:'Your closing kilometre was slower.',explanation:'The closing split was slower by {'+factId+'}. This shows how the pace changed within that run. It leaves open whether you deliberately eased up or found the effort harder toward the finish.',assessment:'interpretation',factIds:[factId],signal:{factId,direction:'slower'},nextAction:'On a similar run, check whether your effort changes between the opening and closing kilometre.'});
  assert.deepEqual(extractCoaching(result(independent),pack),independent);
+ assert.deepEqual(extractCoaching(result({...independent,worthKnowing:'See https://example.test'}),pack),independent);
  assert.throws(()=>extractCoaching(result({choice:'latest'}),pack),/evidence checks/);
 });
 test('affected check-ins replace generated advice and skip Gemini, even without goals',async()=>{

@@ -5,6 +5,10 @@ Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
 
+- Gemini training briefs include a “Worth knowing” note when the model supplies
+  a usable explanation. It is saved with the existing report and appears beneath
+  the next-run recommendation.
+
 - Training's Coaching brief leads with the verdict and highlights the next-run
   recommendation. Supporting numbers, cited runs, findings and comparisons
   open on demand. Verified in Chromium with synthetic brief and job states.
