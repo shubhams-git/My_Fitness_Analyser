@@ -1,4 +1,4 @@
-import './session.js';
+import {privateJson,viewSnapshot,refreshView} from './session.js';
 import { entryMarkup,mountWeightEntry,clearWeightDraft,editWeight } from './journal-entry.js';
 import { journalView } from './journal-view.js';
 import { chartMarkup } from './journal-chart.js';
@@ -12,7 +12,7 @@ const journalParams=new URLSearchParams(location.search);
 let data,windowChoice=['30','all'].includes(journalParams.get('window'))?journalParams.get('window'):'90',selection=0,chart,preview,busy=false,animation,motion=true,shown=12,writingWeight=false;
 try{motion=localStorage.getItem('mfa-visual-motion')!=='off';}catch{}
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-async function api(url,options){const response=await fetch(url,{cache:'no-store',...options});if(response.status===401){location.replace('/sign-in.html');throw new Error('Sign in to open your journal.');}let value;try{value=await response.json();}catch{throw new Error('The service could not respond. Try again.');}if(!response.ok)throw new Error(value.error||'The request could not finish.');return value;}
+const api=privateJson;
 function graph(){const result=chartMarkup({data,selection,kg,day,width:innerWidth<1000?500:900});chart=result.geometry;return result.markup;}
 function updateCursor(announce=false){const point=chart?.points[selection];if(!point)return;
  document.querySelector('#selected-kg').textContent=kg(Math.round(point.trendKg*10)/10);
@@ -29,7 +29,7 @@ function render(animateView=true){
  root.innerHTML=journalView({data,windowChoice,graph,entry:entryMarkup(data),kg,signed,day,escape,arrow,logo,motion:motion&&!reduced.matches,shown});
  bind();if(animateView)animate();
 }
-async function load(window=windowChoice,animateView=true){const next=await api('/api/journal?window='+window);data=next;windowChoice=window;journalParams.set('window',window);history.replaceState(null,'',location.pathname+'?'+journalParams+location.hash);selection=Math.max(0,(data.trend?.points||data.points).length-1);render(animateView);}
+async function load(window=windowChoice,animateView=true){const next=await refreshView('/api/journal?window='+window,{force:true});data=next;windowChoice=window;journalParams.set('window',window);history.replaceState(null,'',location.pathname+'?'+journalParams+location.hash);selection=Math.max(0,(data.trend?.points||data.points).length-1);render(animateView);}
 function error(message){document.querySelector('#import-error').textContent=message;}
 function notice(message){const node=document.querySelector('#journal-status');node.textContent=message;node.tabIndex=-1;node.focus({preventScroll:true});}
 function setBusy(value){writingWeight=value;document.querySelectorAll('[data-window],#choose-file,#more-readings,#log-strength,[data-edit-session],[data-restore-session]').forEach(b=>b.disabled=value);}
@@ -74,4 +74,13 @@ async function commitImport(){
   const changed=Object.values(result.counts).reduce((n,c)=>n+c.added+c.updated+c.deleted,0);const message=result.duplicate||!changed?'Already up to date. No duplicate records added.':'MASS history saved '+(data.cloud?'to your private account.':'on this computer.');document.querySelector('#import-status').textContent=message;notice(message);
  }catch(e){busy=false;if(preview)renderReview(e.message);else error(e.message);}
 }
-try{await load();}catch(e){root.innerHTML=`<main class="training-loading"><h1>Your journal couldn’t load.</h1><p>${escape(e.message)}</p><button class="primary-button" id="retry">Retry</button><a href="/training" class="text-button">Back to training</a></main>`;document.querySelector('#retry').addEventListener('click',()=>location.reload());}
+const endpoint='/api/journal?window='+windowChoice;
+const cached=viewSnapshot(endpoint)?.value;
+if(cached){data=cached;selection=Math.max(0,(data.trend?.points||data.points).length-1);render(false);}
+try{
+ const next=await refreshView(endpoint);
+ // Leave active forms and chart selections in place while refreshing the cache.
+ if(!cached||(!busy&&!writingWeight&&!root.contains(document.activeElement)&&data===cached&&JSON.stringify(cached)!==JSON.stringify(next))){
+  data=next;selection=Math.max(0,(next.trend?.points||next.points).length-1);render(false);
+ }
+}catch(e){if(cached){document.querySelector('#journal-status').textContent='Showing saved journal data. Refresh to try again.';}else{root.innerHTML=`<main class="training-loading"><h1>Your journal couldn’t load.</h1><p>${escape(e.message)}</p><button class="primary-button" id="retry">Retry</button><a href="/training" class="text-button">Back to training</a></main>`;document.querySelector('#retry').addEventListener('click',()=>location.reload());}}

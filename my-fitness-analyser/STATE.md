@@ -5,6 +5,10 @@ Completed local increment: durable training analysis (F22)
 
 ## Implemented
 
+- Training and Progress switch within one document. Training and Journal reuse a
+  short-lived tab snapshot during a background refresh. The first visit shows
+  navigation while data loads, and independent Supabase reads run in parallel.
+
 - F22 adds durable, owner-scoped coaching jobs, shared Gemini pacing and
   model timing/usage details. A synthetic 3.5 Flash-Lite Generate Content brief
   passed validation, and a recorded brief covers exhausted provider attempts.
