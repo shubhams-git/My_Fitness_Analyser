@@ -1,5 +1,11 @@
 # Architecture proposal
 
+F22 adds an explicit training analysis job on Supabase, dispatched to one
+bounded Vercel attempt at a time. The worker only accepts an unguessable job
+capability and signed evidence; no persistent user token or Supabase service
+role is required. See [F22](features/F22_DURABLE_TRAINING_ANALYSIS.md) for
+activation and live verification status.
+
 ## Current implementation — 7 November 2026
 
 F08 adds owner-scoped AI preferences, immutable consent events and cached analysis

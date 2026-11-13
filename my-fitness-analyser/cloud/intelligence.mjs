@@ -7,6 +7,7 @@ import { coachingEvidence,evidenceHash,legacyEvidenceHash } from '../analysis/co
 import { COACH_SCHEMA,COACH_PROMPT,COACH_SYSTEM,DISCLOSURE,coachingSchema,discomfortVerdict,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { localDay } from './journal.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
+import {TRAINING_JOB_POLICY,TRAINING_ROUTE,signTrainingJob} from './training-job-policy.mjs';
 export const TRAINING_DISCLOSURE='gemini-training-v2';
 export async function aiPreference(api,disclosure=DISCLOSURE){const rows=await api.json(`/rest/v1/ai_preferences?owner_id=eq.${api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===disclosure?r.enabled:r?.enabled===false?false:null,revision:r?Number(r.revision):0,disclosureVersion:disclosure,updatedAt:r?.updated_at||null};}
 export async function setAiPreference(api,enabled,disclosure=DISCLOSURE){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow Gemini analysis.');return api.json('/rest/v1/rpc/set_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure}});}
@@ -20,7 +21,7 @@ export async function recentStrength(api,anchor){
  const manualDays=new Set(manual.map(row=>row.date_key));
  return [...manual,...imported.filter(row=>!manualDays.has(row.date_key))];
 }
-export function coachingRequest(pack,model,thinking='high'){
+export function coachingRequest(pack,model,thinking='high',maxOutput=16384){
  const schema=providerSchema(coachingSchema(pack));
  const chartOptions=schema.properties.charts.items.anyOf;
  if(chartOptions){
@@ -35,7 +36,7 @@ export function coachingRequest(pack,model,thinking='high'){
   model,store:false,system_instruction:COACH_SYSTEM,
   input:JSON.stringify({schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,...pack.content}),
   response_format:{type:'text',mime_type:'application/json',schema},
-  generation_config:generationConfig(model,thinking)
+  generation_config:generationConfig(model,thinking,maxOutput)
  };
 }
 export function extractCoaching(result,pack){
@@ -74,22 +75,50 @@ function recordedBrief(context,reason){
 const recordedReason=context=>discomfortVerdict(context.pack)?'discomfort'
  :context.pack.content.workouts&&context.pack.content.facts.some(f=>f.id==='volume.28d.recent.runs'&&f.value===0)?'coverage':null;
 export class TrainingIntelligence {
- constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
+ constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false,durable=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.durable=durable;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
  preference(){return aiPreference(this.api,this.disclosure);}
  configured(){return geminiConfigured(this.env);}
- async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,zoneVersions:zones.versions,goalVersions:goals.versions}),model=modelRoute('run-coaching')[0].model,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,MODEL_POLICY,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
+ async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=hash=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,COACH_PROMPT,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
-  const exact=await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`),rows=exact.length?exact:await this.api.json(path+'&limit=5');
-  const valid=rows.filter(r=>{try{
+  const valid=rows=>rows.filter(r=>{try{
    if(r.schema_version!==COACH_SCHEMA||![COACH_PROMPT,'runner-coach-v7','runner-coach-v6','runner-coach-v5','runner-coach-v4'].includes(r.prompt_version)||!r.evidence)return false;
    const canonical=evidenceHash(r.evidence.content),legacy=canonical!==r.evidence.hash&&legacyEvidenceHash(r.evidence.content)===r.evidence.hash;
    if(canonical!==r.evidence.hash&&!legacy)return false;validateCoaching(r.report,r.evidence);if(legacy&&r.evidence_key===context.legacyKey&&canonical===context.pack.hash&&r.model_id===context.model)r.evidence_key=context.key;return true;
   }catch{return false;}});
-  return valid.find(r=>r.evidence_key===context.key)||valid[0]||null;
+  const exact=valid(await this.api.json(path+`&or=(evidence_key.eq.${context.key},evidence_key.eq.${context.legacyKey})&limit=2`));
+  return exact.find(r=>r.evidence_key===context.key)||exact[0]||valid(await this.api.json(path+'&limit=5'))[0]||null;
  }
  item(row,key){return row?{id:row.id,report:row.report,evidence:row.evidence.content,mapping:row.evidence.mapping,generatedAt:row.finished_at,model:row.model_id,modelPolicy:row.model_policy||null,attempts:row.provider_attempts||[],stale:row.evidence_key!==key,usedFallback:row.model_id!==modelRoute('run-coaching')[0].model}:null;}
- async status(){const consent=await this.preference(),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model,minRuns:this.wholeTraining?1:2};if(consent.enabled!==true)return {...base,review:null};const context=await this.context(),reason=recordedReason(context);return {...base,runs:context.pack.content.sessions.length,review:reason?recordedBrief(context,reason):this.item(await this.saved(context),context.key)};}
+ async jobStatus({summary}){
+  if(!this.durable)return {job:null,ready:true};
+  const rpc=name=>this.api.request('/rest/v1/rpc/'+name,{method:'POST',body:{}});
+  const [result,readiness]=await Promise.all([rpc('training_job_status'),summary?null:rpc('training_worker_ready')]);
+  const job=result.ok?await result.json():null;
+  return {job,ready:result.ok&&(summary||Boolean(readiness?.ok&&await readiness.json()))};
+ }
+ async status({summary=false,settings=false}={}){const consent=await this.preference(),base={consent,configured:this.configured(),model:modelRoute('run-coaching')[0].model,minRuns:this.wholeTraining?1:2};if(consent.enabled!==true||settings)return {...base,review:null,job:null};
+  if(summary){const {job}=await this.jobStatus({summary});return {...base,job};}
+  const [context,{job,ready}]=await Promise.all([this.context(),this.jobStatus({summary})]),reason=recordedReason(context),saved=reason?null:await this.saved(context);
+  base.configured&&=ready;
+  return {...base,runs:context.pack.content.sessions.length,job,review:reason?recordedBrief(context,reason):saved?this.item(saved,context.key):job?.state==='failed'?recordedBrief(context,'provider'):null};
+ }
+ async enqueue(){
+  const pref=await this.preference();if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');
+  const context=await this.context(),reason=recordedReason(context);
+  if(reason)return {review:recordedBrief(context,reason),job:null};
+  if(!this.configured())throw new CloudError(409,'Gemini is not configured for this app.');
+  if(context.pack.content.sessions.length<1)throw new CloudError(409,'Sync an outdoor Garmin run before requesting your brief.');
+  const cached=await this.saved(context);
+  if(cached?.evidence_key===context.key&&cached.model_id===context.model)return {review:this.item(cached,context.key),job:null};
+  const evidenceKey=context.key;
+  const signature=signTrainingJob(geminiKeys(this.env)[0],{owner:this.api.config.owner,evidenceKey,consentRevision:pref.revision,pack:context.pack});
+  const claim=await this.api.request('/rest/v1/rpc/enqueue_training_job',{method:'POST',body:{evidence_key:evidenceKey,evidence_pack:context.pack,consent_revision:pref.revision,job_signature:signature,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
+  if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===429?429:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===429?'Please wait a moment before requesting another analysis.':'The background analysis could not be queued. Try again shortly.');
+  return {job:await claim.json()};
+ }
+ // Compatibility path for legacy non-hosted callers. The hosted handler
+ // exclusively uses enqueue() and the worker; its write RPCs are retired.
  async generate(){
   const pref=await this.preference();if(pref.enabled!==true)throw new CloudError(403,'Allow Gemini analysis in your AI settings first.');
   const context=await this.context();

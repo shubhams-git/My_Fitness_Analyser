@@ -16,10 +16,11 @@ export function modelRoute(task){
 export function generationConfig(model,thinking='high',maxOutput=16384){return {max_output_tokens:maxOutput,...(thinking?{thinking_level:thinking}:{})};}
 export function geminiKeys(env){const names=['GEMINI_API_KEY',...(env.GEMINI_KEY_POOL_FREE_CONFIRMED==='1'?Array.from({length:4},(_,i)=>'GEMINI_API_KEY_'+(i+2)):[])];return [...new Set(names.map(n=>env[n]?.trim()).filter(Boolean))];}
 export function geminiConfigured(env){
- return env.GEMINI_FREE_TIER_CONFIRMED==='1'&&geminiKeys(env).length>=2;
+ return env.GEMINI_FREE_TIER_CONFIRMED==='1'&&geminiKeys(env).length>=1;
 }
+export const geminiKeyIds=keys=>keys.map(key=>createHash('sha256').update('gemini-key-slot:'+key).digest('hex'));
 export function sharedGeminiKey(api,task,reviewId,keys){
- const keyIds=keys.map(key=>createHash('sha256').update('gemini-key-slot:'+key).digest('hex'));
+ const keyIds=geminiKeyIds(keys);
  return async()=>{
   let slot;
   try{
@@ -30,6 +31,47 @@ export function sharedGeminiKey(api,task,reviewId,keys){
   if(!Number.isInteger(slot)||!keys[slot-1])throw new CloudError(503,'Gemini key rotation is unavailable. Try again later.');
   return keys[slot-1];
  };
+}
+
+function retryDelay(response,error){
+ const header=response.headers.get('retry-after'),retryInfo=error?.details?.find?.(detail=>typeof detail?.retryDelay==='string')?.retryDelay;
+ const values=[header&&(/^\d+$/.test(header)?Number(header):(Date.parse(header)-Date.now())/1000),retryInfo&&/^\d+(?:\.\d+)?s$/.test(retryInfo)&&Number(retryInfo.slice(0,-1))];
+ const dayLimit=error?.details?.some?.(detail=>detail?.violations?.some?.(violation=>/perday|daily/i.test((violation.quotaId||'')+' '+(violation.quotaMetric||''))));
+ if(dayLimit)values.push(86400);
+ return Math.ceil(Math.min(86400,Math.max(65,...values.filter(Number.isFinite))));
+}
+
+async function boundedJson(response){
+ let size=0;const chunks=[];
+ for await(const chunk of response.body||[]){size+=chunk.length;if(size>256000)throw new Error('response too large');chunks.push(chunk);}
+ return JSON.parse(Buffer.concat(chunks).toString());
+}
+
+export async function geminiAttempt({entry,apiKey,body,validate,fetcher=fetch,clock=Date.now}){
+ const start=clock(),signal=AbortSignal.timeout(entry.timeout),attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'network',httpStatus:null,elapsedMs:0};
+ let report=null,retrySeconds=0;
+ try{
+  const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal,headers:{'Content-Type':'application/json','x-goog-api-key':apiKey,'Api-Revision':'2026-05-20'},body:JSON.stringify(body)});
+  attempt.httpStatus=response.status;
+  if(!response.ok){
+   attempt.outcome=response.status===429?'quota':[401,403].includes(response.status)?'key':response.status>=500?'unavailable':'request';
+   if([400,429].includes(response.status)){
+    const error=(await boundedJson(response).catch(()=>null))?.error;
+    if(response.status===429)retrySeconds=retryDelay(response,error);
+    if(response.status===400&&error?.details?.some?.(detail=>detail?.reason==='API_KEY_INVALID'))attempt.outcome='key';
+   }else await response.body?.cancel().catch(()=>{});
+  }else{
+   attempt.outcome='invalid';
+   const json=await boundedJson(response);
+   for(const [source,target] of Object.entries({total_input_tokens:'inputTokens',total_output_tokens:'outputTokens',total_thought_tokens:'thoughtTokens'})){
+    if(Number.isSafeInteger(json?.usage?.[source])&&json.usage[source]>=0)attempt[target]=json.usage[source];
+   }
+   if(json?.status==='incomplete')attempt.outcome='incomplete';
+   else{report=validate(json);attempt.outcome='complete';}
+  }
+ }catch(error){if(signal.aborted||error?.name==='TimeoutError')attempt.outcome='timeout';}
+ attempt.elapsedMs=Math.max(0,clock()-start);
+ return {attempt,report,retrySeconds};
 }
 let lastLocalKey;
 export async function routedGemini({task,keys,request,validate,reserveKey,beforeAttempt=async()=>{},fetcher=fetch,totalMs=210000,clock=Date.now}){

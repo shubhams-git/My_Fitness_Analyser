@@ -32,11 +32,11 @@ test('weight evidence excludes identities, notes and dates; schema rejects inven
 });
 test('weight AI is explicit and consent-scoped, caches valid reports and never retries quota on a paid fallback',async()=>{
  let enabled=false,calls=0,reads=0,saved=null,status=200;
- const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_gemini_key_slot'))return 1;if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async()=>Response.json('saved')};
+ const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_weight_gemini'))return {slot:1};if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async path=>Response.json(path.includes('training_worker_ready')?true:'saved')};
  const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:async()=>{calls++;return status===200?Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report((await engine.context()).pack))}]}]}):new Response('private body test-secret',{status});}});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
  enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);
- saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,5);
+ saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,2);
  enabled=false;assert.equal((await engine.status()).review,null);
 });
 test('weight consent SQL isolates owners, audits choices and rejects publication after revocation',async()=>{
@@ -58,8 +58,8 @@ test('weight changes during a provider request prevent publication against old e
  const changed=structuredClone(data);let published=false,failed=false,engine;
  const api={config:{owner},json:async(path,options)=>{
   if(path.includes('weight_ai_preferences'))return [{enabled:true,disclosure_version:'gemini-weight-v1',revision:1}];
-  if(path.includes('reserve_gemini_key_slot'))return 1;if(path.includes('finish_weight_review')){published=options.body.result_status==='complete';failed=options.body.result_status==='failed';return true;}return [];
- },request:async()=>Response.json('pending')};
+  if(path.includes('reserve_weight_gemini'))return {slot:1};if(path.includes('finish_weight_review')){published=options.body.result_status==='complete';failed=options.body.result_status==='failed';return true;}return [];
+ },request:async path=>Response.json(path.includes('training_worker_ready')?true:'pending')};
  engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:keyEnv,fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(p))}]}]});}});
  await assert.rejects(engine.generate(),e=>e.status===409);assert.equal(published,false);assert.equal(failed,true);
 });

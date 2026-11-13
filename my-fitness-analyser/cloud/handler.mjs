@@ -33,7 +33,12 @@ export async function privateHandler(request,response,route,{configReader=cloudC
       if(request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await setAiPreference(api,body.enabled,TRAINING_DISCLOSURE));return;}
     }
     if(route==='ai-review'&&['GET','POST'].includes(request.method)){
-      const intelligence=new TrainingIntelligence(api,library,{env,wholeTraining:true});send(200,request.method==='GET'?await intelligence.status():await intelligence.generate());return;
+      const intelligence=new TrainingIntelligence(api,library,{env,wholeTraining:true,durable:true});
+      if(request.method==='GET'){
+        const params=new URL(request.url,'https://app.invalid').searchParams;
+        send(200,await intelligence.status({summary:params.get('view')==='job',settings:params.get('view')==='settings'}));
+      }else{const next=await intelligence.enqueue();send(next.job?202:200,next);}
+      return;
     }
     if(route==='password'&&request.method==='POST'){
       const body=JSON.parse((await readBody(request,4096)).toString());

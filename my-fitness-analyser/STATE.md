@@ -1,9 +1,15 @@
 # Current state
 
-Updated: 12 November 2026 (Australia/Sydney)
-Completed local increment: coaching model priority and key rotation
+Updated: 13 November 2026 (Australia/Sydney)
+Completed local increment: durable training analysis (F22)
 
 ## Implemented
+
+- F22 adds durable, owner-scoped coaching jobs, shared Gemini pacing and
+  model timing/usage details. 141 tests and foundation/config checks passed;
+  the hosted Supabase dispatcher and an end-to-end production job are still
+  unverified. See [F22](features/F22_DURABLE_TRAINING_ANALYSIS.md). Garmin
+  Personal API is pull-only; the automatic sync design is documented there.
 
 - Satellite route replay now runs for 20–24.5 seconds after imagery loads.
   Local Chromium played the synthetic 4.8 km preview to completion in 22.8
@@ -279,5 +285,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-With approval, configure the production Free-tier key pool, apply the
-rotation migration, and deploy the coaching update.
+Apply the F22 migrations and dispatcher origin to Supabase, then release and
+verify one consented Training job after leaving the page.

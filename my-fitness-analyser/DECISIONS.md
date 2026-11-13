@@ -1,5 +1,15 @@
 # Decision register
 
+D46 — Durable training analysis, 13 November 2026. An explicit request records
+an owner-scoped evidence snapshot and returns immediately. A Supabase dispatch
+trigger and minute scheduler deliver and recover jobs independently of the
+browser. A Vercel invocation handles one model attempt with a database lease.
+Supabase stores validated reports and sanitised attempt measurements. Training
+and Journal share a conservative rate budget across all configured keys. A
+quota response backs off that model across the app. Garmin Personal remains
+pull-only, and Garmin sync or an upload does not yet opt a member into automatic
+Gemini analysis. See [F22](features/F22_DURABLE_TRAINING_ANALYSIS.md).
+
 D45 — Coaching model priority and key rotation, 12 November 2026. Running
 coaching tries Gemini 3.8 Flash, Gemini 3.6 Flash, then Gemini 3.1 Flash-Lite.
 An explicit retry starts from the preferred model even when an earlier
