@@ -21,19 +21,22 @@ test('weight trend spans missing calendar days without inventing readings or cha
  assert.equal(weightTrend([...a,{date:'2026-12-01',kg:500,readings:1}],{anchor:'2026-09-01'}).latest.trendKg,97);
 });
 test('weight evidence excludes identities, notes and dates; schema rejects invented quantities and body-composition claims',()=>{
- const p=weightEvidence(data),payload=JSON.stringify(weightRequest(p,'gemini-3.6-flash'));
+ const p=weightEvidence(data),payload=JSON.stringify(weightRequest(p));
  for(const value of [owner,'private@example.test','secret note','2026-09-01'])assert.ok(!payload.includes(value));
  assert.ok(p.content.facts.some(f=>f.id==='recent.weeklyRate'));assert.equal(p.content.observations.length,12);validateWeightReport(report(p),p);
  // Legitimate count and magnitude citations must not require redundant facts.
  validateWeightReport({...report(p),focus:'coverage',signal:{factId:'period.span',direction:'none'},explanation:'Across {history.readings}, the trend changed. The latest reading is {latest.age} old.',factIds:['period.span','latest.age','period.trendDifference','history.readings']},p);
  validateWeightReport({...report(p),focus:'trend',signal:{factId:'period.trendDifference',direction:'none'},factIds:['period.trendDifference','history.days','latest.age']},p);
  for(const v of [{headline:'You lost 3 kg.'},{headline:'Your fat loss is ideal.'},{factIds:['latest.scale']},{supportingFactIds:['invented']},{nextStep:'eat-less'},{extra:1}])assert.throws(()=>validateWeightReport({...report(p),...v},p));
- assert.equal(weightRequest(p,'gemini-3.6-flash').generation_config.thinking_level,'high');assert.equal(weightRequest(p,'gemini-3.6-flash').store,false);
+ assert.equal(weightRequest(p).generationConfig.thinkingConfig,undefined);assert.equal(weightRequest(p).generationConfig.maxOutputTokens,undefined);
+});
+const providerResult=value=>Response.json({
+ candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify(value)}]}}]
 });
 test('weight AI is explicit and consent-scoped, caches valid reports and never retries quota on a paid fallback',async()=>{
  let enabled=false,calls=0,reads=0,saved=null,status=200;
- const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_weight_gemini'))return {slot:1};if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async path=>Response.json(path.includes('training_worker_ready')?true:'saved')};
- const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:async()=>{calls++;return status===200?Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report((await engine.context()).pack))}]}]}):new Response('private body test-secret',{status});}});
+ const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_weight_gemini'))return {slot:calls%2+1};if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async path=>Response.json(path.includes('training_worker_ready')?true:'saved')};
+ const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:async(url,options)=>{calls++;assert.match(url,/gemini-3\.6-flash:generateContent$/);assert.equal(options.headers['x-goog-api-key'],calls===1?keyEnv.GEMINI_API_KEY:keyEnv.GEMINI_API_KEY_2);return status===200?providerResult(report((await engine.context()).pack)):new Response('private body test-secret',{status});}});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
  enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);
  saved=null;status=429;await assert.rejects(engine.generate(),e=>e.status===429&&!e.message.includes('test-secret'));assert.equal(calls,2);
@@ -60,7 +63,7 @@ test('weight changes during a provider request prevent publication against old e
   if(path.includes('weight_ai_preferences'))return [{enabled:true,disclosure_version:'gemini-weight-v1',revision:1}];
   if(path.includes('reserve_weight_gemini'))return {slot:1};if(path.includes('finish_weight_review')){published=options.body.result_status==='complete';failed=options.body.result_status==='failed';return true;}return [];
  },request:async path=>Response.json(path.includes('training_worker_ready')?true:'pending')};
- engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:keyEnv,fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(p))}]}]});}});
+ engine=new WeightIntelligence(api,{journal:{dataset:async()=>changed},env:keyEnv,fetcher:async()=>{const p=(await engine.context()).pack;changed.points.at(-1).kg+=1;return providerResult(report(p));}});
  await assert.rejects(engine.generate(),e=>e.status===409);assert.equal(published,false);assert.equal(failed,true);
 });
 

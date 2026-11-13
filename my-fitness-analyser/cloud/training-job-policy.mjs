@@ -1,8 +1,9 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
+import {PRIMARY_GEMINI_MODEL} from './gemini-router.mjs';
 
 export const TRAINING_JOB_POLICY='durable-coach-v3';
 export const TRAINING_ROUTE=Object.freeze([
- {model:'gemini-3.6-flash',timeout:220000,endpoint:'generateContent'},
+ PRIMARY_GEMINI_MODEL,
  {model:'gemini-3.5-flash-lite',timeout:220000,endpoint:'generateContent'}
 ]);
 

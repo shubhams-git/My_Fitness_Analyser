@@ -56,8 +56,9 @@ outcome, HTTP error code and thinking tokens when Google returned them. Each
 attempt is separately bounded by a 300s Vercel function and a 260s dispatch
 request. Stuck jobs expire after 30 minutes or repeated worker interruptions.
 
-Journal remains an explicit request for one 3.6 Flash/high attempt, capped at
-100 seconds and 16,384 tokens. Both hosted flows share an app-wide database
+Journal requests one 3.6 Flash attempt through Generate Content with default
+thinking and the same 220-second timeout as Training. Both flows require two
+distinct Free-tier keys and rotate through the same app-wide database
 budget: one request start every 65 seconds, at most 20 per Pacific day. Optional
 confirmed Free credentials rotate within the same budget. Google measures quota
 by project and model; additional keys do not raise this app's budget. A 429

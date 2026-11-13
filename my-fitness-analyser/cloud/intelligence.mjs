@@ -1,5 +1,5 @@
 import {CloudGoals} from './goals.mjs';
-import {MODEL_POLICY,modelRoute,generationConfig,routedGemini,geminiKeys,geminiConfigured,sharedGeminiKey} from './gemini-router.mjs';
+import {MODEL_POLICY,modelRoute,generationConfig,routedGemini,geminiKeys,geminiConfigured,sharedGeminiKey,structuredGeminiRequest} from './gemini-router.mjs';
 import {CloudZones} from './zones.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
@@ -56,11 +56,7 @@ export function coachingGenerationRequest(pack){
   .replace('Use at most one optional comparison chart with recorded values from the listed sessions.','')
   .replace('Use the exact schemaVersion and evidenceHash.','')+
   '\nReturn verdict and findings only. Each claim uses signalFactId for its main supporting fact. The app assembles citations from signalFactId and the exact {fact.id} placeholders in the prose. Cite at most six facts per claim. Put no numbers or zone labels outside placeholders.';
- return {
-  systemInstruction:{parts:[{text:systemInstruction}]},
-  contents:[{parts:[{text:JSON.stringify(pack.content)}]}],
-  generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema}
- };
+ return structuredGeminiRequest({instruction:systemInstruction,input:pack.content,schema});
 }
 
 function assembleGeneratedReport(result,pack){

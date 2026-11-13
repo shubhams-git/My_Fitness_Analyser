@@ -1,6 +1,18 @@
 import {createHash} from 'node:crypto';
 import {CloudError} from './supabase.mjs';
 export const MODEL_POLICY='flash-routes-v2';
+export const PRIMARY_GEMINI_MODEL=Object.freeze({
+ model:'gemini-3.6-flash',timeout:220000,endpoint:'generateContent'
+});
+
+export function structuredGeminiRequest({instruction,input,schema}){
+ return {
+  systemInstruction:{parts:[{text:instruction}]},
+  contents:[{parts:[{text:JSON.stringify(input)}]}],
+  generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema}
+ };
+}
+
 const intensive=new Set(['run-coaching','weight-coaching','goal-analysis','zone-analysis']);
 const basic=new Set(['summary-format','activity-label','import-field-normalization']);
 export function modelRoute(task){

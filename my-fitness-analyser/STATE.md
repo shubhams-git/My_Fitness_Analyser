@@ -5,6 +5,10 @@ Completed local increment: durable training analysis (F22)
 
 ## Implemented
 
+- Training and Journal weight insights share Gemini 3.6 Flash defaults, a
+  220-second request timeout, and app-wide rotation across distinct keys.
+  Existing weight insights remain available until refreshed.
+
 - Cold Activity, Training, Progress and Journal visits show a branded first
   paint with working navigation and page-specific loading content. Initial reads
   start alongside page assets. Slow and failed requests retain the shell.
