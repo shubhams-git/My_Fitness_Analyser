@@ -58,13 +58,16 @@ test('Garmin range projection preserves separate coverage, quality and gaps with
  }
 });
 
-test('older consent blocks before reading evidence and Free keys cannot enable personal analysis',async()=>{
+test('older consent blocks before reading evidence and personal keys are resolved independently',async()=>{
  const env={GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_API_KEY:'free',GEMINI_API_KEY_2:'free2'};
  const api={config:{owner:'member'},json:async()=>[{enabled:true,disclosure_version:'gemini-training-v2',revision:4}]};
  const engine=new TrainingIntelligence(api,{read:async()=>assert.fail('read evidence')},{durable:true,wholeTraining:true,env});
  assert.equal((await engine.status()).consent.enabled,null);
  await assert.rejects(engine.enqueue(),error=>error.status===403);
- assert.deepEqual(personalGeminiKeys({...env,GEMINI_PERSONAL_DATA_APPROVED:'1',GEMINI_PERSONAL_API_KEY:'free'}),[]);
+ assert.deepEqual(personalGeminiKeys({...env,GEMINI_PERSONAL_DATA_APPROVED:'1'}),[]);
+ const personal={...env,GEMINI_PERSONAL_API_KEY:'free',GEMINI_PERSONAL_API_KEY_2:'free2',GEMINI_PERSONAL_API_KEY_3:'free'};
+ assert.deepEqual(personalGeminiKeys(personal),[]);
+ assert.deepEqual(personalGeminiKeys({...personal,GEMINI_PERSONAL_DATA_APPROVED:'1'}),['free','free2']);
  assert.deepEqual(TRAINING_ROUTE.map(({model,timeout})=>[model,timeout]),[
   ['gemini-3.6-flash',120000],['gemini-3.6-flash',70000],['gemini-3-flash-preview',55000],['gemini-3.1-flash-lite',40000]
  ]);
