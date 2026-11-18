@@ -91,3 +91,8 @@ route, reduced motion and imagery fallback.
 
 - [Optic flow and steering study](https://pmc.ncbi.nlm.nih.gov/articles/PMC4892451/)
 - [W3C guidance on animation from interactions](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions)
+
+
+18 November production review found the DOM marker advancing before the
+asynchronous trail update. The runner now uses a circle layer in the same
+GeoJSON source as the trail so their positions publish together.

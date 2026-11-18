@@ -1,6 +1,6 @@
 # Current state
 
-Updated: 14 November 2026 (Australia/Sydney)
+Updated: 18 November 2026 (Australia/Sydney)
 Completed local increment: task-first Field Notes (F23)
 
 ## Implemented
@@ -10,6 +10,8 @@ Completed local increment: task-first Field Notes (F23)
   during the chase and reveals the full route on pullback. Reduced motion
   retains top-down manual inspection. Chromium checked live tiles with a
   synthetic route, turn framing, playback controls and imagery fallback.
+  The runner dot and trail render in the same map update to keep them aligned
+  during fast playback. Production was inspected on the Melbourne run.
 
 - Route replay can use higher-resolution MapTiler Cloud Free imagery with an
   origin-restricted `MAPTILER_BROWSER_KEY` on the deployment. EOxCloudless
