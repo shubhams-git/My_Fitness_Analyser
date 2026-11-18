@@ -17,6 +17,12 @@
 .sign-in-panel .sign-in-help{font-size:.875rem;margin-top:20px;max-width:36ch}
 #sign-in-status{color:var(--color-danger);font-size:.875rem;line-height:1.55;overflow-wrap:anywhere;margin:0}
 #sign-in-status:empty{display:none}
+#sign-in-status[data-success]{color:var(--color-text)}
+.sign-in-toggle.password-visibility{position:static;margin-block:6px 10px;padding-inline:8px;text-decoration:underline;text-underline-offset:3px}
+.sign-in-providers{display:flex;flex-wrap:wrap;gap:8px}
+.sign-in-providers button{flex:1;justify-content:center;min-height:44px}
+.sign-in-providers button:disabled{opacity:.55;cursor:default}
+#provider-status{color:var(--color-muted);margin-top:8px}
 .sign-in-track{grid-column:2;grid-row:2;width:min(100%,24rem);height:auto;max-height:52vh;align-self:center;justify-self:center;stroke:var(--color-divider);stroke-width:1.5}
 .sign-in-track .sign-in-start{stroke:var(--color-accent);stroke-width:2}
 @media(max-width:700px){.sign-in-shell{grid-template-columns:minmax(0,1fr);align-content:start;gap:28px;min-height:auto}.sign-in-track{display:none}}

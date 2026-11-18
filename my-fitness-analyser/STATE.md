@@ -1,9 +1,15 @@
 # Current state
 
 Updated: 19 November 2026 (Australia/Sydney)
-Completed increment: progressive flyover trail and tighter chase framing (F16)
+Completed increment: private member onboarding and encrypted Garmin sync (F24)
 
 ## Implemented
+
+- Member onboarding uses invited email registration and configurable Google,
+  Facebook and GitHub OAuth. New members connect Garmin on Account before
+  opening their record. Supabase holds the encrypted per-member credential.
+  The production migration, owner credential import and invitation hook have
+  been verified. See [F24](features/F24_PRIVATE_MEMBER_ONBOARDING.md).
 
 - Weekly goal progress on Training uses the shared goal styling, with the same heading scale as neighbouring sections and its own progress row.
 
@@ -337,10 +343,9 @@ Work stays on master; no new branch for this increment.
 
 ## Remaining boundaries
 
-- Saurav has no invited account yet; his email/identity setup is required. RLS and
-  membership support a second athlete now. No self-service public signup.
-- The server Garmin key is available only to its configured owner. Other members
-  use manual FIT until encrypted per-member connections are delivered.
+- New members need an invited email address and an enabled sign-in method.
+  Production OAuth provider credentials and SMTP for external password signup
+  are pending. The existing password account can continue to sign in.
 - Actual owner manual weigh-in capture and physical iPhone Safari still need
   user/device observation; synthetic SQL/UI tests do not claim those checks.
 - NRC/Strava uploads are private intake, not automatic extraction or an operator
@@ -353,4 +358,5 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Verify the hosted flyover and Story download on physical iPhone Safari.
+Configure the sign-in method for the first invited member and verify onboarding
+and sync with their own Garmin account.

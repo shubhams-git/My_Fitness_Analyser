@@ -1,5 +1,13 @@
 # Decision register
 
+D52 — Private member onboarding, 19 November 2026. Keep one Supabase project
+and its owner-scoped policies. Admit verified invited email addresses through
+Supabase's managed password and Google, Facebook and GitHub OAuth flows. Bind
+PKCE to the browser and use the existing server-side session cookies. Encrypt
+each Garmin Personal API key against its owner UUID and use the stored value
+for hosted sync. Seed the current owner's encrypted credential from the
+existing Vercel secret. See [F24](features/F24_PRIVATE_MEMBER_ONBOARDING.md).
+
 D51 — Continuous lightning flyover and Story export, 19 November 2026.
 Use a camera path sampled in playback time so the orbit, entry, turns and
 pullback match when played or scrubbed. Render the complete GPS route as a

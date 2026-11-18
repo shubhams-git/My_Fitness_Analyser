@@ -226,6 +226,7 @@ async function show(url,{key,restore,focus=false,force=false}={}){
       },'Apply update');
     }catch(error){
       if(signal.aborted||error.name==='AbortError')return;
+      if(error.status===428){location.replace('/account#garmin-connection');return;}
       const reconnect=()=>{
         sync.textContent='Reconnecting…';
         void refreshView(route.endpoint,route.tag,{force:true}).then(next=>{
@@ -237,6 +238,7 @@ async function show(url,{key,restore,focus=false,force=false}={}){
     }
   }catch(error){
     if(signal.aborted)return;
+    if(error.status===428){location.replace('/account#garmin-connection');return;}
     if(error.name==='AbortError'){
       // A write completed while this read was in flight. Read the new version.
       void show(new URL(location.href),{key,restore,focus});

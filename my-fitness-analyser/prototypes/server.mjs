@@ -29,6 +29,7 @@ const server=http.createServer(async(req,res)=>{
   const pathname=new URL(req.url,`http://127.0.0.1:${port}`).pathname;
   const json=(status,value)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
   if(pathname==='/api/private'){await privateHandler(req,res,new URL(req.url,'http://localhost').searchParams.get('route'));return;}
+  if(pathname==='/api/auth/callback'){await privateHandler(req,res,'auth-callback');return;}
   if(process.env.FITNESS_CLOUD_ENABLED!=='1'&&pathname==='/api/journal'&&req.method==='GET'){try{const saved=await library.read();json(200,{...journalDataset(saved.mass,{window:['30','all'].includes(new URL(req.url,'http://localhost').searchParams.get('window'))?new URL(req.url,'http://localhost').searchParams.get('window'):'90'}),local:true});}catch{json(500,{error:'Your saved journal could not be read.'});}return;}
   if(process.env.FITNESS_CLOUD_ENABLED!=='1'&&['/api/mass/preview','/api/mass/commit'].includes(pathname)&&req.method==='POST'){
     if(req.headers.origin!==`http://${req.headers.host}`){json(403,{error:'Open the local app to import MASS.'});return;}

@@ -2,7 +2,8 @@ import {CloudGoals} from './goals.mjs';
 import { CloudZones } from './zones.mjs';
 import { randomUUID,createHash } from 'node:crypto';
 import { CloudLibrary,CloudError,cloudConfig } from './supabase.mjs';
-import { authorize,requireOrigin,signIn,signOut } from './auth.mjs';
+import { authOptions,authorize,finishAuth,register,requireOrigin,signIn,signOut,startOAuth } from './auth.mjs';
+import { GarminCredentials } from './garmin-credentials.mjs';
 import { GarminSync } from '../prototypes/garmin.mjs';
 import { trainingDataset } from '../prototypes/training-data.mjs';
 import { activityKind } from '../prototypes/activity-kind.js';
@@ -22,12 +23,34 @@ export async function privateHandler(request,response,route,{configReader=cloudC
   try{
     if(env.FITNESS_CLOUD_ENABLED!=='1'&&!env.VERCEL)throw new CloudError(503,'Private hosting is not enabled. Use the local app.');
     const config=configReader(env);
+    if(route==='auth-options'&&request.method==='GET'){send(200,await authOptions(config));return;}
+    if(config.memberAccounts){
+      if(route==='register'&&request.method==='POST'){
+        await register(request,response,config,JSON.parse((await readBody(request,16384)).toString()));
+        send(200,{confirmationRequired:true});return;
+      }
+      if(route==='oauth'&&request.method==='POST'){
+        const body=JSON.parse((await readBody(request,4096)).toString());
+        send(200,{url:startOAuth(request,response,config,body?.provider)});return;
+      }
+      if(route==='auth-callback'&&request.method==='GET'){
+        response.statusCode=303;response.setHeader('Location',await finishAuth(request,response,config));response.end();return;
+      }
+    }
     if(route==='login'&&request.method==='POST'){await signIn(request,response,config,JSON.parse((await readBody(request,16384)).toString()));send(200,{signedIn:true});return;}
     if(route==='logout'&&request.method==='POST'){await signOut(request,response,config);send(200,{signedOut:true});return;}
     const api=await auth(request,response,config),library=libraryFactory(api);
     authTime=Math.round(performance.now()-started);
-    const garminConfigured=Boolean(env.GARMIN_PERSONAL_API_KEY&&config.owner===api.config.owner);
     if(request.method==='POST')requireOrigin(request,config);
+    const credentials=config.memberAccounts?new GarminCredentials(api,env.GARMIN_CREDENTIAL_ENCRYPTION_KEY):null;
+    if(credentials&&route==='garmin-connection'&&request.method==='POST'){
+      const body=JSON.parse((await readBody(request,8192)).toString());
+      await credentials.save(body?.key);send(200,{configured:true});return;
+    }
+    const garminConfigured=credentials&&['profile','data','training','journal'].includes(route)
+      ?await credentials.configured():false;
+    if(credentials&&!garminConfigured&&['data','training','journal'].includes(route))
+      throw new CloudError(428,'Connect Garmin in Account to finish setting up your record.');
     if(route==='goals'&&['GET','POST'].includes(request.method)){const goals=new CloudGoals(api);send(200,request.method==='GET'?await goals.snapshot():await goals.save(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='zones'&&['GET','POST'].includes(request.method)){const zones=new CloudZones(api);send(200,request.method==='GET'?await zones.snapshot():await zones.save(JSON.parse((await readBody(request,8192)).toString())));return;}
     if(route==='weight-ai'&&['GET','POST'].includes(request.method)){const engine=new WeightIntelligence(api,{env});send(200,request.method==='GET'?await engine.status():await engine.generate());return;}
@@ -73,7 +96,7 @@ export async function privateHandler(request,response,route,{configReader=cloudC
         api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=display_name`),
         api.json(`/rest/v1/screenshot_submissions?owner_id=eq.${api.config.owner}&select=id,provider,original_name,status,created_at&order=created_at.desc&limit=50`)
       ]);
-      send(200,{user:{...api.user,displayName:profiles[0]?.display_name||api.user.displayName||'Athlete'},garmin:{configured:garminConfigured},submissions,historyFrom:'2026-07-01'});return;
+      send(200,{user:{...api.user,displayName:profiles[0]?.display_name||api.user.displayName||'Athlete'},garmin:{configured:garminConfigured,connectable:Boolean(credentials)},submissions,historyFrom:'2026-07-01'});return;
     }
     if(route==='journal'&&request.method==='GET'){const [snapshot,goalVersions]=await Promise.all([new CloudJournal(api).snapshot(),new CloudGoals(api).versions()]);send(200,{...journalProjection(snapshot,{window:new URL(request.url,'http://localhost').searchParams.get('window')||'90',goalVersions}),local:false,cloud:true,viewer:api.user});return;}
     if(route==='weigh-in'&&request.method==='POST'){send(200,await new CloudJournal(api).save(JSON.parse((await readBody(request,8192)).toString())));return;}
@@ -109,13 +132,14 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     if(route==='import'&&request.method==='POST'){send(200,await library.import(await readBody(request)));return;}
     if(route==='restore'&&request.method==='POST'){send(200,await library.restore(JSON.parse((await readBody(request)).toString())));return;}
     if(route==='sync'&&request.method==='POST'){
-      if(!garminConfigured)throw new CloudError(409,'Garmin is not connected to your account. You can import your own original FIT file.');
+      const key=credentials?await credentials.read():null;
+      if(!key)throw new CloudError(409,'Connect Garmin in Account before syncing your account.');
       const claim=await api.json('/rest/v1/rpc/claim_fitness_sync',{method:'POST',body:{}});if(!claim)throw new CloudError(409,'A Garmin sync is already running.');
       try{
         const profiles=await api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=timezone`);
-        const result=await new GarminSync(library,{keyReader:async()=>env.GARMIN_PERSONAL_API_KEY||'',cutoff:'2026-07-01',
+        const result=await new GarminSync(library,{keyReader:async()=>key,cutoff:'2026-07-01',
           recoveryAnchor:localDay(profiles[0]?.timezone||'Australia/Sydney')}).run();
-        send(result.complete?200:502,result);
+        send(result.complete?200:502,result.complete?result:{...result,error:result.errors[0]?.message||'Garmin sync was interrupted. Retry to continue.'});
       }
       finally{await api.json('/rest/v1/rpc/release_fitness_sync',{method:'POST',body:{claim_id:claim}}).catch(()=>{});}return;
     }

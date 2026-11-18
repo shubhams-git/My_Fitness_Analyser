@@ -1,5 +1,12 @@
 # Architecture proposal
 
+F24 extends the existing owner namespace to invited password registration and
+Supabase OAuth. Auth confirms the invited email and Postgres claims the
+invitation for that Auth UUID. Hosted Garmin sync verifies and encrypts a
+credential per owner, then opens it only for that owner's explicit sync.
+The app uses the existing RLS and private object namespace.
+[F24 implementation and rollout](features/F24_PRIVATE_MEMBER_ONBOARDING.md).
+
 F22 adds an explicit training analysis job on Supabase, dispatched to one
 bounded Vercel attempt at a time. The worker only accepts an unguessable job
 capability and signed evidence; no persistent user token or Supabase service

@@ -45,6 +45,7 @@ export function invalidateFor(url){
   if(['password','logout','login'].includes(route)){clearSnapshots();return;}
   if(['ai-consent','ai-review','weight-ai','weight-ai-consent','mass-preview'].includes(route)||pathname==='/api/mass/preview')return;
   if(route==='screenshots'){invalidate(['account']);return;}
+  if(route==='garmin-connection'){invalidate(['account','training','activity','journal']);return;}
   if(route==='weigh-in'){invalidate(['journal']);return;}
   if(route==='strength-entry'||pathname==='/api/mass/commit'){invalidate(['journal','training']);return;}
   if(route==='goals'){invalidate(['training','journal']);return;}

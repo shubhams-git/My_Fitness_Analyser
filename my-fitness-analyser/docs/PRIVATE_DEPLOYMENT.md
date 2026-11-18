@@ -4,7 +4,13 @@
 Vercel is connected to GitHub master. F07 is the authenticated real-data cutover.
 See features/F07-private-members.md for actual verification and remaining gates.
 
-## Account setup and migration
+## Private member onboarding
+
+The hosted release uses invited password registration and configurable social
+login. [F24 production setup](../features/F24_PRIVATE_MEMBER_ONBOARDING.md)
+covers the current migration, invitations, provider callbacks and SMTP.
+
+## Original account setup and migration
 
 1. Select the existing Vercel project
    or a separate private project, with application root `my-fitness-analyser`.
@@ -43,9 +49,9 @@ UI/connection, not Git. `.env.example` contains names only.
 
 - `SUPABASE_URL`: `https://PROJECT_REF.supabase.co`
 - `SUPABASE_ANON_KEY`: project's anon/publishable key (never service role)
-- `FITNESS_OWNER_ID`: bootstrap Garmin owner's Auth UUID (not the signed-in identity)
 - `APP_ORIGIN`: exact HTTPS app origin, without a trailing slash
-- `GARMIN_PERSONAL_API_KEY`: existing owner's key, server-only
+- `FITNESS_MEMBER_ACCOUNTS=1`: enables member onboarding and hosted Garmin connections
+- `GARMIN_CREDENTIAL_ENCRYPTION_KEY`: server-only AES-256 key as 64 hex digits
 - `FITNESS_CLOUD_ENABLED=1`: enables guarded real-data endpoints
 
 Hosted routes always require Auth, even when FITNESS_CLOUD_ENABLED is zero.

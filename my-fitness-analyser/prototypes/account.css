@@ -24,4 +24,8 @@
 .ac-display .text-button{display:inline-flex;align-items:center;text-decoration:underline}
 .ac-controls #motion span{margin-left:8px;color:var(--color-muted)}
 #ai-settings .ai-consent h3{display:none}
+#garmin-key-form[hidden],#replace-garmin-key[hidden],#sync-garmin[hidden]{display:none}
+#garmin-key-form button{justify-self:start;margin-top:0}
+#replace-garmin-key{min-height:44px;margin-inline-end:12px}
+#garmin-key-status:empty{display:none}
 @media(max-width:720px){.ac-group{grid-template-columns:minmax(0,1fr);gap:18px}.ac-main .ac-intro{margin-bottom:14px}.ac-index{gap:0 18px;margin-bottom:16px}}

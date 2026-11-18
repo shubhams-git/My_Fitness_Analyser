@@ -42,7 +42,11 @@ export class GarminClient {
       let response;try{response=await this.fetcher(base+path,{method,redirect:'error',signal:signal||AbortSignal.timeout(30000),headers:{Authorization:authorization||`Bearer ${this.token}`,Accept:binary?'application/x-zip-compressed':'*/*'}});}catch{throw new Error('Garmin could not be reached. Try syncing again.');}
       if(response.status===401&&!authorization&&refresh){await this.authenticate(signal);return this.request(path,{method,binary,refresh:false,signal});}
       if(!signal&&[429,500,502,503,504].includes(response.status)&&attempt<2){const retry=Number(response.headers.get('retry-after'));await this.pause(Number.isFinite(retry)&&retry>0?Math.min(retry*1000,30000):500*2**attempt);continue;}
-      if(!response.ok)throw new Error(response.status===401||response.status===403?'Garmin access was denied. Check or renew the API key in .env.':`Garmin request failed (HTTP ${response.status}). Retry sync to continue.`);
+      if(!response.ok){
+        const error=new Error(response.status===401||response.status===403?'Garmin access was denied. Check or renew your Garmin Personal API key.':`Garmin request failed (HTTP ${response.status}). Retry sync to continue.`);
+        error.status=response.status;
+        throw error;
+      }
       let size=0;const chunks=[];for await(const chunk of response.body){size+=chunk.length;if(size>limit)throw new Error('Garmin response exceeds the supported size.');chunks.push(chunk);}return Buffer.concat(chunks);
     }
   }

@@ -71,6 +71,7 @@
     { "source": "/api/restore", "destination": "/api/private?route=restore" },
     { "source": "/api/export", "destination": "/api/private?route=export" },
     { "source": "/api/garmin/sync", "destination": "/api/private?route=sync" },
+    { "source": "/api/auth/callback", "destination": "/api/private?route=auth-callback" },
     { "source": "/route-view.js", "destination": "/prototypes/route-view.js" },
     {
       "source": "/",

@@ -15,6 +15,17 @@ root.innerHTML=accountMarkup;
 const $=selector=>root.querySelector(selector);
 const main=$('main'),grid=$('.ac-grid'),[garmin,screenshots,backup,password]=grid.children;
 const queue=$('.ac-queue'),zones=$('#running-zones'),goals=$('#goals');
+garmin.id='garmin-connection';
+garmin.tabIndex=-1;
+$('#sync-garmin').insertAdjacentHTML('beforebegin',`
+  <form id="garmin-key-form" method="post" hidden>
+    <label for="garmin-key">Garmin Personal API key</label>
+    <input id="garmin-key" type="password" autocomplete="off" autocapitalize="none" spellcheck="false" aria-describedby="garmin-description" maxlength="1800" required>
+    <button type="submit" class="secondary-button">Connect Garmin</button>
+  </form>
+  <button id="replace-garmin-key" class="text-button" type="button" aria-expanded="false" aria-controls="garmin-key-form" hidden>Replace API key</button>
+  <p id="garmin-key-status" role="status"></p>
+`);
 const group=(id,title,...items)=>{
  const section=document.createElement('section');
  section.className='ac-group';section.id=id;
@@ -54,8 +65,48 @@ exportLink.addEventListener('click',async event=>{
  catch(error){if(!signal.aborted)exportStatus.textContent=error.message||'Couldn’t prepare the backup. Try again.';}
  finally{exportLink.removeAttribute('aria-disabled');}
 });
-function showProfile(p){$('#member-name').textContent=p.user.displayName;$('#member-email').textContent=p.user.email;$('#avatar').textContent=p.user.displayName.slice(0,1).toUpperCase();$('#garmin-status').textContent=p.garmin.configured?'Connected':'Not connected';$('#garmin-description').textContent=p.garmin.configured?'Sync your activities and available sleep and recovery summaries into your private record.':'A Garmin connection has not been set up for this account. You can import original FIT recordings below.';$('#sync-garmin').hidden=!p.garmin.configured;$('#submissions').innerHTML=p.submissions.length?p.submissions.map(s=>`<div class="ac-submission"><div><strong>${esc(s.original_name)}</strong><span>${s.provider==='strava'?'Strava':'Nike Run Club'} · ${new Date(s.created_at).toLocaleDateString('en-AU')}</span></div><span class="ac-badge">${esc(s.status.replaceAll('_',' '))}</span></div>`).join(''):'<p>No screenshots waiting for review.</p>';}
-$('#sync-garmin').addEventListener('click',async event=>{const button=event.currentTarget,status=$('#fit-status');button.disabled=true;status.textContent='Syncing your Garmin recordings…';try{const r=await privateJson('/api/garmin/sync',{method:'POST'});status.textContent=`${r.imported} added · ${r.updated} updated · ${r.unchanged} unchanged. Open Training to explore.`;}catch(e){status.textContent=e.message;}finally{button.disabled=false;}});
+const garminForm=$('#garmin-key-form'),garminKey=$('#garmin-key'),replaceKey=$('#replace-garmin-key');
+function showGarmin({configured,connectable}){
+ $('#garmin-status').textContent=configured?'Connected':'Not connected';
+ $('#garmin-description').textContent=configured
+   ?'Sync activities and available sleep and recovery summaries into your private record.'
+   :connectable?'Enter the Personal API key from your Garmin Connect account to finish setup.':'You can import original FIT recordings below.';
+ $('#sync-garmin').hidden=!configured;
+ garminForm.hidden=!connectable||configured;
+ replaceKey.hidden=!connectable||!configured;
+ replaceKey.setAttribute('aria-expanded','false');
+ replaceKey.textContent='Replace API key';
+ garminForm.querySelector('button').textContent=configured?'Save replacement key':'Connect Garmin';
+}
+function showProfile(p){
+ $('#member-name').textContent=p.user.displayName;
+ $('#member-email').textContent=p.user.email;
+ $('#avatar').textContent=p.user.displayName.slice(0,1).toUpperCase();
+ showGarmin(p.garmin);
+ $('#submissions').innerHTML=p.submissions.length?p.submissions.map(s=>`<div class="ac-submission"><div><strong>${esc(s.original_name)}</strong><span>${s.provider==='strava'?'Strava':'Nike Run Club'} · ${new Date(s.created_at).toLocaleDateString('en-AU')}</span></div><span class="ac-badge">${esc(s.status.replaceAll('_',' '))}</span></div>`).join(''):'<p>No screenshots waiting for review.</p>';
+}
+replaceKey.addEventListener('click',()=>{
+ garminForm.hidden=!garminForm.hidden;
+ replaceKey.setAttribute('aria-expanded',String(!garminForm.hidden));
+ replaceKey.textContent=garminForm.hidden?'Replace API key':'Cancel replacement';
+ if(garminForm.hidden)garminForm.reset();
+ else garminKey.focus();
+});
+garminForm.addEventListener('submit',async event=>{
+ event.preventDefault();
+ const button=garminForm.querySelector('button'),status=$('#garmin-key-status');
+ button.disabled=replaceKey.disabled=true;
+ status.textContent='Verifying your Garmin key…';
+ try{
+  await privateJson('/api/private?route=garmin-connection',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key:garminKey.value})});
+  garminForm.reset();
+  showGarmin({configured:true,connectable:true});
+  status.textContent='Garmin connected. Sync Garmin to bring in your data.';
+  $('#sync-garmin').focus();
+ }catch(error){status.textContent=error.message;}
+ finally{button.disabled=replaceKey.disabled=false;}
+});
+$('#sync-garmin').addEventListener('click',async event=>{const button=event.currentTarget,status=$('#garmin-key-status');button.disabled=true;status.textContent='Syncing your Garmin recordings…';try{const r=await privateJson('/api/garmin/sync',{method:'POST'});status.textContent=`${r.imported} added · ${r.updated} updated · ${r.unchanged} unchanged. Open Training to explore.`;}catch(e){status.textContent=e.message;}finally{button.disabled=false;}});
 $('#fit-file').addEventListener('change',async event=>{const file=event.target.files[0];if(!file)return;const out=$('#fit-status');if(file.size>3.5*1024*1024){out.textContent='Choose a FIT file smaller than 3.5 MB.';return;}event.target.disabled=true;out.textContent='Saving your recording…';try{const r=await privateJson('/api/import',{method:'POST',body:file});out.innerHTML=`${r.duplicate?'Already in your record.':'Recording saved.'} <a href="/app.html?activity=${encodeURIComponent(r.activity.id)}">Open session ↗</a>`;}catch(e){out.textContent=e.message;}finally{event.target.disabled=false;}});
 $('#screenshots').addEventListener('change',event=>{$('#file-selection').textContent=event.target.files.length+' screenshots selected';});
 $('#screenshot-form').addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,files=[...$('#screenshots').files],button=form.querySelector('button'),out=$('#screenshot-status'),provider=$('#provider').value,fileSelection=$('#file-selection');if(!files.length||files.length>20||files.some(f=>f.size>3.5*1024*1024)){out.textContent='Choose up to 20 JPG or PNG files, each smaller than 3.5 MB.';return;}button.disabled=true;const batch=crypto.randomUUID();let done=0;try{for(const file of files){out.textContent=`Saving screenshot ${done+1} of ${files.length}…`;await privateJson('/api/private?route=screenshots',{method:'POST',headers:{'x-source-provider':provider,'x-import-batch':batch,'x-original-name':encodeURIComponent(file.name)},body:file});done++;}out.textContent=`${done} screenshots saved privately for review. They will appear as runs after their dates and figures are checked.`;form.reset();fileSelection.textContent='JPG or PNG · up to 20 images · 3.5 MB each';const profile=await refreshView('/api/private?route=profile','account',{force:true});if(!signal.aborted)showProfile(profile);}catch(e){out.textContent=`${done} saved. ${e.message} You can retry; identical images will not duplicate.`;}finally{button.disabled=false;}});

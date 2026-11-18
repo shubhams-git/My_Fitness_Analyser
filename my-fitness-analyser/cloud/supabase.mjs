@@ -10,13 +10,13 @@ async function parallelRead(items,read,limit=4){
 }
 export class CloudError extends Error { constructor(status,message){super(message);this.status=status;} }
 export function cloudConfig(env=process.env){
-  const {SUPABASE_URL:url,SUPABASE_ANON_KEY:key,FITNESS_OWNER_ID:owner,APP_ORIGIN:origin}=env;
+  const {SUPABASE_URL:url,SUPABASE_ANON_KEY:key,APP_ORIGIN:origin}=env;
   if(!url||!key||!origin)throw new CloudError(503,'Private hosting is not configured yet.');
   let role;try{role=JSON.parse(Buffer.from(key.split('.')[1]||'','base64url').toString()).role;}catch{}
   if(key.startsWith('sb_secret_')||role==='service_role')throw new CloudError(503,'Use the Supabase publishable or anon key, not a privileged key.');
-  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url)||(owner&&!/^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}$/.test(owner)))throw new CloudError(503,'Private hosting configuration needs attention.');
+  if(!/^https:\/\/[a-z0-9-]+\.supabase\.co$/.test(url))throw new CloudError(503,'Private hosting configuration needs attention.');
   const parsed=new URL(origin);if(parsed.origin!==origin||(parsed.protocol!=='https:'&&!['127.0.0.1','localhost'].includes(parsed.hostname))||(env.VERCEL&&parsed.protocol!=='https:'))throw new CloudError(503,'Set the private app HTTPS origin.');
-  return {url,key,owner,origin};
+  return {url,key,origin,memberAccounts:env.FITNESS_MEMBER_ACCOUNTS==='1'};
 }
 
 export class SupabaseApi {
