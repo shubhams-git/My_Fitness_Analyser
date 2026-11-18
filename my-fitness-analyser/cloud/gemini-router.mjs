@@ -33,12 +33,9 @@ export function modelRoute(task){
  throw new CloudError(400,'Unsupported intelligence task.');
 }
 export function generationConfig(model,thinking='high',maxOutput=16384){return {max_output_tokens:maxOutput,...(thinking?{thinking_level:thinking}:{})};}
-export function geminiKeys(env){const names=['GEMINI_API_KEY',...(env.GEMINI_KEY_POOL_FREE_CONFIRMED==='1'?Array.from({length:4},(_,i)=>'GEMINI_API_KEY_'+(i+2)):[])];return [...new Set(names.map(n=>env[n]?.trim()).filter(Boolean))];}
-export function personalGeminiKeys(env){
- if(env.GEMINI_PERSONAL_DATA_APPROVED!=='1')return [];
- return [...new Set(['GEMINI_PERSONAL_API_KEY','GEMINI_PERSONAL_API_KEY_2','GEMINI_PERSONAL_API_KEY_3','GEMINI_PERSONAL_API_KEY_4','GEMINI_PERSONAL_API_KEY_5']
-  .map(name=>env[name]?.trim()).filter(Boolean))];
-}
+const geminiKeyNames=['GEMINI_API_KEY','GEMINI_API_KEY_2','GEMINI_API_KEY_3','GEMINI_API_KEY_4','GEMINI_API_KEY_5'];
+export const GEMINI_POOL_SIZE=geminiKeyNames.length;
+export function geminiKeys(env){return [...new Set(geminiKeyNames.map(name=>env[name]?.trim()).filter(Boolean))];}
 export const geminiKeyIds=keys=>keys.map(key=>createHash('sha256').update('gemini-key-slot:'+key).digest('hex'));
 export function sharedGeminiKey(api,task,reviewId,keys){
  const keyIds=geminiKeyIds(keys);

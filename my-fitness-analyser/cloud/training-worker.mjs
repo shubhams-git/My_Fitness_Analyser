@@ -1,5 +1,5 @@
 import {SupabaseApi,cloudConfig} from './supabase.mjs';
-import {personalGeminiKeys,geminiKeyIds,geminiAttempt} from './gemini-router.mjs';
+import {geminiKeys,GEMINI_POOL_SIZE,geminiKeyIds,geminiAttempt} from './gemini-router.mjs';
 import {coachingGenerationRequest,extractCoaching} from './intelligence.mjs';
 import {COACH_PROMPT,COACH_SCHEMA} from '../analysis/coaching-contract.mjs';
 import {coachingViews,evidenceHash} from '../analysis/coaching-evidence.mjs';
@@ -18,8 +18,8 @@ export async function runTrainingJob(api,{id,capability},{env=process.env,fetche
  const finish=({attempt=null,report=null,retrySeconds=0,failure=null}={})=>rpc('finish_training_job',{
   ...lease,attempt,result_report:report,retry_seconds:retrySeconds,failure_code:failure
  });
- const keys=personalGeminiKeys(env),entry=TRAINING_ROUTE[job.step];
- if(keys.length<2)return finish({failure:'configuration'});
+ const keys=geminiKeys(env),entry=TRAINING_ROUTE[job.step];
+ if(keys.length!==GEMINI_POOL_SIZE)return finish({failure:'configuration'});
  if(!entry||job.promptVersion!==COACH_PROMPT||job.schemaVersion!==COACH_SCHEMA||!job.pack?.content||
   !validJobSignature(keys,job)||evidenceHash(job.pack.content)!==job.pack.hash)return finish({failure:'evidence'});
  const saveRecorded=result=>finish({...result,report:recordedTrainingReport(job.pack),failure:RECORDED_COACH});

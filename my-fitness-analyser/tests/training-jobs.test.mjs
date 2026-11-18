@@ -4,14 +4,14 @@ import assert from 'node:assert/strict';
 import {readFile} from 'node:fs/promises';
 import {PGlite} from '@electric-sql/pglite';
 import {runTrainingJob} from '../cloud/training-worker.mjs';
-import {geminiAttempt,geminiKeyIds,structuredGeminiRequest} from '../cloud/gemini-router.mjs';
+import {geminiAttempt,geminiKeys,geminiKeyIds,structuredGeminiRequest} from '../cloud/gemini-router.mjs';
 import {signTrainingJob,TRAINING_ROUTE} from '../cloud/training-job-policy.mjs';
 import {coachingEvidence} from '../analysis/coaching-evidence.mjs';
 import {COACH_PROMPT,COACH_SCHEMA} from '../analysis/coaching-contract.mjs';
 import {syntheticHistory} from '../prototypes/training-data.mjs';
 
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
-const key='synthetic-key',env={GEMINI_PERSONAL_API_KEY:key,GEMINI_PERSONAL_API_KEY_2:'synthetic-second-key',GEMINI_PERSONAL_DATA_APPROVED:'1'};
+const key='synthetic-key',env={GEMINI_API_KEY:key,GEMINI_API_KEY_2:'synthetic-second-key',GEMINI_API_KEY_3:'test-third',GEMINI_API_KEY_4:'test-fourth',GEMINI_API_KEY_5:'test-fifth'};
 const pack=coachingEvidence({activities:Object.fromEntries(syntheticHistory().map(a=>[a.id,{...a,synthetic:false}])),feedback:{}},{anchor:'2026-11-07'});
 const evidenceKey='a'.repeat(64);
 const worthKnowing='Elapsed pace includes stops, while moving pace omits them. Runs with different stop patterns can rank differently depending on which clock you compare.';
@@ -36,7 +36,7 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
  const rpc={claim_training_job:['job_id','job_capability'],training_generation_allowed:['job_id','job_capability','job_lease'],reserve_training_gemini:['job_id','job_capability','job_lease','key_ids','target_model'],finish_training_job:['job_id','job_capability','job_lease','attempt','result_report','retry_seconds','failure_code']};
  const api={json:async(path,{body})=>{const name=path.split('/').at(-1),args=rpc[name].map(field=>body[field]);return sql(`select ${name}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args);}};
  let calls=0;
- const fetcher=countedProvider(async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.ok(JSON.stringify(body).includes('teach one specific, non-obvious idea'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],calls%2===1?key:env.GEMINI_PERSONAL_API_KEY_2);
+ const fetcher=countedProvider(async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.ok(JSON.stringify(body).includes('teach one specific, non-obvious idea'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],geminiKeys(env)[calls-1]);
   if(calls<4)return Response.json({error:{message:'unavailable'}},{status:503});
   const {factIds,signal,...prose}=report.verdict;
   return Response.json({usageMetadata:{promptTokenCount:600,thoughtsTokenCount:500,candidatesTokenCount:350},candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({verdict:{...prose,signalFactId:signal.factId},findings:[],worthKnowing})}]}}]});});
@@ -78,11 +78,11 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
   }
   const weight=await beginWeight();
   await assert.rejects(beginWeight(),error=>error.code==='PT409');
-  const reserveWeight=()=>sql('select reserve_weight_gemini($1,$2,$3)',[weight,geminiKeyIds([key,env.GEMINI_PERSONAL_API_KEY_2]),'gemini-3.6-flash']);
+  const reserveWeight=()=>sql('select reserve_weight_gemini($1,$2,$3)',[weight,geminiKeyIds(geminiKeys(env)),'gemini-3.6-flash']);
   await admin();await db.exec("update gemini_request_budget set next_request_at=now()+interval '65 seconds',used=20");
   await as('authenticated',owner);
-  assert.equal((await reserveWeight()).slot,1,'weight rotates away from the last Training key even at the app caps');
-  for(const model of ['gemini-3.6-flash','gemini-3-flash-preview','gemini-3.1-flash-lite'])assert.ok((await sql('select reserve_weight_gemini($1,$2,$3)',[weight,geminiKeyIds([key,env.GEMINI_PERSONAL_API_KEY_2]),model])).slot);
+  assert.equal((await reserveWeight()).slot,5,'weight rotates away from the last Training key even at the app caps');
+  for(const model of ['gemini-3.6-flash','gemini-3-flash-preview','gemini-3.1-flash-lite'])assert.ok((await sql('select reserve_weight_gemini($1,$2,$3)',[weight,geminiKeyIds(geminiKeys(env)),model])).slot);
   await assert.rejects(reserveWeight(),e=>e.code==='42501');
   const weightTrace=[{model:'gemini-3-flash-preview',thinking:'default',outcome:'complete',httpStatus:200}];
   assert.equal(await sql("select finish_weight_review_v2($1,'complete','{}','{}','gemini-3-flash-preview',$2)",[weight,weightTrace]),true);

@@ -1,5 +1,5 @@
 import {CloudGoals} from './goals.mjs';
-import {PRIMARY_GEMINI_MODEL,ANALYSIS_ROUTE,structuredGeminiRequest,geminiAttempt,geminiKeyIds,personalGeminiKeys} from './gemini-router.mjs';
+import {PRIMARY_GEMINI_MODEL,ANALYSIS_ROUTE,structuredGeminiRequest,geminiAttempt,geminiKeyIds,geminiKeys,GEMINI_POOL_SIZE} from './gemini-router.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
 import { CloudJournal } from './journal.mjs';
@@ -26,7 +26,7 @@ export class WeightIntelligence {
  constructor(api,{env=process.env,fetcher=fetch,journal=new CloudJournal(api),goals=new CloudGoals(api)}={}){this.api=api;this.env=env;this.fetcher=fetcher;this.journal=journal;this.goals=goals;}
  async preference(){const rows=await this.api.json(`/rest/v1/weight_ai_preferences?owner_id=eq.${this.api.config.owner}&select=enabled,disclosure_version,revision,updated_at`),r=rows[0];return {enabled:r?.disclosure_version===WEIGHT_DISCLOSURE?r.enabled:null,revision:r?Number(r.revision):0,disclosureVersion:WEIGHT_DISCLOSURE};}
  async setPreference(enabled){if(typeof enabled!=='boolean')throw new CloudError(400,'Choose whether to allow weight analysis.');return this.api.json('/rest/v1/rpc/set_weight_ai_preference',{method:'POST',body:{allow_analysis:enabled,disclosure:WEIGHT_DISCLOSURE}});}
- configured(){return personalGeminiKeys(this.env).length>=2;}
+ configured(){return geminiKeys(this.env).length===GEMINI_POOL_SIZE;}
  async providerReady(){
   if(!this.configured())return false;
   const response=await this.api.request('/rest/v1/rpc/training_worker_ready',{method:'POST',body:{}});
@@ -54,7 +54,7 @@ export class WeightIntelligence {
   if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===409?409:503,
    claim.status===403?'Your weight sharing choice changed. Check your AI settings.':
    claim.status===409?'A weight insight is already running. Try again shortly.':'Couldn’t start the weight insight. Try again shortly.');
-  const id=await claim.json(),keys=personalGeminiKeys(this.env);
+  const id=await claim.json(),keys=geminiKeys(this.env);
   let trace=[];try{
    for(const entry of weightRoute){
     if(Date.now()>=deadline)break;

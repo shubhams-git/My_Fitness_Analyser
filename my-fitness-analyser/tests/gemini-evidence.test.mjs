@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {fetchGarminRecovery,mergeGarminRecovery} from '../prototypes/garmin-recovery.mjs';
 import {coachingEvidence,coachingViews} from '../analysis/coaching-evidence.mjs';
 import {coachingGenerationRequest,TrainingIntelligence} from '../cloud/intelligence.mjs';
-import {geminiAttempt,personalGeminiKeys,structuredGeminiRequest} from '../cloud/gemini-router.mjs';
+import {geminiAttempt,geminiKeys,structuredGeminiRequest} from '../cloud/gemini-router.mjs';
 import {TRAINING_ROUTE} from '../cloud/training-job-policy.mjs';
 import {syntheticHistory} from '../prototypes/training-data.mjs';
 import {geminiOutput} from './gemini-fixture.mjs';
@@ -58,16 +58,16 @@ test('Garmin range projection preserves separate coverage, quality and gaps with
  }
 });
 
-test('older consent blocks before reading evidence and personal keys are resolved independently',async()=>{
- const env={GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_API_KEY:'free',GEMINI_API_KEY_2:'free2'};
+test('older consent blocks before reading evidence and production uses one five-key pool',async()=>{
+ const env={GEMINI_API_KEY:'a',GEMINI_API_KEY_2:'b',GEMINI_API_KEY_3:'c',GEMINI_API_KEY_4:'d',GEMINI_API_KEY_5:'e'};
  const api={config:{owner:'member'},json:async()=>[{enabled:true,disclosure_version:'gemini-training-v2',revision:4}]};
  const engine=new TrainingIntelligence(api,{read:async()=>assert.fail('read evidence')},{durable:true,wholeTraining:true,env});
  assert.equal((await engine.status()).consent.enabled,null);
  await assert.rejects(engine.enqueue(),error=>error.status===403);
- assert.deepEqual(personalGeminiKeys({...env,GEMINI_PERSONAL_DATA_APPROVED:'1'}),[]);
- const personal={...env,GEMINI_PERSONAL_API_KEY:'free',GEMINI_PERSONAL_API_KEY_2:'free2',GEMINI_PERSONAL_API_KEY_3:'free'};
- assert.deepEqual(personalGeminiKeys(personal),[]);
- assert.deepEqual(personalGeminiKeys({...personal,GEMINI_PERSONAL_DATA_APPROVED:'1'}),['free','free2']);
+ assert.equal(engine.configured(),true);
+ assert.deepEqual(geminiKeys({...env,GEMINI_API_KEY_1:'ignored'}),['a','b','c','d','e']);
+ env.GEMINI_API_KEY_5=' a ';
+ assert.equal(engine.configured(),false);
  assert.deepEqual(TRAINING_ROUTE.map(({model,timeout})=>[model,timeout]),[
   ['gemini-3.6-flash',120000],['gemini-3.6-flash',70000],['gemini-3-flash-preview',55000],['gemini-3.1-flash-lite',40000]
  ]);

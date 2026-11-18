@@ -1,5 +1,5 @@
 import {CloudGoals} from './goals.mjs';
-import {MODEL_POLICY,modelRoute,generationConfig,routedGemini,personalGeminiKeys,sharedGeminiKey,structuredGeminiRequest} from './gemini-router.mjs';
+import {MODEL_POLICY,modelRoute,generationConfig,routedGemini,geminiKeys,GEMINI_POOL_SIZE,sharedGeminiKey,structuredGeminiRequest} from './gemini-router.mjs';
 import {CloudZones} from './zones.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
@@ -116,7 +116,7 @@ const recordedReason=context=>discomfortVerdict(context.pack)?'discomfort'
 export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false,durable=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.durable=durable;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
  preference(){return aiPreference(this.api,this.disclosure);}
- configured(){return personalGeminiKeys(this.env).length>=2;}
+ configured(){return geminiKeys(this.env).length===GEMINI_POOL_SIZE;}
  async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,includeRecovery:this.durable,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=(hash,prompt=COACH_PROMPT)=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,prompt,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash),previousPromptKey:fingerprint(pack.hash,PREVIOUS_COACH_PROMPT)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
@@ -151,7 +151,7 @@ export class TrainingIntelligence {
   const cached=await this.saved(context);
   if(cached?.evidence_key===context.key&&cached.model_id===context.model)return {review:this.item(cached,context.key),job:null};
   const evidenceKey=context.key;
-  const signature=signTrainingJob(personalGeminiKeys(this.env)[0],{owner:this.api.config.owner,evidenceKey,consentRevision:pref.revision,pack:context.pack});
+  const signature=signTrainingJob(geminiKeys(this.env)[0],{owner:this.api.config.owner,evidenceKey,consentRevision:pref.revision,pack:context.pack});
   const claim=await this.api.request('/rest/v1/rpc/enqueue_training_job',{method:'POST',body:{evidence_key:evidenceKey,evidence_pack:context.pack,consent_revision:pref.revision,job_signature:signature,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
   if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===429?429:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===429?'Please wait a moment before requesting another analysis.':'The background analysis could not be queued. Try again shortly.');
   return {job:await claim.json()};
@@ -168,7 +168,7 @@ export class TrainingIntelligence {
   const claim=await this.api.request('/rest/v1/rpc/begin_training_review',{method:'POST',body:{evidence_key:context.key,model_id:context.model,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
   if(claim.status===429)return recordedBrief(context,'cooldown');
   if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===409?409:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===409?'A review is already running. Try again shortly.':'The review could not start. Please retry.');
-  const id=await claim.json(),keys=personalGeminiKeys(this.env);
+  const id=await claim.json(),keys=geminiKeys(this.env);
   let trace=[];try{
    const routed=await routedGemini({task:'run-coaching',keys,reserveKey:sharedGeminiKey(this.api,'run-coaching',id,keys),fetcher:this.fetcher,request:entry=>{const legacy=coachingRequest(context.pack,entry.model,entry.thinking);return structuredGeminiRequest({instruction:legacy.system_instruction,input:JSON.parse(legacy.input),schema:legacy.response_format.schema});},validate:(json,entry)=>extractCoaching(json,context.pack),beforeAttempt:async()=>{if((await this.context()).key!==context.key)throw new CloudError(409,'Your goals, zones or training changed. Review the updated record.');const latestPref=await this.preference();if(latestPref.enabled!==true||latestPref.revision!==pref.revision)throw new CloudError(403,'Gemini sharing changed. This review stopped.');}});
    trace=routed.attempts.map(legacyAttempt);const report=routed.report;

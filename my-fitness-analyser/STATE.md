@@ -5,6 +5,8 @@ Completed increment: consented recovery evidence and counted Gemini requests (F2
 
 ## Implemented
 
+- The next hosted release uses one five-key Gemini rotation pool for Training and Weight. Configure the five named Production keys before deploying. See [Gemini data sharing](docs/GEMINI_DATA_SHARING.md).
+
 - Hosted Garmin sync saves up to 28 days of allowlisted sleep, HRV and daily wellness summaries for the connected member. Training includes up to 24 detailed outdoor runs with recovery coverage and comparison windows, under the renewed v3 disclosure.
 - The worker counts the complete request using the selected model before every generation. Training uses a 120-second primary attempt, then 70/55/40-second fallbacks. Missing counts fail closed. The final fallback starts with a smaller evidence view.
 - Production Supabase records migrations 20261118120000 and 20261119120000 in the private release ledger. Personal provider calls require an approved project. Existing Free keys remain suitable for synthetic testing only. See [Gemini data sharing](docs/GEMINI_DATA_SHARING.md).

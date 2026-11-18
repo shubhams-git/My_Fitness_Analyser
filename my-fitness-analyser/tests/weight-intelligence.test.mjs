@@ -7,7 +7,7 @@ import { weightTrend } from '../prototypes/weight-trend.js';
 import { weightEvidence } from '../analysis/weight-evidence.mjs';
 import { validateWeightReport,WEIGHT_SCHEMA,WEIGHT_PROMPT } from '../analysis/weight-contract.mjs';
 import { WeightIntelligence,weightRequest } from '../cloud/weight-intelligence.mjs';
-const keyEnv={GEMINI_PERSONAL_API_KEY:'test-secret',GEMINI_PERSONAL_API_KEY_2:'second-secret',GEMINI_PERSONAL_DATA_APPROVED:'1'};
+const keyEnv={GEMINI_API_KEY:'test-secret',GEMINI_API_KEY_2:'second-secret',GEMINI_API_KEY_3:'test-third',GEMINI_API_KEY_4:'test-fourth',GEMINI_API_KEY_5:'test-fifth'};
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 const data={anchor:'2026-11-08',today:'2026-11-08',points:Array.from({length:12},(_,i)=>({date:new Date(Date.UTC(2026,8,1+i*3)).toISOString().slice(0,10),kg:80-i*.1+Math.sin(i)*.2,readings:1})),note:'secret note',viewer:{id:owner,email:'private@example.test'}};
 function report(p){return {schemaVersion:WEIGHT_SCHEMA,evidenceHash:p.hash,headline:'Your recorded trend moved by {period.trendDifference}.',explanation:'Across {history.days} recorded days, the trend changed. Your latest reading is {latest.age} old.',advice:'Keep your usual routine and compare the next few readings.',signal:{factId:'period.trendChange',direction:'down'},factIds:['period.trendChange','period.trendDifference','history.days','latest.age'],focus:'trend',nextStep:'refresh-readings',supportingFactIds:['period.trendChange','history.days']};}
@@ -50,7 +50,7 @@ const providerResult=value=>Response.json({
 test('weight AI is explicit and consent-scoped, caches valid reports and bounds free-model fallbacks',async()=>{
  let enabled=false,calls=0,reads=0,saved=null,status=200;
  const api={config:{owner},json:async(path,options)=>{if(path.includes('weight_ai_preferences'))return [{enabled,disclosure_version:'gemini-weight-v1',revision:1}];if(path.includes('reserve_weight_gemini'))return {slot:calls%2+1};if(path.includes('finish_weight_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:'gemini-3.6-flash',schema_version:WEIGHT_SCHEMA,prompt_version:WEIGHT_PROMPT,finished_at:new Date().toISOString()};return true;}return saved?[saved]:[];},request:async path=>Response.json(path.includes('training_worker_ready')?true:'saved')};
- const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:countedProvider(async(url,options)=>{calls++;assert.match(url,/gemini-(3\.6-flash|3-flash-preview|3\.1-flash-lite):generateContent$/);assert.equal(options.headers['x-goog-api-key'],calls%2===1?keyEnv.GEMINI_PERSONAL_API_KEY:keyEnv.GEMINI_PERSONAL_API_KEY_2);return status===200?providerResult({...report((await engine.context()).pack),worthKnowing:'A moving average keeps earlier readings in the calculation. It can lag when a trend changes direction.'}):new Response('private body test-secret',{status});})});
+ const engine=new WeightIntelligence(api,{journal:{dataset:async()=>{reads++;return data;}},env:keyEnv,fetcher:countedProvider(async(url,options)=>{calls++;assert.match(url,/gemini-(3\.6-flash|3-flash-preview|3\.1-flash-lite):generateContent$/);assert.equal(options.headers['x-goog-api-key'],calls%2===1?keyEnv.GEMINI_API_KEY:keyEnv.GEMINI_API_KEY_2);return status===200?providerResult({...report((await engine.context()).pack),worthKnowing:'A moving average keeps earlier readings in the calculation. It can lag when a trend changes direction.'}):new Response('private body test-secret',{status});})});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(reads,0);assert.equal(calls,0);
  enabled=true;await engine.generate();await engine.generate();assert.equal(calls,1);assert.equal((await engine.status()).review.stale,false);assert.equal((await engine.status()).review.report.worthKnowing,'A moving average keeps earlier readings in the calculation. It can lag when a trend changes direction.');
  saved.prompt_version='weight-coach-v5';saved.evidence_key='older-prompt';
@@ -73,7 +73,7 @@ test('weight reaches the final model with rotated keys and preserves all attempt
  }};
  engine=new WeightIntelligence(api,{env:keyEnv,journal:{dataset:async()=>data},fetcher:countedProvider(async(url,options)=>{
   assert.ok(url.endsWith(models[calls]+':generateContent'));
-  assert.equal(options.headers['x-goog-api-key'],calls%2===0?keyEnv.GEMINI_PERSONAL_API_KEY:keyEnv.GEMINI_PERSONAL_API_KEY_2);
+  assert.equal(options.headers['x-goog-api-key'],calls%2===0?keyEnv.GEMINI_API_KEY:keyEnv.GEMINI_API_KEY_2);
   calls++;
   if(calls===1)throw new DOMException('timeout','TimeoutError');
   if(calls===2)return new Response('',{status:503});

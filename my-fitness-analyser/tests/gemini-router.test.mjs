@@ -4,9 +4,9 @@ import {routedGemini,modelRoute,geminiKeys,structuredGeminiRequest,sharedGeminiK
 import { PGlite } from '@electric-sql/pglite';
 import { readFile } from 'node:fs/promises';
 const request=entry=>structuredGeminiRequest({instruction:'example',input:{model:entry.model},schema:{}});
-test('free-confirmed pool deduplicates keys and rotates on every attempted request',async()=>{
+test('Gemini pool deduplicates keys and rotates on every attempted request',async()=>{
  const env={GEMINI_API_KEY:'a',GEMINI_API_KEY_2:'b',GEMINI_API_KEY_3:'a',GEMINI_API_KEY_4:'c'};
- assert.deepEqual(geminiKeys(env),['a']);env.GEMINI_KEY_POOL_FREE_CONFIRMED='1';const keys=geminiKeys(env),used=[],requests=[];
+ assert.deepEqual(geminiKeys(env),['a','b','c']);const keys=geminiKeys(env),used=[],requests=[];
  const result=await routedGemini({task:'run-coaching',keys,request,validate:j=>j,fetcher:countedProvider(async(_,o)=>{used.push(o.headers['x-goog-api-key']);requests.push(JSON.parse(o.body));return used.length<3?new Response('private',{status:503}):geminiOutput({ok:true});})});
  assert.equal(new Set(used).size,3);assert.equal(result.model,'gemini-3.1-flash-lite');assert.deepEqual(requests.map(r=>JSON.parse(r.contents[0].parts[0].text).model),['gemini-3.8-flash','gemini-3.6-flash','gemini-3.1-flash-lite']);assert.ok(!JSON.stringify(result.attempts).includes('x-goog-api-key'));
  assert.deepEqual(modelRoute('summary-format').map(e=>e.model),['gemini-3.8-flash','gemini-3.6-flash','gemini-3.5-flash-lite','gemini-3.1-flash-lite']);

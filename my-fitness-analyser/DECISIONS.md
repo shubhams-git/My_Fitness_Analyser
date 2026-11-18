@@ -367,3 +367,7 @@ summary and keep the previous Gemini brief in storage.
 ## 19 November 2026 · Garmin recovery and counted Gemini input
 
 The hosted Training worker now receives an expanded allowlisted evidence pack, requires the versioned training-and-recovery consent, and counts the full request using the selected model before sending generation. The primary generation timeout is 120 seconds. Training retains a recorded fallback. Personal requests require a separately verified Gemini project. The previous Free-only configuration supports synthetic validation. See [the deployed data and request contract](docs/GEMINI_DATA_SHARING.md).
+
+## 19 November 2026 · One hosted Gemini key pool
+
+Training and Weight rotate five distinct credentials from the same production settings. Member consent still governs sharing. Production uses the base key and suffixes 2, 3, 4 and 5.

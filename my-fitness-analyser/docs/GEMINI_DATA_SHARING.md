@@ -6,7 +6,7 @@ Updated 19 November 2026. The hosted Training request queues a Supabase job. The
 
 Account → AI preferences asks members to allow training and recovery sharing under `gemini-training-v3`. Earlier approvals require a new choice. The client sends the disclosure version it displayed, and Supabase checks the current version and revision at enqueue, claim, provider reservation, token counting, generation and publication. Switching off cancels pending work and hides saved briefings. Completed reports remain in the private database. Previously transmitted requests cannot be recalled.
 
-Google prohibits personal and sensitive submissions to its unpaid service. `GEMINI_API_KEY` and the optional Free pool are for generated data only. Hosted Training and weight require `GEMINI_PERSONAL_DATA_APPROVED=1` and at least two distinct `GEMINI_PERSONAL_API_KEY*` credentials from an approved project. This setting records operator verification of provider terms and project configuration. The application does not enable billing or use a paid fallback automatically. The production project currently has no approved personal-data credentials. [Google Gemini terms](https://aistudio.google.com/docs/terms#unpaid-services).
+Hosted Training and Weight share a rotation pool of five distinct server-side Gemini credentials. Set `GEMINI_API_KEY`, `GEMINI_API_KEY_2`, `GEMINI_API_KEY_3`, `GEMINI_API_KEY_4` and `GEMINI_API_KEY_5` in Vercel Production and redeploy. Use keys from a project whose terms permit personal data. Google prohibits personal and sensitive submissions to its unpaid service. [Google Gemini terms](https://aistudio.google.com/docs/terms#unpaid-services).
 
 ## Training evidence
 
