@@ -363,3 +363,7 @@ owner consent, the concurrent review guard, and evidence cache. Use a thirty
 second cooldown instead of counting failed attempts toward a daily cap. When
 Gemini cannot return a validated brief, show a labelled, evidence-backed run
 summary and keep the previous Gemini brief in storage.
+
+## 19 November 2026 · Garmin recovery and counted Gemini input
+
+The hosted Training worker now receives an expanded allowlisted evidence pack, requires the versioned training-and-recovery consent, and counts the full request using the selected model before sending generation. The primary generation timeout is 120 seconds. Training retains a recorded fallback. Personal requests require a separately verified Gemini project. The previous Free-only configuration supports synthetic validation. See [the deployed data and request contract](docs/GEMINI_DATA_SHARING.md).

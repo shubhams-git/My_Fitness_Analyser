@@ -4,7 +4,7 @@
     "time": null
   },
   "zoneContext": [],
-  "version": "coaching-evidence-v5",
+  "version": "coaching-evidence-v6",
   "dataset": "personal",
   "scope": "Outdoor Garmin runs for performance. Other recorded workouts provide context for the next run.",
   "runsInHistory": 9,
@@ -1996,6 +1996,3478 @@
       "sessionIds": []
     },
     {
+      "id": "recovery.sleep.d0.sleepS",
+      "label": "Estimated sleep",
+      "value": 24800,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.napS",
+      "label": "Estimated nap time",
+      "value": 1200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d0.score",
+      "label": "Garmin sleep score",
+      "value": 68,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.sleepS",
+      "label": "Estimated sleep",
+      "value": 25230,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d1.score",
+      "label": "Garmin sleep score",
+      "value": 69,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.sleepS",
+      "label": "Estimated sleep",
+      "value": 25660,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d2.score",
+      "label": "Garmin sleep score",
+      "value": 70,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.sleepS",
+      "label": "Estimated sleep",
+      "value": 26090,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d3.score",
+      "label": "Garmin sleep score",
+      "value": 71,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.sleepS",
+      "label": "Estimated sleep",
+      "value": 26520,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d4.score",
+      "label": "Garmin sleep score",
+      "value": 72,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.sleepS",
+      "label": "Estimated sleep",
+      "value": 26950,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.napS",
+      "label": "Estimated nap time",
+      "value": 1200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d5.score",
+      "label": "Garmin sleep score",
+      "value": 73,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.sleepS",
+      "label": "Estimated sleep",
+      "value": 24800,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d6.score",
+      "label": "Garmin sleep score",
+      "value": 74,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.sleepS",
+      "label": "Estimated sleep",
+      "value": 25660,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d8.score",
+      "label": "Garmin sleep score",
+      "value": 76,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.sleepS",
+      "label": "Estimated sleep",
+      "value": 26090,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d9.score",
+      "label": "Garmin sleep score",
+      "value": 77,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.sleepS",
+      "label": "Estimated sleep",
+      "value": 26520,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.napS",
+      "label": "Estimated nap time",
+      "value": 1200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d10.score",
+      "label": "Garmin sleep score",
+      "value": 78,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.sleepS",
+      "label": "Estimated sleep",
+      "value": 26950,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d11.score",
+      "label": "Garmin sleep score",
+      "value": 79,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.sleepS",
+      "label": "Estimated sleep",
+      "value": 24800,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d12.score",
+      "label": "Garmin sleep score",
+      "value": 80,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.sleepS",
+      "label": "Estimated sleep",
+      "value": 25230,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d13.score",
+      "label": "Garmin sleep score",
+      "value": 81,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.sleepS",
+      "label": "Estimated sleep",
+      "value": 25660,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d14.score",
+      "label": "Garmin sleep score",
+      "value": 82,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.sleepS",
+      "label": "Estimated sleep",
+      "value": 26520,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d16.score",
+      "label": "Garmin sleep score",
+      "value": 84,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.sleepS",
+      "label": "Estimated sleep",
+      "value": 26950,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d17.score",
+      "label": "Garmin sleep score",
+      "value": 85,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.sleepS",
+      "label": "Estimated sleep",
+      "value": 24800,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d18.score",
+      "label": "Garmin sleep score",
+      "value": 86,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.sleepS",
+      "label": "Estimated sleep",
+      "value": 25230,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d19.score",
+      "label": "Garmin sleep score",
+      "value": 87,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.sleepS",
+      "label": "Estimated sleep",
+      "value": 25660,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.napS",
+      "label": "Estimated nap time",
+      "value": 1200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d20.score",
+      "label": "Garmin sleep score",
+      "value": 68,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.sleepS",
+      "label": "Estimated sleep",
+      "value": 26090,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d21.score",
+      "label": "Garmin sleep score",
+      "value": 69,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.sleepS",
+      "label": "Estimated sleep",
+      "value": 26520,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d22.score",
+      "label": "Garmin sleep score",
+      "value": 70,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.sleepS",
+      "label": "Estimated sleep",
+      "value": 24800,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d24.score",
+      "label": "Garmin sleep score",
+      "value": 72,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.sleepS",
+      "label": "Estimated sleep",
+      "value": 25230,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.napS",
+      "label": "Estimated nap time",
+      "value": 1200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d25.score",
+      "label": "Garmin sleep score",
+      "value": 73,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.sleepS",
+      "label": "Estimated sleep",
+      "value": 25660,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d26.score",
+      "label": "Garmin sleep score",
+      "value": 74,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.sleepS",
+      "label": "Estimated sleep",
+      "value": 26090,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.napS",
+      "label": "Estimated nap time",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.deepS",
+      "label": "Estimated deep sleep",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.lightS",
+      "label": "Estimated light sleep",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.remS",
+      "label": "Estimated REM sleep",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.awakeS",
+      "label": "Estimated awake time",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.unmeasuredS",
+      "label": "Unmeasured time in sleep window",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.d27.score",
+      "label": "Garmin sleep score",
+      "value": 75,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.sleepS",
+      "label": "Estimated sleep mean across recorded days",
+      "value": 25721.4,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.sleepSDays",
+      "label": "Estimated sleep days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.napS",
+      "label": "Estimated nap time mean across recorded days",
+      "value": 342.9,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.napSDays",
+      "label": "Estimated nap time days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.deepS",
+      "label": "Estimated deep sleep mean across recorded days",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.deepSDays",
+      "label": "Estimated deep sleep days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.lightS",
+      "label": "Estimated light sleep mean across recorded days",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.lightSDays",
+      "label": "Estimated light sleep days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.remS",
+      "label": "Estimated REM sleep mean across recorded days",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.remSDays",
+      "label": "Estimated REM sleep days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.awakeS",
+      "label": "Estimated awake time mean across recorded days",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.awakeSDays",
+      "label": "Estimated awake time days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.unmeasuredS",
+      "label": "Unmeasured time in sleep window mean across recorded days",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.unmeasuredSDays",
+      "label": "Unmeasured time in sleep window days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.score",
+      "label": "Garmin sleep score mean across recorded days",
+      "value": 71,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent7.scoreDays",
+      "label": "Garmin sleep score days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.sleepS",
+      "label": "Estimated sleep mean across recorded days",
+      "value": 25875,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.sleepSDays",
+      "label": "Estimated sleep days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.napS",
+      "label": "Estimated nap time mean across recorded days",
+      "value": 200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.napSDays",
+      "label": "Estimated nap time days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.deepS",
+      "label": "Estimated deep sleep mean across recorded days",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.deepSDays",
+      "label": "Estimated deep sleep days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.lightS",
+      "label": "Estimated light sleep mean across recorded days",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.lightSDays",
+      "label": "Estimated light sleep days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.remS",
+      "label": "Estimated REM sleep mean across recorded days",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.remSDays",
+      "label": "Estimated REM sleep days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.awakeS",
+      "label": "Estimated awake time mean across recorded days",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.awakeSDays",
+      "label": "Estimated awake time days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.unmeasuredS",
+      "label": "Unmeasured time in sleep window mean across recorded days",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.unmeasuredSDays",
+      "label": "Unmeasured time in sleep window days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.score",
+      "label": "Garmin sleep score mean across recorded days",
+      "value": 78.5,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.previous7.scoreDays",
+      "label": "Garmin sleep score days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.sleepS",
+      "label": "Estimated sleep mean across recorded days",
+      "value": 25780.4,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.sleepSDays",
+      "label": "Estimated sleep days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.napS",
+      "label": "Estimated nap time mean across recorded days",
+      "value": 240,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.napSDays",
+      "label": "Estimated nap time days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.deepS",
+      "label": "Estimated deep sleep mean across recorded days",
+      "value": 4200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.deepSDays",
+      "label": "Estimated deep sleep days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.lightS",
+      "label": "Estimated light sleep mean across recorded days",
+      "value": 15200,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.lightSDays",
+      "label": "Estimated light sleep days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.remS",
+      "label": "Estimated REM sleep mean across recorded days",
+      "value": 5500,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.remSDays",
+      "label": "Estimated REM sleep days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.awakeS",
+      "label": "Estimated awake time mean across recorded days",
+      "value": 1000,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.awakeSDays",
+      "label": "Estimated awake time days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.unmeasuredS",
+      "label": "Unmeasured time in sleep window mean across recorded days",
+      "value": 0,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.unmeasuredSDays",
+      "label": "Unmeasured time in sleep window days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.score",
+      "label": "Garmin sleep score mean across recorded days",
+      "value": 75.7,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.sleep.recent28.scoreDays",
+      "label": "Garmin sleep score days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d0.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 43,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d0.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d1.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 44,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d1.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d2.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 45,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d2.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d3.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 46,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d3.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d4.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 47,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d4.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d5.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 48,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d5.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d6.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 49,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d6.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d8.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d8.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d9.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d9.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d10.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 53,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d10.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d11.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 54,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d11.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d12.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 55,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d12.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d13.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 56,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d13.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d14.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 43,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d14.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d16.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 45,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d16.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d17.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 46,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d17.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d18.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 47,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d18.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d19.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 48,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d19.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d20.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 49,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d20.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d21.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d21.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d22.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d22.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d24.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 53,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d24.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d25.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 54,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d25.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d26.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 55,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d26.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 52,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d27.overnightMs",
+      "label": "Overnight average HRV",
+      "value": 56,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.d27.weeklyMs",
+      "label": "Garmin weekly average HRV",
+      "value": 50,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent7.overnightMs",
+      "label": "Overnight average HRV mean across recorded days",
+      "value": 46,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent7.overnightMsDays",
+      "label": "Overnight average HRV days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent7.weeklyMs",
+      "label": "Garmin weekly average HRV mean across recorded days",
+      "value": 50.9,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent7.weeklyMsDays",
+      "label": "Garmin weekly average HRV days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.previous7.overnightMs",
+      "label": "Overnight average HRV mean across recorded days",
+      "value": 53.5,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.previous7.overnightMsDays",
+      "label": "Overnight average HRV days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.previous7.weeklyMs",
+      "label": "Garmin weekly average HRV mean across recorded days",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.previous7.weeklyMsDays",
+      "label": "Garmin weekly average HRV days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent28.overnightMs",
+      "label": "Overnight average HRV mean across recorded days",
+      "value": 49.6,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent28.overnightMsDays",
+      "label": "Overnight average HRV days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent28.weeklyMs",
+      "label": "Garmin weekly average HRV mean across recorded days",
+      "value": 51,
+      "unit": "ms",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.hrv.recent28.weeklyMsDays",
+      "label": "Garmin weekly average HRV days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d0.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 48,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d0.stress",
+      "label": "Garmin daily average stress",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d0.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 18,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d0.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 78,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d0.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 45,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d0.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 38,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d1.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 49,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d1.stress",
+      "label": "Garmin daily average stress",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d1.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 19,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d1.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 79,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d1.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 46,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d1.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 39,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d2.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 50,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d2.stress",
+      "label": "Garmin daily average stress",
+      "value": 22,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d2.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d2.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 80,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d2.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 47,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d2.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 40,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d3.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 51,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d3.stress",
+      "label": "Garmin daily average stress",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d3.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d3.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 81,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d3.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 48,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d3.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 41,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d4.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 52,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d4.stress",
+      "label": "Garmin daily average stress",
+      "value": 24,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d4.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 22,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d4.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 82,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d4.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 49,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d4.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 42,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d5.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 48,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d5.stress",
+      "label": "Garmin daily average stress",
+      "value": 25,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d5.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d5.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 83,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d5.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 50,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d5.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 43,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d6.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 49,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d6.stress",
+      "label": "Garmin daily average stress",
+      "value": 26,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d6.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 24,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d6.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 84,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d6.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 51,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d6.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 44,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d8.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 51,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d8.stress",
+      "label": "Garmin daily average stress",
+      "value": 28,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d8.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 26,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d8.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 78,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d8.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 53,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d8.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 46,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d9.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 52,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d9.stress",
+      "label": "Garmin daily average stress",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d9.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 27,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d9.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 79,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d9.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 54,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d9.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 47,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d10.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 48,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d10.stress",
+      "label": "Garmin daily average stress",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d10.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 28,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d10.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 80,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d10.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 55,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d10.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 48,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d11.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 49,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d11.stress",
+      "label": "Garmin daily average stress",
+      "value": 22,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d11.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 18,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d11.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 81,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d11.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 56,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d11.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 49,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d12.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 50,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d12.stress",
+      "label": "Garmin daily average stress",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d12.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 19,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d12.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 82,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d12.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 45,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d12.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 50,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d13.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 51,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d13.stress",
+      "label": "Garmin daily average stress",
+      "value": 24,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d13.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d13.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 83,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d13.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 46,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d13.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 51,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d14.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 52,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d14.stress",
+      "label": "Garmin daily average stress",
+      "value": 25,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d14.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d14.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 84,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d14.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 47,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d14.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 52,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d16.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 49,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d16.stress",
+      "label": "Garmin daily average stress",
+      "value": 27,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d16.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d16.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 78,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d16.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 49,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d16.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 39,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d17.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 50,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d17.stress",
+      "label": "Garmin daily average stress",
+      "value": 28,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d17.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 24,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d17.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 79,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d17.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 50,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d17.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 40,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d18.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 51,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d18.stress",
+      "label": "Garmin daily average stress",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d18.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 25,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d18.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 80,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d18.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 51,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d18.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 41,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d19.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 52,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d19.stress",
+      "label": "Garmin daily average stress",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d19.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 26,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d19.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 81,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d19.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 52,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d19.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 42,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d20.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 48,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d20.stress",
+      "label": "Garmin daily average stress",
+      "value": 22,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d20.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 27,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d20.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 82,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d20.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 53,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d20.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 43,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d21.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 49,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d21.stress",
+      "label": "Garmin daily average stress",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d21.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 28,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d21.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 83,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d21.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 54,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d21.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 44,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d22.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 50,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d22.stress",
+      "label": "Garmin daily average stress",
+      "value": 24,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d22.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 18,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d22.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 84,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d22.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 55,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d22.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 45,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d24.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 52,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d24.stress",
+      "label": "Garmin daily average stress",
+      "value": 26,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d24.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d24.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 78,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d24.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 45,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d24.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 47,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d25.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 48,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d25.stress",
+      "label": "Garmin daily average stress",
+      "value": 27,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d25.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d25.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 79,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d25.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 46,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d25.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 48,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d26.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 49,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d26.stress",
+      "label": "Garmin daily average stress",
+      "value": 28,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d26.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 22,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d26.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 80,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d26.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 47,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d26.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 49,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d27.restingHrBpm",
+      "label": "Garmin resting heart rate",
+      "value": 50,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d27.stress",
+      "label": "Garmin daily average stress",
+      "value": 20,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d27.batteryMin",
+      "label": "Garmin daily Body Battery low",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d27.batteryMax",
+      "label": "Garmin daily Body Battery high",
+      "value": 81,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d27.batteryCharged",
+      "label": "Garmin daily Body Battery charge",
+      "value": 48,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.d27.batteryDrained",
+      "label": "Garmin daily Body Battery drain",
+      "value": 50,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.restingHrBpm",
+      "label": "Garmin resting heart rate mean across recorded days",
+      "value": 49.6,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.restingHrBpmDays",
+      "label": "Garmin resting heart rate days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.stress",
+      "label": "Garmin daily average stress mean across recorded days",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.stressDays",
+      "label": "Garmin daily average stress days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryMin",
+      "label": "Garmin daily Body Battery low mean across recorded days",
+      "value": 21,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryMinDays",
+      "label": "Garmin daily Body Battery low days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryMax",
+      "label": "Garmin daily Body Battery high mean across recorded days",
+      "value": 81,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryMaxDays",
+      "label": "Garmin daily Body Battery high days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryCharged",
+      "label": "Garmin daily Body Battery charge mean across recorded days",
+      "value": 48,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryChargedDays",
+      "label": "Garmin daily Body Battery charge days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryDrained",
+      "label": "Garmin daily Body Battery drain mean across recorded days",
+      "value": 41,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent7.batteryDrainedDays",
+      "label": "Garmin daily Body Battery drain days contributing to mean",
+      "value": 7,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.restingHrBpm",
+      "label": "Garmin resting heart rate mean across recorded days",
+      "value": 50.2,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.restingHrBpmDays",
+      "label": "Garmin resting heart rate days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.stress",
+      "label": "Garmin daily average stress mean across recorded days",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.stressDays",
+      "label": "Garmin daily average stress days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryMin",
+      "label": "Garmin daily Body Battery low mean across recorded days",
+      "value": 23,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryMinDays",
+      "label": "Garmin daily Body Battery low days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryMax",
+      "label": "Garmin daily Body Battery high mean across recorded days",
+      "value": 80.5,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryMaxDays",
+      "label": "Garmin daily Body Battery high days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryCharged",
+      "label": "Garmin daily Body Battery charge mean across recorded days",
+      "value": 51.5,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryChargedDays",
+      "label": "Garmin daily Body Battery charge days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryDrained",
+      "label": "Garmin daily Body Battery drain mean across recorded days",
+      "value": 48.5,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.previous7.batteryDrainedDays",
+      "label": "Garmin daily Body Battery drain days contributing to mean",
+      "value": 6,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.restingHrBpm",
+      "label": "Garmin resting heart rate mean across recorded days",
+      "value": 49.9,
+      "unit": "bpm",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.restingHrBpmDays",
+      "label": "Garmin resting heart rate days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.stress",
+      "label": "Garmin daily average stress mean across recorded days",
+      "value": 23.6,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.stressDays",
+      "label": "Garmin daily average stress days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryMin",
+      "label": "Garmin daily Body Battery low mean across recorded days",
+      "value": 22.5,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryMinDays",
+      "label": "Garmin daily Body Battery low days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryMax",
+      "label": "Garmin daily Body Battery high mean across recorded days",
+      "value": 80.8,
+      "unit": "score",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryMaxDays",
+      "label": "Garmin daily Body Battery high days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryCharged",
+      "label": "Garmin daily Body Battery charge mean across recorded days",
+      "value": 49.7,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryChargedDays",
+      "label": "Garmin daily Body Battery charge days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryDrained",
+      "label": "Garmin daily Body Battery drain mean across recorded days",
+      "value": 44.7,
+      "unit": "points",
+      "sessionIds": []
+    },
+    {
+      "id": "recovery.wellness.recent28.batteryDrainedDays",
+      "label": "Garmin daily Body Battery drain days contributing to mean",
+      "value": 25,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
       "id": "workouts.strength.count",
       "label": "Recent strength sessions",
       "value": 1,
@@ -2101,5 +5573,962 @@
         ]
       }
     ]
+  },
+  "recovery": {
+    "source": "Garmin Connect",
+    "windowDays": 28,
+    "dayBasis": "Garmin calendar date; sleep is the provider-labelled night.",
+    "limitations": "Watch-derived estimates. Missing days and fields are unknown. Today may be incomplete. Stage estimates, HRV, stress and Body Battery are context, not clinical or readiness measurements.",
+    "domains": {
+      "sleep": {
+        "state": "fetched",
+        "syncedDaysAgo": 0,
+        "recordedDays": 25,
+        "coverage": {
+          "sleepS": 25,
+          "napS": 25,
+          "deepS": 25,
+          "lightS": 25,
+          "remS": 25,
+          "awakeS": 25,
+          "unmeasuredS": 25,
+          "score": 25
+        },
+        "rows": [
+          {
+            "daysAgo": 0,
+            "ref": "recovery.sleep.d0",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": false,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 1,
+            "ref": "recovery.sleep.d1",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 2,
+            "ref": "recovery.sleep.d2",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 3,
+            "ref": "recovery.sleep.d3",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 4,
+            "ref": "recovery.sleep.d4",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 5,
+            "ref": "recovery.sleep.d5",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 6,
+            "ref": "recovery.sleep.d6",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 8,
+            "ref": "recovery.sleep.d8",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 9,
+            "ref": "recovery.sleep.d9",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 10,
+            "ref": "recovery.sleep.d10",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 11,
+            "ref": "recovery.sleep.d11",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 12,
+            "ref": "recovery.sleep.d12",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 13,
+            "ref": "recovery.sleep.d13",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 14,
+            "ref": "recovery.sleep.d14",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 16,
+            "ref": "recovery.sleep.d16",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 17,
+            "ref": "recovery.sleep.d17",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 18,
+            "ref": "recovery.sleep.d18",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 19,
+            "ref": "recovery.sleep.d19",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 20,
+            "ref": "recovery.sleep.d20",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 21,
+            "ref": "recovery.sleep.d21",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 22,
+            "ref": "recovery.sleep.d22",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 24,
+            "ref": "recovery.sleep.d24",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 25,
+            "ref": "recovery.sleep.d25",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 26,
+            "ref": "recovery.sleep.d26",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          },
+          {
+            "daysAgo": 27,
+            "ref": "recovery.sleep.d27",
+            "metrics": [
+              "sleepS",
+              "napS",
+              "deepS",
+              "lightS",
+              "remS",
+              "awakeS",
+              "unmeasuredS",
+              "score"
+            ],
+            "windowConfirmed": true,
+            "fromDevice": true
+          }
+        ]
+      },
+      "hrv": {
+        "state": "fetched",
+        "syncedDaysAgo": 0,
+        "recordedDays": 25,
+        "coverage": {
+          "overnightMs": 25,
+          "weeklyMs": 25
+        },
+        "rows": [
+          {
+            "daysAgo": 0,
+            "ref": "recovery.hrv.d0",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 1,
+            "ref": "recovery.hrv.d1",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 2,
+            "ref": "recovery.hrv.d2",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 3,
+            "ref": "recovery.hrv.d3",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 4,
+            "ref": "recovery.hrv.d4",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 5,
+            "ref": "recovery.hrv.d5",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 6,
+            "ref": "recovery.hrv.d6",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 8,
+            "ref": "recovery.hrv.d8",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 9,
+            "ref": "recovery.hrv.d9",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 10,
+            "ref": "recovery.hrv.d10",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 11,
+            "ref": "recovery.hrv.d11",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 12,
+            "ref": "recovery.hrv.d12",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 13,
+            "ref": "recovery.hrv.d13",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 14,
+            "ref": "recovery.hrv.d14",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 16,
+            "ref": "recovery.hrv.d16",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 17,
+            "ref": "recovery.hrv.d17",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 18,
+            "ref": "recovery.hrv.d18",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 19,
+            "ref": "recovery.hrv.d19",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 20,
+            "ref": "recovery.hrv.d20",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 21,
+            "ref": "recovery.hrv.d21",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 22,
+            "ref": "recovery.hrv.d22",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 24,
+            "ref": "recovery.hrv.d24",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 25,
+            "ref": "recovery.hrv.d25",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 26,
+            "ref": "recovery.hrv.d26",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          },
+          {
+            "daysAgo": 27,
+            "ref": "recovery.hrv.d27",
+            "metrics": [
+              "overnightMs",
+              "weeklyMs"
+            ]
+          }
+        ]
+      },
+      "wellness": {
+        "state": "fetched",
+        "syncedDaysAgo": 0,
+        "recordedDays": 25,
+        "coverage": {
+          "restingHrBpm": 25,
+          "stress": 25,
+          "batteryMin": 25,
+          "batteryMax": 25,
+          "batteryCharged": 25,
+          "batteryDrained": 25
+        },
+        "rows": [
+          {
+            "daysAgo": 0,
+            "ref": "recovery.wellness.d0",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 1,
+            "ref": "recovery.wellness.d1",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 2,
+            "ref": "recovery.wellness.d2",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 3,
+            "ref": "recovery.wellness.d3",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 4,
+            "ref": "recovery.wellness.d4",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 5,
+            "ref": "recovery.wellness.d5",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 6,
+            "ref": "recovery.wellness.d6",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 8,
+            "ref": "recovery.wellness.d8",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 9,
+            "ref": "recovery.wellness.d9",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 10,
+            "ref": "recovery.wellness.d10",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 11,
+            "ref": "recovery.wellness.d11",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 12,
+            "ref": "recovery.wellness.d12",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 13,
+            "ref": "recovery.wellness.d13",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 14,
+            "ref": "recovery.wellness.d14",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 16,
+            "ref": "recovery.wellness.d16",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 17,
+            "ref": "recovery.wellness.d17",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 18,
+            "ref": "recovery.wellness.d18",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 19,
+            "ref": "recovery.wellness.d19",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 20,
+            "ref": "recovery.wellness.d20",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 21,
+            "ref": "recovery.wellness.d21",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 22,
+            "ref": "recovery.wellness.d22",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 24,
+            "ref": "recovery.wellness.d24",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 25,
+            "ref": "recovery.wellness.d25",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 26,
+            "ref": "recovery.wellness.d26",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          },
+          {
+            "daysAgo": 27,
+            "ref": "recovery.wellness.d27",
+            "metrics": [
+              "restingHrBpm",
+              "stress",
+              "batteryMin",
+              "batteryMax",
+              "batteryCharged",
+              "batteryDrained"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "runCoverage": {
+    "detailedRuns": 9,
+    "oldestDetailedDaysAgo": 37,
+    "splitLimitPerRun": 16,
+    "runsEligibleForDetailedZones": 8
   }
 }

@@ -3,17 +3,9 @@
 For the current hosted Training and weight prompts, all transmitted fields,
 synthetic request examples and fallback policy, see [Gemini data sharing](GEMINI_DATA_SHARING.md).
 
-Current update, 7 November: F08 adds owner-consented personal run briefings with a
-new evidence/schema/client, private reports and Account AI preferences. See
-[F08](../features/F08-coaching-intelligence.md). The synthetic-only pipeline below
-remains the local lab's historical contract; it no longer describes opted-in
-hosted member generation. Gemini 3.6 high thinking passed the current synthetic
-provider test; 3.8/3.7 returned 503. No provider billing change was made.
-
-Implemented 5 November 2026. The owner's current direction is to defer database
-setup, use the local Garmin library for UI, and use **synthetic data only for
-Gemini**. Billing was confirmed active; the Gemini key has not been added. No
-live model response or personal-data model analysis has been verified.
+This page describes the synthetic-only local lab. The hosted Training and
+Journal analysis use separate evidence builders, consent and publication paths.
+The local lab sends generated records through the counted Generate Content path.
 
 ## One pipeline, two explicit data modes
 
@@ -25,7 +17,7 @@ flowchart LR
   N --> D[Versioned measurements and coverage]
   D --> U[Personal training overview]
   S[Generated synthetic history] --> E[Bounded evidence pack]
-  E --> M[Gemini: one review tool]
+  E --> M[Gemini: counted JSON generation]
   M --> V[Schema and evidence validation]
   V --> C[Private local response cache]
   C --> R[Separate synthetic analysis lab]
@@ -98,8 +90,7 @@ restricted to enums built from this request's evidence. The response includes
 the exact evidence hash and version. Confidence is an evidence category, not a
 calibrated probability.
 
-Only a complete/requires-action response with exactly one correct function call
-and object arguments enters validation. Ajv checks the complete JSON Schema
+Only a complete response with a single JSON output enters validation. Ajv checks the complete JSON Schema
 locally, including lengths Google may not enforce. Evidence checks reject
 unavailable chart measurements, unknown IDs, pace findings without an eligible
 comparison, false insufficient-history assertions and coverage findings without
@@ -128,12 +119,11 @@ separate sections with explicit labels.
   prompt and schema versions. Cached responses are revalidated on read.
 - One-minute process-local cooldown after a request attempt. No automatic paid
   retries. This is a local cost guard, not distributed production rate limiting.
-- Fixed Google HTTPS destination, redirects rejected, ninety-second timeout,
-  bounded response size. Provider error bodies and keys never reach the UI.
+- Fixed Google HTTPS destination, redirects rejected, 120-second generation timeout,
+  12-second token preflight and a bounded response. Provider bodies and keys stay server-side.
 - Google quota/access/network/incomplete/schema errors preserve measured data.
   No invented replacement insight. No key field is rendered in the browser.
-- Public Vercel is synthetic preview only. Its analysis status is disabled;
-  no model request executes from the public deployment in this increment.
+- The local synthetic lab does not run on the hosted application.
 
 ## Run it
 
@@ -144,11 +134,6 @@ separate sections with explicit labels.
 5. Inspect citations and provenance. Repeating the same test reuses the saved
    validated response. Changed evidence/model/prompt/schema creates a new key.
 
-Gemini HTTP behavior is currently tested with mocked responses. A live provider
-call and generated-output evaluation remain pending the key. Private Supabase
-provisioning, real-data AI calls, strength/MASS context and scheduled analysis
-remain separate work.
-
 Optional visual fixture: `node tests/preview-training.mjs` serves a clearly
 labelled mocked review on port 4189 without provider requests. Modes `empty`
 and `invalid` exercise their respective UI states. This is test tooling, not a
@@ -158,9 +143,7 @@ live Gemini integration. Stop it before changing modes.
 
 - [3.5 Flash deprecation](https://aistudio.google.com/docs/models/gemini-3.5-flash)
 - [3.6 Flash capabilities](https://aistudio.google.com/docs/models/gemini-3.6-flash)
-- [Interactions overview](https://aistudio.google.com/docs/interactions-overview)
-- [Interactions REST schema](https://aistudio.google.com/api-reference/interactions-api)
-- [Function calling](https://aistudio.google.com/docs/function-calling)
+- [Token counting](https://aistudio.google.com/api-reference/tokens)
 - [Structured output and schema limits](https://aistudio.google.com/docs/structured-output)
 - [Gemini API terms](https://aistudio.google.com/docs/terms)
 

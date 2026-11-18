@@ -34,7 +34,11 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     if(route==='weight-ai-consent'&&request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await new WeightIntelligence(api,{env}).setPreference(body.enabled));return;}
     if(route==='ai-consent'){
       if(request.method==='GET'){send(200,await aiPreference(api,TRAINING_DISCLOSURE));return;}
-      if(request.method==='POST'){const body=JSON.parse((await readBody(request,4096)).toString());send(200,await setAiPreference(api,body.enabled,TRAINING_DISCLOSURE));return;}
+      if(request.method==='POST'){
+        const body=JSON.parse((await readBody(request,4096)).toString());
+        if(body.enabled===true&&body.disclosureVersion!==TRAINING_DISCLOSURE)throw new CloudError(409,'Reload Training and review the current Gemini sharing notice.');
+        send(200,await setAiPreference(api,body.enabled,TRAINING_DISCLOSURE));return;
+      }
     }
     if(route==='ai-review'&&['GET','POST'].includes(request.method)){
       const intelligence=new TrainingIntelligence(api,library,{env,wholeTraining:true,durable:true});
@@ -107,7 +111,12 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     if(route==='sync'&&request.method==='POST'){
       if(!garminConfigured)throw new CloudError(409,'Garmin is not connected to your account. You can import your own original FIT file.');
       const claim=await api.json('/rest/v1/rpc/claim_fitness_sync',{method:'POST',body:{}});if(!claim)throw new CloudError(409,'A Garmin sync is already running.');
-      try{const result=await new GarminSync(library,{keyReader:async()=>env.GARMIN_PERSONAL_API_KEY||'',cutoff:'2026-07-01'}).run();send(result.complete?200:502,result);}
+      try{
+        const profiles=await api.json(`/rest/v1/fitness_profiles?owner_id=eq.${api.config.owner}&select=timezone`);
+        const result=await new GarminSync(library,{keyReader:async()=>env.GARMIN_PERSONAL_API_KEY||'',cutoff:'2026-07-01',
+          recoveryAnchor:localDay(profiles[0]?.timezone||'Australia/Sydney')}).run();
+        send(result.complete?200:502,result);
+      }
       finally{await api.json('/rest/v1/rpc/release_fitness_sync',{method:'POST',body:{claim_id:claim}}).catch(()=>{});}return;
     }
     if(route==='export'&&request.method==='GET'){

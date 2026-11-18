@@ -1,22 +1,13 @@
 # Current state
 
-Updated: 18 November 2026 (Australia/Sydney)
-Completed local increment: bounded Gemini analysis recovery (F22)
+Updated: 19 November 2026 (Australia/Sydney)
+Completed increment: consented recovery evidence and counted Gemini requests (F22)
 
 ## Implemented
 
-- Local analysis recovery: two 3.6 Flash attempts (70s each), then 3 Flash
-  Preview (55s), then 3.1 Flash-Lite (40s), rotating keys at each reservation.
-  Weight now retries and SQL permits bounded reservations and Preview results;
-  Training SQL permits the fourth step. Migration 20261118120000 and matching
-  deployment are outstanding. Current prompts/data examples:
-  [Gemini sharing](docs/GEMINI_DATA_SHARING.md). This supersedes older route
-  descriptions below. Full serial suite: 148 passed; targeted recovery
-  rerun: 11 passed. Foundation/cloud config checks passed.
-  Parallel suite hit local PGlite initialization failures. No UI changed.
-  Live synthetic probes: 3.6 timed out then returned 503 on another key;
-  3 Flash Preview returned 503; 3.1 Flash-Lite returned a validated two-finding
-  report in 4.06s. No personal health library was used for the probes.
+- Hosted Garmin sync saves up to 28 days of allowlisted sleep, HRV and daily wellness summaries for the connected member. Training includes up to 24 detailed outdoor runs with recovery coverage and comparison windows, under the renewed v3 disclosure.
+- The worker counts the complete request using the selected model before every generation. Training uses a 120-second primary attempt, then 70/55/40-second fallbacks. Missing counts fail closed. The final fallback starts with a smaller evidence view.
+- Production Supabase records migrations 20261118120000 and 20261119120000 in the private release ledger. Personal provider calls require an approved project. Existing Free keys remain suitable for synthetic testing only. See [Gemini data sharing](docs/GEMINI_DATA_SHARING.md).
 
 - Satellite replay follows closer on MapTiler imagery, with subtle pace-driven
   sway and turn banking. The orange trace shows the latest part of the route
@@ -352,4 +343,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Apply the analysis fallback migration and matching deployment, then verify one signed-in analysis completes.
+Confirm an eligible Gemini project for personal training and weight evidence before enabling the hosted provider routes.

@@ -144,3 +144,7 @@ Prompt runner-coach-v9 asks for a separate “Worth knowing” note on running o
 training. It travels with the same Gemini request and saved report. Older
 briefs remain readable and can be refreshed. Missing or malformed notes are
 omitted without invalidating an evidence-backed brief.
+
+## 19 November · Recovery and input-limit verification
+
+The worker validates v3 consent at provider boundaries and publishes only checked evidence citations. The recent pack includes Garmin recovery observations and coverage. Production SQL migrates the four-step fallback before requiring the new consent. [Current request, model and deployment details](../docs/GEMINI_DATA_SHARING.md).

@@ -1,7 +1,7 @@
 import Ajv from 'ajv';
 import { assertFactDirections,assertPersonalLimits } from '../prototypes/insight-format.js';
-export const COACH_SCHEMA='coaching-review-v3',COACH_PROMPT='runner-coach-v9',DISCLOSURE='gemini-run-v1';
-export const PREVIOUS_COACH_PROMPT='runner-coach-v8';
+export const COACH_SCHEMA='coaching-review-v3',COACH_PROMPT='runner-coach-v10',DISCLOSURE='gemini-run-v1';
+export const PREVIOUS_COACH_PROMPT='runner-coach-v9';
 const verdictWords={text:24,explanation:85,nextAction:35};
 const findingWords={headline:16,explanation:65,nextAction:28};
 export function discomfortVerdict(pack){
@@ -16,7 +16,7 @@ const text=maxLength=>({type:'string',minLength:1,maxLength});
 export function coachingSchema(pack,{includeNote=false}={}){
  const facts=pack.content.facts.map(f=>f.id),sessions=pack.content.sessions.map(s=>s.ref),refs=()=>({type:'array',minItems:1,maxItems:6,uniqueItems:true,items:{type:'string',enum:facts}});
  const signal=()=>object({factId:{type:'string',enum:facts},direction:{type:'string',enum:['faster','slower','up','down','steady','none']}});
- const kinds=['consistency','recording','duration',...(facts.some(id=>id.startsWith('goal.'))?['goal']:[]),...(facts.some(id=>id.includes('.zones.')||id.startsWith('zones.'))?['zones']:[]),...(facts.some(id=>id.endsWith('.effort'))?['effort']:[]),...(facts.some(id=>/\.best\d+$/.test(id))?['best_effort']:[]),...(pack.content.comparisons.length?['pace']:[]),...(facts.some(id=>id.endsWith('.splitChange'))?['pacing']:[]),...(facts.some(id=>id.startsWith('workouts.'))?['cross_training']:[])];
+ const kinds=['consistency','recording','duration',...(facts.some(id=>id.startsWith('goal.'))?['goal']:[]),...(facts.some(id=>id.includes('.zones.')||id.startsWith('zones.'))?['zones']:[]),...(facts.some(id=>id.endsWith('.effort'))?['effort']:[]),...(facts.some(id=>/\.best\d+$/.test(id))?['best_effort']:[]),...(pack.content.comparisons.length?['pace']:[]),...(facts.some(id=>id.endsWith('.splitChange'))?['pacing']:[]),...(facts.some(id=>id.startsWith('workouts.'))?['cross_training']:[]),...(facts.some(id=>id.startsWith('recovery.'))?['recovery']:[])];
  const charts=Object.entries({pace:'paceSPerKm',distance:'distanceM',heart_rate:'hrBpm'}).flatMap(([type,suffix])=>{const available=sessions.filter(ref=>facts.includes(ref+'.'+suffix));return available.length>=2?[object({type:{type:'string',enum:[type]},sessionIds:{type:'array',minItems:2,maxItems:8,uniqueItems:true,items:{type:'string',enum:available}}})]:[];});
  return object({schemaVersion:{type:'string',enum:[COACH_SCHEMA]},evidenceHash:{type:'string',enum:[pack.hash]},verdict:object({text:text(220),explanation:text(650),nextAction:text(270),factIds:refs(),signal:signal()}),findings:{type:'array',maxItems:3,items:object({kind:{type:'string',enum:kinds},headline:text(160),explanation:text(500),assessment:{type:'string',enum:['measured','interpretation']},factIds:refs(),signal:signal(),nextAction:text(220)})},charts:{type:'array',maxItems:charts.length?1:0,items:charts.length?{anyOf:charts}:object({})},...(includeNote?{worthKnowing:{type:'string',maxLength:280}}:{})});
 }
@@ -43,6 +43,7 @@ export function validateCoaching(value,pack){
   if(f.kind==='pacing'&&!f.factIds.some(id=>id.endsWith('.splitChange')))throw new Error('A pacing finding needs split measurements.');
   if(f.kind==='effort'&&!f.factIds.some(id=>id.endsWith('.effort')))throw new Error('An effort finding needs a reported effort.');
   if(f.kind==='cross_training'&&!f.factIds.some(id=>id.startsWith('workouts.')))throw new Error('A cross-training finding needs recorded workouts.');
+  if(f.kind==='recovery'&&(f.assessment!=='interpretation'||!f.factIds.some(id=>id.startsWith('recovery.'))))throw new Error('A recovery interpretation needs wearable evidence.');
  }
  for(const chart of report.charts){const suffix={pace:'paceSPerKm',distance:'distanceM',heart_rate:'hrBpm'}[chart.type];if(chart.sessionIds.some(ref=>!facts.has(ref+'.'+suffix)))throw new Error('A chart requested unavailable measurements.');}
  const note=typeof worthKnowing==='string'?worthKnowing.trim():'';

@@ -1,11 +1,12 @@
 import test from 'node:test';
+import {countedProvider,geminiOutput} from './gemini-fixture.mjs';
 import assert from 'node:assert/strict';
 import { PGlite } from '@electric-sql/pglite';
 import { readFile } from 'node:fs/promises';
 import { coachingEvidence,canonicalJson,evidenceHash } from '../analysis/coaching-evidence.mjs';
 import { COACH_SCHEMA,COACH_PROMPT,validateCoaching } from '../analysis/coaching-contract.mjs';
 import { TrainingIntelligence,coachingRequest,extractCoaching } from '../cloud/intelligence.mjs';
-const keyEnv={GEMINI_API_KEY:'test-secret',GEMINI_API_KEY_2:'second-secret',GEMINI_FREE_TIER_CONFIRMED:'1',GEMINI_KEY_POOL_FREE_CONFIRMED:'1'};
+const keyEnv={GEMINI_PERSONAL_API_KEY:'test-secret',GEMINI_PERSONAL_API_KEY_2:'second-secret',GEMINI_PERSONAL_DATA_APPROVED:'1'};
 const owner='11111111-1111-4111-8111-111111111111',other='22222222-2222-4222-8222-222222222222';
 function library(){return {feedback:{},activities:Object.fromEntries(Array.from({length:8},(_,i)=>['a'+i,{id:'a'+i,title:'PRIVATE title DO NOT SEND',date:'2026-10-'+String(10+i).padStart(2,'0'),sport:'Run',source:'Nike Run Club',sourceFile:'Owner-supplied screenshots',distance:2200,running:900+i*10,timer:null,moving:null,elapsed:920+i*10,displayedPace:400+i*4,hr:null,cadence:160,elevationGain:10,records:[],splits:[{distanceM:1000,paceSecondsPerKm:400},{distanceM:1000,paceSecondsPerKm:410}],sourceNote:'private note',synthetic:false}]))};}
 function report(pack){const id='comparison.s01.paceChange';return {schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your recorded pace changed by {'+id+'}.',explanation:'Your latest short run was slower than earlier similar-distance runs.',nextAction:'Start your next short run at a conversational effort.',factIds:[id],signal:{factId:id,direction:'slower'}},findings:[{kind:'pace',headline:'Your latest pace was slower by {'+id+'}.',explanation:'Compared with earlier similar-distance runs from the same source.',assessment:'measured',factIds:[id],signal:{factId:id,direction:'slower'},nextAction:'Record effort on your next similar run.'}],charts:[{type:'pace',sessionIds:['s01','s02']}]};}
@@ -66,7 +67,7 @@ test('affected check-ins replace generated advice and skip Gemini, even without 
  const request=coachingRequest(pack,'gemini-3.1-flash-lite');
  assert.doesNotMatch(JSON.stringify(request),/private check-in|2026-10-17|"lat"/);
  let claims=0,calls=0;
- const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v2',revision:1}]:[],request:async()=>{claims++;}};
+ const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v3',revision:1}]:[],request:async()=>{claims++;}};
  const engine=new TrainingIntelligence(api,{read:async()=>data},{wholeTraining:true,env:{},fetcher:async()=>{calls++;}});
  assert.equal((await engine.status()).review.fallback,'discomfort');
  const safe=await engine.generate();
@@ -77,7 +78,7 @@ test('affected check-ins replace generated advice and skip Gemini, even without 
  assert.equal(claims+calls,0);
 });
 test('no recent outdoor run gets a recorded brief; journal discomfort is scoped and private',async()=>{
- const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v2',revision:1}]:[]};
+ const api={config:{owner},json:async path=>path.includes('ai_preferences')?[{enabled:true,disclosure_version:'gemini-training-v3',revision:1}]:[]};
  const engine=new TrainingIntelligence(api,{read:async()=>library()},{wholeTraining:true,env:{}});
  const brief=(await engine.status()).review;
  assert.equal(brief.fallback,'coverage');assert.match(brief.report.verdict.explanation,/too little running evidence/);
@@ -100,7 +101,7 @@ test('evidence hashes survive PostgreSQL JSONB key reordering and legacy reports
 });
 test('no consent means no library or Google access; quota fallbacks are bounded and never expose provider bodies',async()=>{
  let enabled=false,calls=0;const api={config:{owner},json:async(path,options)=>path.includes('ai_preferences')?[{enabled,disclosure_version:'gemini-run-v1',revision:1}]:path.includes('reserve_gemini_key_slot')?calls%2+1:path.includes('finish_')?true:[],request:async()=>Response.json('review-id')},data={read:async()=>library()};
- let status=429;const engine=new TrainingIntelligence(api,data,{env:keyEnv,fetcher:async()=>{calls++;return new Response('private provider body test-secret',{status});}});
+ let status=429;const engine=new TrainingIntelligence(api,data,{env:keyEnv,fetcher:countedProvider(async()=>{calls++;return new Response('private provider body test-secret',{status});})});
  assert.equal((await engine.status()).review,null);await assert.rejects(engine.generate(),e=>e.status===403);assert.equal(calls,0);enabled=true;assert.equal((await engine.generate()).fallback,'provider');assert.equal(calls,6);
  status=403;assert.equal((await engine.generate()).fallback,'provider');
 });
@@ -126,7 +127,7 @@ test('a validated response is persisted once and reused; opting out hides it wit
   if(path.includes('finish_training_review')){if(options.body.result_status==='complete')saved={id:'saved',report:options.body.result_report,evidence:options.body.result_evidence,evidence_key:(await engine.context()).key,model_id:options.body.result_model,schema_version:COACH_SCHEMA,prompt_version:COACH_PROMPT,finished_at:new Date().toISOString()};return true;}
   return saved?[saved]:[];
  },request:async()=>Response.json('saved')};
- const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:keyEnv,fetcher:async()=>{providerCalls++;return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]});}});
+ const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:keyEnv,fetcher:countedProvider(async()=>{providerCalls++;return geminiOutput(report(pack));})});
  pack=(await engine.context()).pack;assert.equal((await engine.generate()).id,'saved');await engine.generate();assert.equal(providerCalls,1);assert.ok(saved.evidence.mapping.s01);enabled=false;assert.equal((await engine.status()).review,null);assert.ok(saved.report);
 });
 
@@ -144,11 +145,11 @@ test('a saved Flash-Lite report can be retried on the preferred model with the n
   }
   return saved?[saved]:[];
  },request:async()=>Response.json('saved')};
- const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:keyEnv,fetcher:async(_,options)=>{
-  requests.push({model:JSON.parse(options.body).model,key:options.headers['x-goog-api-key']});
+ const engine=new TrainingIntelligence(api,{read:async()=>library()},{env:keyEnv,fetcher:countedProvider(async(url,options)=>{
+  requests.push({model:url.split('/').at(-1).split(':')[0],key:options.headers['x-goog-api-key']});
   if(requests.length<3)return new Response(null,{status:503});
-  return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]});
- }});
+  return geminiOutput(report(pack));
+ })});
  pack=(await engine.context()).pack;
  assert.equal((await engine.generate()).model,'gemini-3.1-flash-lite');
  assert.equal((await engine.status()).review.usedFallback,true);
@@ -178,10 +179,10 @@ test('a training edit during generation prevents publishing advice for the super
   if(path.includes('finish_training_review')){completed=options.body.result_status==='complete';return true;}
   return [];
  },request:async()=>Response.json('pending')};
- const engine=new TrainingIntelligence(api,{read:async()=>structuredClone(data)},{env:keyEnv,fetcher:async()=>{
+ const engine=new TrainingIntelligence(api,{read:async()=>structuredClone(data)},{env:keyEnv,fetcher:countedProvider(async()=>{
   const response=report(pack);data.feedback.a7={answers:{effort:9}};
-  return Response.json({status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(response)}]}]});
- }});
+  return geminiOutput(response);
+ })});
  pack=(await engine.context()).pack;await assert.rejects(engine.generate(),/training changed during analysis/);assert.equal(completed,false);
 });
 

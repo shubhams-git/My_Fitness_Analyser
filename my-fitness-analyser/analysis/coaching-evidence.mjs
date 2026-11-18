@@ -5,6 +5,7 @@ import { trainingDataset } from '../prototypes/training-data.mjs';
 import { comparableRunPaces,recordedTraining } from '../prototypes/progress-model.js';
 import { calendarDay } from '../prototypes/calendar-day.js';
 import { kilometreSplits } from '../prototypes/activity-analysis.js';
+import { recoveryEvidence } from '../prototypes/garmin-recovery.mjs';
 export const COACH_EVIDENCE='coaching-evidence-v5';
 export function canonicalJson(value){if(Array.isArray(value))return '['+value.map(canonicalJson).join(',')+']';if(value&&typeof value==='object')return '{'+Object.keys(value).filter(k=>value[k]!==undefined).sort().map(k=>JSON.stringify(k)+':'+canonicalJson(value[k])).join(',')+'}';return JSON.stringify(value);}
 export const evidenceHash=content=>createHash('sha256').update(canonicalJson(content)).digest('hex');
@@ -41,15 +42,43 @@ function workoutContext(sessions,journal,anchor){
  // journal entries for that day and keep both original records in the library.
  for(const [date,rows] of journalDays)for(const row of rows)add(date,'strength',row.minutes==null?null:row.minutes*60,row.focus);
  for(const s of sessions){
-  if(s.run||s.sourceKind==='screenshot'||s.kind==='strength'&&journalDays.has(s.date))continue;
+  if((s.run&&s.kind!=='treadmill')||s.sourceKind==='screenshot'||s.kind==='strength'&&journalDays.has(s.date))continue;
   add(s.date,s.kind,s.durationS);
  }
  return {windowDays:14,overlappingStrengthDays:[...journalDays.keys()].filter(date=>activityStrengthDays.has(date)).length,
   days:[...byDay.values()].sort((a,b)=>a.daysAgo-b.daysAgo||a.kind.localeCompare(b.kind)).map(row=>({...row,focuses:row.focuses.sort()}))};
 }
-export function coachingEvidence(library,{anchor=calendarDay(),zoneVersions=[],goalVersions=[],strengthEntries=null}={}){
+
+// Compact views keep the original evidence hash for publication. The worker
+// validates against the exact view sent before saving against the full pack.
+export function* coachingViews(pack){
+ yield pack;
+ for(const [runLimit,recoveryDays,splitLimit] of [[12,14,8],[6,7,0],[3,3,0]]){
+  const full=pack.content,sessions=full.sessions.slice(0,runLimit).map(session=>({
+   ...session,personalZones:splitLimit?session.personalZones:[]
+  }));
+  const refs=new Set(sessions.map(session=>session.ref));
+  const comparisons=full.comparisons.filter(comparison=>comparison.sessionIds.every(ref=>refs.has(ref)));
+  const comparisonRefs=new Set(comparisons.map(comparison=>comparison.ref));
+  const facts=full.facts.filter(fact=>{
+   if(!fact.sessionIds.every(ref=>refs.has(ref)))return false;
+   if(fact.id.startsWith('comparison.')&&!comparisonRefs.has(fact.id.split('.').slice(0,2).join('.')))return false;
+   const split=/\.split(\d+)Pace$/.exec(fact.id);
+   if(split&&Number(split[1])>splitLimit||!splitLimit&&fact.id.includes('.zones.'))return false;
+   const recovery=/^recovery\.\w+\.d(\d+)\./.exec(fact.id);
+   return !recovery||Number(recovery[1])<recoveryDays;
+  });
+  const content={...full,sessions,comparisons,facts,truncated:full.truncated||sessions.length<full.sessions.length,
+   requestCoverage:{detailedRuns:sessions.length,splitLimitPerRun:splitLimit,daysOfRecoveryDetail:recoveryDays}};
+  if(full.recovery)content.recovery={...full.recovery,domains:Object.fromEntries(Object.entries(full.recovery.domains).map(([key,domain])=>[
+   key,{...domain,rows:domain.rows.filter(row=>row.daysAgo<recoveryDays)}
+  ]))};
+  yield {...pack,content};
+ }
+}
+export function coachingEvidence(library,{anchor=calendarDay(),zoneVersions=[],goalVersions=[],strengthEntries=null,includeRecovery=false}={}){
  const activities=Object.values(library.activities).filter(a=>!a.synthetic&&a.date>='2026-07-01'),wholeTraining=strengthEntries!==null;
- const data=trainingDataset(activities,library.feedback,{window:'all',anchor,zoneVersions,goalVersions,garminGoals:wholeTraining}),runs=data.sessions.filter(s=>s.run&&(!wholeTraining||s.garminOutdoor)),selected=runs.slice(0,wholeTraining?12:60),facts=[],mapping={};
+ const data=trainingDataset(activities,library.feedback,{window:'all',anchor,zoneVersions,goalVersions,garminGoals:wholeTraining}),runs=data.sessions.filter(s=>s.run&&(!wholeTraining||s.garminOutdoor)),selected=runs.slice(0,wholeTraining?(includeRecovery?24:12):60),facts=[],mapping={};
  const add=(id,label,value,unit,sessionIds=[])=>{if(Number.isFinite(value))facts.push({id,label,value,unit,sessionIds});};
  add('history.runs','Imported runs',runs.length,'count');
  if(runs.some(s=>s.distanceM!==null))add('history.distance','Imported running distance',runs.reduce((n,s)=>n+(s.distanceM??0),0),'m');
@@ -113,6 +142,12 @@ export function coachingEvidence(library,{anchor=calendarDay(),zoneVersions=[],g
   const workouts=workoutContext(data.sessions,strengthEntries,anchor);
   content.scope='Outdoor Garmin runs for performance. Other recorded workouts provide context for the next run.';
   content.workouts=workouts;
+  if(includeRecovery){
+   content.version='coaching-evidence-v6';
+   content.recovery=recoveryEvidence(library.garminRecovery,anchor,add);
+   content.runCoverage={detailedRuns:sessions.length,oldestDetailedDaysAgo:sessions.at(-1)?.daysAgo??null,
+    splitLimitPerRun:16,runsEligibleForDetailedZones:Math.min(8,sessions.length)};
+  }
   for(const kind of new Set(workouts.days.map(row=>row.kind))){
    const rows=workouts.days.filter(row=>row.kind===kind),key=kind.replaceAll('-','_');
    add('workouts.'+key+'.count','Recent '+kind+' sessions',rows.reduce((sum,row)=>sum+row.sessions,0),'count');

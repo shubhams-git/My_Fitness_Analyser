@@ -1,139 +1,43 @@
-# Gemini analysis: data, prompts and failure recovery
+# Gemini data sharing and analysis
 
-Checked 18 November 2026. This describes the hosted Training and General/Journal
-weight paths. `analysis/gemini.mjs` is a separate synthetic-only local lab.
+Updated 19 November 2026. The hosted Training request queues a Supabase job. The Vercel worker checks its capability, lease, evidence signature and current consent before sending evidence to Gemini. Journal weight analysis has its own consent and runs synchronously.
 
-## Exact prompts and example payloads
+## Consent and provider configuration
 
-These files are generated from the actual production request builders using
-invented records. They are examples, not copies of a member's health history.
+Account → AI preferences asks members to allow training and recovery sharing under `gemini-training-v3`. Earlier approvals require a new choice. The client sends the disclosure version it displayed, and Supabase checks the current version and revision at enqueue, claim, provider reservation, token counting, generation and publication. Switching off cancels pending work and hides saved briefings. Completed reports remain in the private database. Previously transmitted requests cannot be recalled.
 
-- [Training prompt](gemini-examples/training-prompt.txt)
-- [Training evidence, decoded for reading](gemini-examples/training-evidence.json)
-- [Complete Training HTTP body, including output schema](gemini-examples/training-request.json)
-- [Weight prompt](gemini-examples/weight-prompt.txt)
-- [Weight evidence, decoded for reading](gemini-examples/weight-evidence.json)
-- [Complete weight HTTP body, including output schema](gemini-examples/weight-request.json)
+Google prohibits personal and sensitive submissions to its unpaid service. `GEMINI_API_KEY` and the optional Free pool are for generated data only. Hosted Training and weight require `GEMINI_PERSONAL_DATA_APPROVED=1` and at least two distinct `GEMINI_PERSONAL_API_KEY*` credentials from an approved project. The application rejects credentials reused from its synthetic pool. This setting records operator verification of provider terms and project configuration. The application does not enable billing or use a paid fallback automatically. The production project currently has no approved personal-data credentials. [Google Gemini terms](https://aistudio.google.com/docs/terms#unpaid-services).
 
-Regenerate with `node scripts/export-gemini-examples.mjs`. In each request,
-`systemInstruction.parts[0].text` is the prompt; `contents[0].parts[0].text`
-is a JSON string containing the evidence. `generationConfig` requests JSON and
-supplies the output schema. No search, browsing or database tool is enabled.
-The server credential travels in the `x-goog-api-key` header, outside the body.
+## Training evidence
 
-## Weight input
+- Up to 24 recent outdoor Garmin runs with relative days, source, environment and time basis. Evidence includes available distance, duration, pace, heart rate, cadence, elevation gain, running power, best elapsed segments, up to 16 full-kilometre splits, and structured effort, breathing, finish and discomfort. Per-run zone detail covers up to eight runs when usable personal zones exist.
+- Same-source comparable-run baselines and signed pace differences, recorded history coverage, recent and previous seven- and 28-day running totals, personal-zone period summaries, explicit running goals and 14 days of workout context. Workout context includes treadmill sessions and strength summaries with source overlap handled by calendar day.
+- Up to 28 calendar days of available Garmin Connect recovery summaries. Sleep includes estimated sleep and naps, deep/light/REM/awake durations, unmeasured duration, sleep score, and device and sleep-window confirmation flags. HRV includes overnight and Garmin rolling weekly averages. Daily wellness includes resting heart rate, average stress, and Body Battery low, high, charge and drain. Per-feed status, relative dates, days with measurements, per-field coverage and recorded means for comparison windows accompany the observations. Days or fields without measurements stay missing. The prompt treats all wearable metrics as imperfect estimates, and bars diagnoses, medical advice, causation and readiness conclusions.
 
-The server reads the member's journal and goal versions, then builds
-`analysis/weight-evidence.mjs`. Only this derived evidence is transmitted:
+An explicit Garmin sync fetches the three range summaries for the connected member, then stores only the numeric/boolean allowlist and the dates in the member’s private library. Activity sync can succeed even when recovery is unavailable. The adapter retains previous observations on a failed feed and marks that feed unavailable. Read-only checks of the actual Garmin endpoints found partial sleep, HRV and daily wellness coverage across a 28-day window. Sleep need and provider narrative, HRV chart samples and HRV status text, movement, calories, respiration, oxygen saturation and Body Battery events are omitted. Watch model, account and device IDs, credentials, activity titles, GPS, FIT files, raw sensor data, exact dates and free-text notes stay out of the Gemini request.
 
-- Up to the latest 90 calendar days ending on the last recorded weigh-in:
-  daily scale kg, smoothed trend kg, individual reading count and days before
-  the latest observation. Older history seeds the trend but is not sent as rows.
-- Calculated facts: recorded days/readings, period length, last-reading age,
-  latest scale/trend/difference, change and gap from the previous recorded day,
-  period trend change, recent recorded range/deviation and robust weekly rate
-  when enough observations exist.
-- Weight goal context when present: kind, status, revision, relative start,
-  deadline presence, target, current progress, remaining amount, baseline,
-  direction and relative timing. Running goals are excluded.
-- Evidence/schema versions, evidence hash, calculation method and rules for
-  missing observations, direction and stale data.
+## Input limit and routing
 
-For example, an observation can be
-`{"daysBeforeLatest":3,"scaleKg":79.1,"trendKg":79.4,"readings":1}`.
-There are no names, account IDs, email addresses, absolute weigh-in dates,
-notes, original MASS exports, training history, GPS, sleep or nutrition records.
-Scale values are still personal health data despite removing identity fields.
+Each attempt calls the exact model’s `models.get` and `countTokens` before `generateContent`. The count wraps the complete generation request, including system instructions, the JSON response schema embedded in those instructions, and evidence. The remaining generation setting selects JSON MIME output. No tools, cached content or extra generation input fields are accepted by this path. The generation body uses the same serialized data that passed counting. The ceiling is the lower of 500,000 and the model’s advertised input limit. Models must advertise both generation and counting. Missing, malformed or failed counts and bodies that still exceed the limit after reduction stop the attempt before inference. The worker can then use its next model or save a recorded-data brief. It validates returned citations against the exact evidence sent.
 
-## Training input
+Full Training evidence is checked first, with deterministic reductions to 12, 6 and 3 detailed runs and 14, 7 and 3 days of recovery rows. Splits and individual-run zone detail shrink with those views. History, coverage, period totals, recovery averages and available recent measurements remain. The fourth Training attempt starts with the six-run, seven-day view to reduce latency after the earlier attempts. Weight already uses a short 90-day evidence window and skips inference if its count cannot be verified.
 
-The server reads owned activities, structured feedback, goals, zone versions
-and recent strength entries. `analysis/coaching-evidence.mjs` transmits:
+| Attempt | Model | Training generation timeout | Weight generation timeout |
+| --- | --- | ---: | ---: |
+| 1 | `gemini-3.6-flash` | 120 s | 120 s |
+| 2 | `gemini-3.6-flash` | 70 s | 50 s |
+| 3 | `gemini-3-flash-preview` | 55 s | 35 s |
+| 4 | `gemini-3.1-flash-lite` | 40 s | 25 s |
 
-- Up to 12 recent eligible outdoor Garmin runs, referenced as `s01`, `s02`,
-  etc.; relative days ago, source/environment, timing/pace bases, limitations,
-  full kilometre split count, structured breathing, finish and discomfort.
-- Measured facts when available: distance, duration, pace, average HR, cadence,
-  elevation gain, running power, fastest elapsed 400/1000/2000/5000 m segments,
-  reported effort, opening/closing/full kilometre paces and signed changes.
-  At most 16 full kilometre split facts per selected run.
-- Personal HR/pace zone boundaries and distribution metadata for up to eight
-  selected runs; calculated zone times/shares and recent 28-day zone summaries.
-- Comparable-run references, median baseline pace and signed/magnitude changes;
-  history counts/distance/active days and recent versus previous 7/28-day totals.
-- Explicit running goal context and calculated progress (weekly distance/time
-  benchmark), revisions and relative timing. No weight readings are included.
-- Recent 14-day non-running workout context grouped by relative day and kind:
-  session counts, recorded duration, recognised strength focus, overlap count
-  and aggregate counts/time. Example:
-  `{"daysAgo":2,"kind":"strength","sessions":1,"durationS":2400,"focuses":["Legs"]}`.
-- Evidence version, scope, history/truncation metadata, fact units and references.
+Model metadata and token counting share a 12-second preflight per attempt. Training uses one generation attempt per worker invocation, a five-minute lease, cooldowns and shared model backoff. Weight uses a 260-second overall deadline, and saved insights survive failed refreshes. The application rotates approved credentials at database reservation. Credential rotation does not raise a Google Cloud project's quota. [Models API](https://aistudio.google.com/api-reference/models), [token counting API](https://aistudio.google.com/api-reference/tokens).
 
-The internal `mapping` from `s01` to a real activity ID stays on the server.
-GPS coordinates, routes, raw sensor streams, FIT files, provider tokens, names,
-email, account IDs, activity titles, notes and exact activity dates are excluded.
-Structured discomfort is health information. Workout-limiting discomfort or
-insufficient recent evidence can produce a recorded brief without calling Gemini.
+## Request examples and verification
 
-## Recovery changes
+Regenerate with `node scripts/export-gemini-examples.mjs`. All payloads use generated measurements.
 
-Both hosted paths now share this sequential route, with default model thinking:
+- Training: [prompt](gemini-examples/training-prompt.txt), [evidence](gemini-examples/training-evidence.json), [complete request](gemini-examples/training-request.json).
+- Weight: [prompt](gemini-examples/weight-prompt.txt), [evidence](gemini-examples/weight-evidence.json), [complete request](gemini-examples/weight-request.json).
 
-| Attempt | Model | Deadline |
-| --- | --- | --- |
-| 1 | `gemini-3.6-flash` | 70s |
-| 2 | `gemini-3.6-flash` | 70s |
-| 3 | `gemini-3-flash-preview` | 55s |
-| 4 | `gemini-3.1-flash-lite` | 40s |
+Local confirmed Free keys advertised both methods and a 1,048,576-token input limit for all three models. Each counted the full synthetic evidence at 33,100 input tokens. Full-payload generation probes returned HTTP 503. Flash-Lite completed a compact synthetic recovery report with two validated findings. Both count and generation usage reported 15,069 input tokens. No personal data went to Gemini during verification.
 
-Each provider attempt reserves the next credential in the shared database pool.
-At least two distinct Free-confirmed keys are required. Rotating keys does not
-increase a project's quota. A quota response records shared model backoff;
-blocked models are skipped. Training retains durable jobs, pacing and its daily
-app budget. Weight remains a synchronous HTTP request with a maximum 235 seconds
-of provider time plus database overhead, within the 300-second function limit;
-a browser/network interruption can still prevent delivery of its response.
-Training ultimately saves its labelled recorded-data brief if Gemini cannot
-produce a valid result. Failed weight analysis preserves earlier reports.
-Consent is checked at reservation and publication; weight evidence is rebuilt
-before each attempt and before saving. Provider output still passes local checks.
-
-Previously weight made one 220-second call. Its SQL permitted only one reservation
-and only 3.6 Flash, and rejected Preview in saved attempt metadata. Training used
-3.5 Flash-Lite as fallback; SQL stopped unsuccessful jobs at step two. Adding a
-model name in JavaScript alone would not fix these database restrictions.
-
-Apply `supabase/migrations/20261118120000_analysis_model_fallbacks.sql` with the
-matching application deployment. It permits four bounded weight reservations,
-the requested fallback IDs, matching per-model backoff, and Training's fourth step.
-Existing grants and owner/consent checks are preserved. This local change does
-not establish that production has been migrated or deployed.
-
-Official model references checked: [3.6 Flash](https://aistudio.google.com/docs/models/gemini-3.6-flash),
-[3 Flash Preview](https://aistudio.google.com/docs/models/gemini-3-flash-preview),
-[3.1 Flash-Lite](https://aistudio.google.com/docs/models/gemini-3.1-flash-lite).
-
-## Verification, 18–19 November
-
-`node scripts/check-coach-live.mjs --route` made four sequential real Gemini
-requests with generated training records and rotating configured Free-confirmed
-keys. It did not read or send the member's health library.
-
-| Model | Result | Elapsed |
-| --- | --- | ---: |
-| 3.6 Flash, first key | Local request deadline | 70.01s |
-| 3.6 Flash, next key | HTTP 503 | 5.75s |
-| 3 Flash Preview, next key | HTTP 503 | 52.67s |
-| 3.1 Flash-Lite, next key | Validated report, two findings | 4.06s |
-
-Flash-Lite reported 11,846 input and 563 output tokens. This proves this prompt
-can succeed through the final fallback; it does not establish a general provider
-availability rate or the cause of Google's 503 responses. The diagnostic exits
-nonzero if any probed model fails, even when the final model succeeds.
-
-All 148 tests passed with `node --test --test-concurrency=1 tests/*.test.mjs`.
-The parallel run encountered local PGlite initialization failures; serial execution
-passed the same database tests. Foundation and cloud configuration checks passed.
-SQL tests use local PostgreSQL/PGlite, not the production database. A readiness
-request without a member JWT returned 401, as expected for this authenticated RPC;
-no signed-in production analysis or migration was verified in this session.
+Apply `20261118120000_analysis_model_fallbacks.sql` before `20261119120000_training_recovery_consent.sql`, then deploy the worker and application together. Earlier production migrations were applied through SQL and there was no standard Supabase CLI ledger. This release records both applied files and their checksums in the private `fitness_release.migrations` table. Use the ledger and live schema to distinguish pending changes from previously applied SQL before retrying.

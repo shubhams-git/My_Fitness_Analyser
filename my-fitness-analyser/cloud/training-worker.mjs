@@ -1,8 +1,8 @@
 import {SupabaseApi,cloudConfig} from './supabase.mjs';
-import {geminiKeys,geminiConfigured,geminiKeyIds,geminiAttempt} from './gemini-router.mjs';
+import {personalGeminiKeys,geminiKeyIds,geminiAttempt} from './gemini-router.mjs';
 import {coachingGenerationRequest,extractCoaching} from './intelligence.mjs';
-import {COACH_PROMPT,PREVIOUS_COACH_PROMPT,COACH_SCHEMA} from '../analysis/coaching-contract.mjs';
-import {evidenceHash} from '../analysis/coaching-evidence.mjs';
+import {COACH_PROMPT,COACH_SCHEMA} from '../analysis/coaching-contract.mjs';
+import {coachingViews,evidenceHash} from '../analysis/coaching-evidence.mjs';
 import {RECORDED_COACH,recordedTrainingReport} from '../analysis/recorded-coaching.mjs';
 import {TRAINING_ROUTE,validJobSignature} from './training-job-policy.mjs';
 
@@ -18,11 +18,10 @@ export async function runTrainingJob(api,{id,capability},{env=process.env,fetche
  const finish=({attempt=null,report=null,retrySeconds=0,failure=null}={})=>rpc('finish_training_job',{
   ...lease,attempt,result_report:report,retry_seconds:retrySeconds,failure_code:failure
  });
- const keys=geminiKeys(env),entry=TRAINING_ROUTE[job.step];
- if(!geminiConfigured(env)||keys.length<2)return finish({failure:'configuration'});
- if(!entry||![COACH_PROMPT,PREVIOUS_COACH_PROMPT].includes(job.promptVersion)||job.schemaVersion!==COACH_SCHEMA||!job.pack?.content||
+ const keys=personalGeminiKeys(env),entry=TRAINING_ROUTE[job.step];
+ if(keys.length<2)return finish({failure:'configuration'});
+ if(!entry||job.promptVersion!==COACH_PROMPT||job.schemaVersion!==COACH_SCHEMA||!job.pack?.content||
   !validJobSignature(keys,job)||evidenceHash(job.pack.content)!==job.pack.hash)return finish({failure:'evidence'});
- const body=coachingGenerationRequest(job.pack,{includeNote:job.promptVersion===COACH_PROMPT});
  const saveRecorded=result=>finish({...result,report:recordedTrainingReport(job.pack),failure:RECORDED_COACH});
  const finishAttempt=result=>!result.report&&job.step===TRAINING_ROUTE.length-1?saveRecorded(result):finish(result);
  // Consent is checked inside this reservation, immediately before transmission.
@@ -32,7 +31,12 @@ export async function runTrainingJob(api,{id,capability},{env=process.env,fetche
  if(budget.modelBlocked)return finishAttempt({attempt:{model:entry.model,thinking:'default',outcome:'quota',httpStatus:null,elapsedMs:0}});
  if(budget.retryAt)return true; // Database released the lease and scheduled the next eligible time.
  if(!Number.isInteger(budget.slot)||!keys[budget.slot-1])return finish({failure:'configuration'});
- const result=await geminiAttempt({entry,apiKey:keys[budget.slot-1],body,validate:json=>extractCoaching(json,job.pack,{compact:true}),fetcher});
+ const candidates=[...coachingViews(job.pack)].map((view,reduction)=>({
+  body:coachingGenerationRequest(view),validate:json=>extractCoaching(json,view,{compact:true}),reduction
+ })).slice(entry.evidenceTier||0);
+ const result=await geminiAttempt({entry,apiKey:keys[budget.slot-1],candidates,fetcher,
+  beforeInput:()=>rpc('training_generation_allowed',lease)});
+ if(result.attempt.outcome==='consent-changed')return finish({failure:'cancelled'});
  console.info('Training Gemini attempt',JSON.stringify(result.attempt));
  return finishAttempt(result);
 }

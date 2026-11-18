@@ -2,6 +2,7 @@ import {supportedGarminKind} from './activity-kind.js';
 import { readFile } from 'node:fs/promises';
 import { parseEnv } from 'node:util';
 import { inflateRawSync } from 'node:zlib';
+import {fetchGarminRecovery,mergeGarminRecovery} from './garmin-recovery.mjs';
 
 const base='https://personal.connectapi.garmin.com';
 const limit=32*1024*1024;
@@ -35,22 +36,22 @@ export function fitFromZip(bytes){
 
 export class GarminClient {
   constructor(key,{fetcher=fetch,pause=ms=>new Promise(r=>setTimeout(r,ms))}={}){this.key=key;this.fetcher=fetcher;this.pause=pause;this.token=null;}
-  async request(path,{method='GET',authorization=null,binary=false,refresh=true}={}){
-    if(!authorization&&!this.token)await this.authenticate();
+  async request(path,{method='GET',authorization=null,binary=false,refresh=true,signal}={}){
+    if(!authorization&&!this.token)await this.authenticate(signal);
     for(let attempt=0;attempt<3;attempt++){
-      let response;try{response=await this.fetcher(base+path,{method,redirect:'error',signal:AbortSignal.timeout(30000),headers:{Authorization:authorization||`Bearer ${this.token}`,Accept:binary?'application/x-zip-compressed':'*/*'}});}catch{throw new Error('Garmin could not be reached. Try syncing again.');}
-      if(response.status===401&&!authorization&&refresh){await this.authenticate();return this.request(path,{method,binary,refresh:false});}
-      if([429,500,502,503,504].includes(response.status)&&attempt<2){const retry=Number(response.headers.get('retry-after'));await this.pause(Number.isFinite(retry)&&retry>0?Math.min(retry*1000,30000):500*2**attempt);continue;}
+      let response;try{response=await this.fetcher(base+path,{method,redirect:'error',signal:signal||AbortSignal.timeout(30000),headers:{Authorization:authorization||`Bearer ${this.token}`,Accept:binary?'application/x-zip-compressed':'*/*'}});}catch{throw new Error('Garmin could not be reached. Try syncing again.');}
+      if(response.status===401&&!authorization&&refresh){await this.authenticate(signal);return this.request(path,{method,binary,refresh:false,signal});}
+      if(!signal&&[429,500,502,503,504].includes(response.status)&&attempt<2){const retry=Number(response.headers.get('retry-after'));await this.pause(Number.isFinite(retry)&&retry>0?Math.min(retry*1000,30000):500*2**attempt);continue;}
       if(!response.ok)throw new Error(response.status===401||response.status===403?'Garmin access was denied. Check or renew the API key in .env.':`Garmin request failed (HTTP ${response.status}). Retry sync to continue.`);
       let size=0;const chunks=[];for await(const chunk of response.body){size+=chunk.length;if(size>limit)throw new Error('Garmin response exceeds the supported size.');chunks.push(chunk);}return Buffer.concat(chunks);
     }
   }
-  async authenticate(){const token=(await this.request('/personalapitoken-service/personal-api/personal-api-key/token',{method:'POST',authorization:`ApiKey ${this.key}`})).toString().trim();if(!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(token))throw new Error('Garmin returned an unexpected access token.');this.token=token;}
-  async json(path){try{return JSON.parse((await this.request(path)).toString());}catch(e){if(e instanceof SyntaxError)throw new Error('Garmin returned unexpected activity data.');throw e;}}
+  async authenticate(signal){const token=(await this.request('/personalapitoken-service/personal-api/personal-api-key/token',{method:'POST',authorization:`ApiKey ${this.key}`,signal})).toString().trim();if(!/^[\w-]+\.[\w-]+\.[\w-]+$/.test(token))throw new Error('Garmin returned an unexpected access token.');this.token=token;}
+  async json(path,options){try{return JSON.parse((await this.request(path,options)).toString());}catch(e){if(e instanceof SyntaxError)throw new Error('Garmin returned unexpected activity data.');throw e;}}
 }
 
 export class GarminSync {
-  constructor(library,{keyReader=readGarminKey,clientFactory=key=>new GarminClient(key),cutoff=null}={}){this.library=library;this.keyReader=keyReader;this.clientFactory=clientFactory;this.cutoff=cutoff;this.running=false;this.progress=null;}
+  constructor(library,{keyReader=readGarminKey,clientFactory=key=>new GarminClient(key),cutoff=null,recoveryAnchor=null}={}){this.library=library;this.keyReader=keyReader;this.clientFactory=clientFactory;this.cutoff=cutoff;this.recoveryAnchor=recoveryAnchor;this.running=false;this.progress=null;}
   async status(){return {configured:Boolean(await this.keyReader()),running:this.running,progress:this.progress,...(await this.library.read()).garminSync};}
   async run(){
     if(this.running)throw new Error('A Garmin sync is already running.');this.running=true;
@@ -59,6 +60,13 @@ export class GarminSync {
       const key=await this.keyReader();if(!key)throw new Error('Add the Garmin API key to the project .env file.');const client=this.clientFactory(key);let exhausted=false;const seen=new Set();
       for(let start=0;start<1000;start+=20){
         const page=await client.json(`/activitylist-service/activities/search/activities?start=${start}&limit=20`);if(!Array.isArray(page))throw new Error('Garmin returned an unexpected activity list.');
+        if(start===0&&this.recoveryAnchor){
+          const feeds=await fetchGarminRecovery(client,this.recoveryAnchor);
+          try{
+            await this.library.mutate(data=>{data.garminRecovery=mergeGarminRecovery(data.garminRecovery,feeds);});
+            result.recovery=Object.fromEntries(Object.entries(feeds).map(([domain,feed])=>[domain,feed.state]));
+          }catch{result.recovery={storage:'unavailable'};}
+        }
         for(const item of page){
           const id=String(item.activityId);if(!/^[1-9]\d{0,15}$/.test(id)||!Number.isSafeInteger(Number(id)))throw new Error('Garmin returned an invalid activity identity.');if(seen.has(id))continue;seen.add(id);result.seen++;
           if(this.cutoff&&(!/^\d{4}-\d{2}-\d{2}/.test(item.startTimeLocal||'')||item.startTimeLocal.slice(0,10)<this.cutoff)){result.skipped++;continue;}

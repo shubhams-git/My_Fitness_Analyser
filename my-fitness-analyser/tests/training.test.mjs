@@ -1,4 +1,5 @@
 import test from 'node:test';
+import {countedProvider,geminiOutput} from './gemini-fixture.mjs';
 import assert from 'node:assert/strict';
 import { mkdtemp,rm,writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -125,17 +126,18 @@ test('review schema rejects extra fields, mismatched context, unknown refs, unsu
  for(const mutate of mutations){const r=structuredClone(valid);mutate(r);assert.throws(()=>validateReview(r,pack));}
  const personal=evidencePack(dataset([session()]));assert.throws(()=>validateReview({...valid,evidenceHash:personal.hash},personal));assert.throws(()=>buildRequest(personal,'gemini-3.6-flash'),/Personal-data/);
 });
-test('Interactions request forces one known tool, stateless storage and source-selected charts',()=>{
- const pack=demoEvidence(),request=buildRequest(pack,'gemini-3.6-flash');assert.equal(request.store,false);assert.deepEqual(request.generation_config.tool_choice.allowed_tools,{mode:'any',tools:[TOOL_NAME]});assert.equal(request.tools.length,1);assert.equal(request.tools[0].parameters.additionalProperties,false);assert.equal(JSON.parse(request.input).evidenceHash,pack.hash);
- const valid={status:'requires_action',steps:[{type:'function_call',name:TOOL_NAME,arguments:report(pack)}]};assert.equal(extractReport(valid,pack).dataset,'synthetic');
- for(const result of [{...valid,status:'incomplete'},{...valid,steps:[]},{...valid,steps:[...valid.steps,...valid.steps]},{...valid,steps:[{...valid.steps[0],name:'execute_sql'}]},{...valid,steps:[{...valid.steps[0],arguments:'{}'}]}])assert.throws(()=>extractReport(result,pack));
+test('synthetic JSON request includes its schema and accepts only a complete validated model report',()=>{
+ const pack=demoEvidence(),request=buildRequest(pack);assert.equal(request.generationConfig.responseMimeType,'application/json');
+ assert.match(request.systemInstruction.parts[0].text,/additionalProperties/);assert.equal(JSON.parse(request.contents[0].parts[0].text).evidenceHash,pack.hash);
+ const valid={status:'completed',steps:[{type:'model_output',content:[{type:'text',text:JSON.stringify(report(pack))}]}]};assert.equal(extractReport(valid,pack).dataset,'synthetic');
+ for(const result of [{...valid,status:'incomplete'},{...valid,steps:[]},{...valid,steps:[...valid.steps,...valid.steps]},{...valid,steps:[{type:'function_call'}]}])assert.throws(()=>extractReport(result,pack));
 });
 test('unconfirmed free-tier configuration blocks generation without a provider request',async()=>{
  const directory=await temporaryCache();let calls=0;try{const service=new GeminiReviews({directory,configReader:async()=>({key:'SYNTHETIC_TEST_KEY',model:'gemini-3.8-flash',freeTierConfirmed:false}),fetcher:async()=>{calls++;}});assert.equal((await service.status()).configured,false);await assert.rejects(service.generate(),/Free plan/);assert.equal(calls,0);}finally{await removeCache(directory);}
 });
 test('Gemini requests deduplicate, cache only validated responses and invalidate with the model',async()=>{
  const directory=await temporaryCache();let calls=0,model='gemini-3.6-flash';
- try{const pack=demoEvidence(),service=new GeminiReviews({directory,configReader:async()=>({key:'SYNTHETIC_TEST_KEY',model}),fetcher:async(url,options)=>{calls++;assert.equal(url,'https://generativelanguage.googleapis.com/v1beta/interactions');assert.equal(options.headers['x-goog-api-key'],'SYNTHETIC_TEST_KEY');assert.equal(JSON.parse(options.body).store,false);return new Response(JSON.stringify({status:'requires_action',model,steps:[{type:'function_call',name:TOOL_NAME,arguments:report(pack)}]}));}});
+ try{const pack=demoEvidence(),service=new GeminiReviews({directory,configReader:async()=>({key:'SYNTHETIC_TEST_KEY',model}),fetcher:countedProvider(async(url,options)=>{calls++;assert.match(url,/gemini-3\.6-flash:generateContent$/);assert.equal(options.headers['x-goog-api-key'],'SYNTHETIC_TEST_KEY');return geminiOutput(report(pack));})});
  const [a,b]=await Promise.all([service.generate(),service.generate()]);assert.equal(calls,1);assert.equal(a.evidenceHash,b.evidenceHash);assert.equal(a.validated,true);assert.equal((await service.generate()).cached,true);assert.equal(calls,1);
  assert.equal((await service.status()).configured,true);model='gemini-3.8-flash';assert.equal((await service.status()).review,null);
  const context=await service.context();await writeFile(new URL(context.cacheKey+'.json',directory),JSON.stringify({...a,requestedModel:model,report:{...a.report,extra:true}}));assert.equal(await service.cached(context),null);
@@ -143,5 +145,5 @@ test('Gemini requests deduplicate, cache only validated responses and invalidate
 });
 test('missing key and quota failures do not expose credentials or provider error bodies',async()=>{
  const directory=await temporaryCache();try{let calls=0;const noKey=new GeminiReviews({directory,configReader:async()=>({key:'',model:'gemini-3.6-flash'}),fetcher:async()=>{calls++;}});assert.equal((await noKey.status()).configured,false);await assert.rejects(noKey.generate(),/GEMINI_API_KEY/);assert.equal(calls,0);
- const fail=new GeminiReviews({directory,configReader:async()=>({key:'PRIVATE_KEY',model:'gemini-3.6-flash'}),fetcher:async()=>new Response('PRIVATE_PROVIDER_BODY',{status:429})});await assert.rejects(fail.generate(),error=>/quota/.test(error.message)&&!error.message.includes('PRIVATE'));await assert.rejects(fail.generate(),/wait a minute/);}finally{await removeCache(directory);}
+ const fail=new GeminiReviews({directory,configReader:async()=>({key:'PRIVATE_KEY',model:'gemini-3.6-flash'}),fetcher:countedProvider(async()=>new Response('PRIVATE_PROVIDER_BODY',{status:429}))});await assert.rejects(fail.generate(),error=>/quota/.test(error.message)&&!error.message.includes('PRIVATE'));await assert.rejects(fail.generate(),/wait a minute/);}finally{await removeCache(directory);}
 });

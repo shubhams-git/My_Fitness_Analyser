@@ -2,21 +2,21 @@ import {createHash} from 'node:crypto';
 import {CloudError} from './supabase.mjs';
 export const MODEL_POLICY='flash-routes-v2';
 export const PRIMARY_GEMINI_MODEL=Object.freeze({
- model:'gemini-3.6-flash',timeout:70000,endpoint:'generateContent'
+ model:'gemini-3.6-flash',timeout:120000,endpoint:'generateContent'
 });
 // Sequential requests only; reservation rotates credentials before every call.
 export const ANALYSIS_ROUTE=Object.freeze([
  PRIMARY_GEMINI_MODEL,
- PRIMARY_GEMINI_MODEL,
+ Object.freeze({...PRIMARY_GEMINI_MODEL,timeout:70000}),
  Object.freeze({model:'gemini-3-flash-preview',timeout:55000,endpoint:'generateContent'}),
  Object.freeze({model:'gemini-3.1-flash-lite',timeout:40000,endpoint:'generateContent'})
 ]);
 
 export function structuredGeminiRequest({instruction,input,schema}){
  return {
-  systemInstruction:{parts:[{text:instruction}]},
+  systemInstruction:{parts:[{text:instruction+'\n\nReturn a JSON object matching this schema:\n'+JSON.stringify(schema)}]},
   contents:[{parts:[{text:JSON.stringify(input)}]}],
-  generationConfig:{responseMimeType:'application/json',responseJsonSchema:schema}
+  generationConfig:{responseMimeType:'application/json'}
  };
 }
 
@@ -34,8 +34,12 @@ export function modelRoute(task){
 }
 export function generationConfig(model,thinking='high',maxOutput=16384){return {max_output_tokens:maxOutput,...(thinking?{thinking_level:thinking}:{})};}
 export function geminiKeys(env){const names=['GEMINI_API_KEY',...(env.GEMINI_KEY_POOL_FREE_CONFIRMED==='1'?Array.from({length:4},(_,i)=>'GEMINI_API_KEY_'+(i+2)):[])];return [...new Set(names.map(n=>env[n]?.trim()).filter(Boolean))];}
-export function geminiConfigured(env){
- return env.GEMINI_FREE_TIER_CONFIRMED==='1'&&geminiKeys(env).length>=1;
+export function personalGeminiKeys(env){
+ if(env.GEMINI_PERSONAL_DATA_APPROVED!=='1')return [];
+ const syntheticKeys=new Set(['GEMINI_API_KEY','GEMINI_API_KEY_2','GEMINI_API_KEY_3','GEMINI_API_KEY_4','GEMINI_API_KEY_5']
+  .map(name=>env[name]?.trim()).filter(Boolean));
+ return [...new Set(['GEMINI_PERSONAL_API_KEY','GEMINI_PERSONAL_API_KEY_2','GEMINI_PERSONAL_API_KEY_3','GEMINI_PERSONAL_API_KEY_4','GEMINI_PERSONAL_API_KEY_5']
+  .map(name=>env[name]?.trim()).filter(key=>key&&!syntheticKeys.has(key)))];
 }
 export const geminiKeyIds=keys=>keys.map(key=>createHash('sha256').update('gemini-key-slot:'+key).digest('hex'));
 export function sharedGeminiKey(api,task,reviewId,keys){
@@ -66,15 +70,63 @@ async function boundedJson(response){
  return JSON.parse(Buffer.concat(chunks).toString());
 }
 
-export async function geminiAttempt({entry,apiKey,body,validate,fetcher=fetch,clock=Date.now}){
- const start=clock(),signal=AbortSignal.timeout(entry.timeout),attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'network',httpStatus:null,elapsedMs:0};
- const generateContent=entry.endpoint==='generateContent';
- const url='https://generativelanguage.googleapis.com/v1beta/'+(generateContent?`models/${entry.model}:generateContent`:'interactions');
+export const MAX_GEMINI_INPUT_TOKENS=500000;
+export const GEMINI_PREFLIGHT_MS=12000;
+const geminiBase='https://generativelanguage.googleapis.com/v1beta/models/';
+const textParts=value=>Array.isArray(value?.parts)&&value.parts.length>0&&value.parts.every(part=>
+ part&&Object.keys(part).length===1&&typeof part.text==='string');
+function countableBody(body){
+ return body&&Object.keys(body).length===3&&textParts(body.systemInstruction)&&Array.isArray(body.contents)&&
+  body.contents.length>0&&body.contents.every(textParts)&&Object.keys(body.generationConfig||{}).length===1&&
+  body.generationConfig.responseMimeType==='application/json'&&
+  [body.systemInstruction,...body.contents].every(content=>Object.keys(content).length===1);
+}
+
+export async function geminiAttempt({entry,apiKey,body,validate,candidates,beforeInput=async()=>true,fetcher=fetch,clock=Date.now,deadline=Infinity}){
+ const start=clock(),attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'token-count-unavailable',httpStatus:null,elapsedMs:0};
+ const done=(report=null,retrySeconds=0)=>{attempt.elapsedMs=Math.max(0,clock()-start);return {attempt,report,retrySeconds};};
+ if(!/^gemini-[a-z0-9.-]+$/.test(entry.model)||entry.endpoint!=='generateContent'||clock()>=deadline)return done();
+ const url=geminiBase+entry.model;
  const headers={'Content-Type':'application/json','x-goog-api-key':apiKey};
- if(!generateContent)headers['Api-Revision']='2026-05-20';
+ const preflight=AbortSignal.timeout(Math.max(1,Math.min(GEMINI_PREFLIGHT_MS,deadline-clock())));
+ let limit;
+ try{
+  const response=await fetcher(url,{redirect:'error',signal:preflight,headers});
+  if(!response.ok){await response.body?.cancel().catch(()=>{});return done();}
+  const model=await boundedJson(response);
+  if(model.name!=='models/'+entry.model||!Number.isSafeInteger(model.inputTokenLimit)||model.inputTokenLimit<=0||
+   !['countTokens','generateContent'].every(method=>model.supportedGenerationMethods?.includes(method)))return done();
+  limit=Math.min(MAX_GEMINI_INPUT_TOKENS,model.inputTokenLimit);
+ }catch{return done();}
+ let serialized,selected;
+ for(const [index,candidate] of [...(candidates||[{body,validate}])].slice(0,4).entries()){
+  if(preflight.aborted)return done();
+  if(!await beforeInput()){attempt.outcome='consent-changed';return done();}
+  attempt.outcome='token-count-unavailable';
+  try{
+   const snapshot=JSON.stringify(candidate.body),payload=JSON.parse(snapshot);
+   if(!countableBody(payload))return done();
+   const response=await fetcher(url+':countTokens',{method:'POST',redirect:'error',signal:preflight,headers,
+    body:JSON.stringify({generateContentRequest:{model:'models/'+entry.model,...payload}})});
+   if(!response.ok){await response.body?.cancel().catch(()=>{});return done();}
+   const {totalTokens}=await boundedJson(response);
+   if(!Number.isSafeInteger(totalTokens)||totalTokens<=0)return done();
+   if(totalTokens>limit){attempt.outcome='token-limit';continue;}
+   serialized=snapshot;selected=candidate;
+   attempt.countedInputTokens=totalTokens;
+   attempt.evidenceReduction=candidate.reduction??index;
+   break;
+  }catch{return done();}
+ }
+ if(!selected)return done();
+ if(!await beforeInput()){attempt.outcome='consent-changed';return done();}
+ const remaining=deadline-clock();
+ if(remaining<=0){attempt.outcome='timeout';return done();}
+ const signal=AbortSignal.timeout(Math.min(entry.timeout,remaining));
+ attempt.outcome='network';
  let report=null,retrySeconds=0;
  try{
-  const response=await fetcher(url,{method:'POST',redirect:'error',signal,headers,body:JSON.stringify(body)});
+  const response=await fetcher(url+':generateContent',{method:'POST',redirect:'error',signal,headers,body:serialized});
   attempt.httpStatus=response.status;
   if(!response.ok){
    attempt.outcome=response.status===429?'quota':[401,403].includes(response.status)?'key':response.status>=500?'unavailable':'request';
@@ -86,16 +138,16 @@ export async function geminiAttempt({entry,apiKey,body,validate,fetcher=fetch,cl
   }else{
    attempt.outcome='invalid';
    const raw=await boundedJson(response);
-   const json=generateContent?normalizeGeneratedContent(raw):raw;
+   const json=normalizeGeneratedContent(raw);
    for(const [source,target] of Object.entries({total_input_tokens:'inputTokens',total_output_tokens:'outputTokens',total_thought_tokens:'thoughtTokens'})){
     if(Number.isSafeInteger(json?.usage?.[source])&&json.usage[source]>=0)attempt[target]=json.usage[source];
    }
    if(json?.status==='incomplete')attempt.outcome='incomplete';
-   else{report=validate(json);attempt.outcome='complete';}
+   else if(attempt.inputTokens>limit)attempt.outcome='token-limit';
+   else{report=selected.validate(json);attempt.outcome='complete';}
   }
  }catch(error){if(signal.aborted||error?.name==='TimeoutError')attempt.outcome='timeout';}
- attempt.elapsedMs=Math.max(0,clock()-start);
- return {attempt,report,retrySeconds};
+ return done(report,retrySeconds);
 }
 
 function normalizeGeneratedContent(result){
@@ -110,7 +162,7 @@ function normalizeGeneratedContent(result){
 let lastLocalKey;
 export async function routedGemini({task,keys,request,validate,reserveKey,beforeAttempt=async()=>{},fetcher=fetch,totalMs=210000,clock=Date.now}){
  keys=[...new Set(keys||[])];
- if(keys.length<2)throw new CloudError(503,'Gemini needs at least two distinct confirmed Free-tier keys for rotation.');
+ if(keys.length<2)throw new CloudError(503,'Gemini needs at least two distinct approved keys for rotation.');
  const nextKey=reserveKey||(()=>{
   lastLocalKey=keys[(keys.indexOf(lastLocalKey)+1)%keys.length];
   return lastLocalKey;
@@ -126,33 +178,17 @@ export async function routedGemini({task,keys,request,validate,reserveKey,before
   // are authorization boundaries, not reasons to try a different model.
   await beforeAttempt(entry);
   if(clock()>=deadline)break;
-  const body=JSON.stringify(request(entry));
-  const apiKey=await nextKey();
-  const remaining=deadline-clock();
+  const body=request(entry),apiKey=await nextKey();
   if(!keys.includes(apiKey))throw new CloudError(503,'Gemini key rotation returned an invalid slot.');
-  const attempt={model:entry.model,thinking:entry.thinking||'default',outcome:'network',httpStatus:null};attempts.push(attempt);
-  try{
-   const response=await fetcher('https://generativelanguage.googleapis.com/v1beta/interactions',{method:'POST',redirect:'error',signal:AbortSignal.timeout(Math.max(1,Math.min(entry.timeout,remaining))),headers:{'Content-Type':'application/json','x-goog-api-key':apiKey,'Api-Revision':'2026-05-20'},body});
-   attempt.httpStatus=response.status;
-   if(!response.ok){
-    attempt.outcome='http';lastStatus=response.status;
-    let rejectedKey=false;
-    if(response.status===400){
-     const body=await response.json().catch(()=>null);
-     rejectedKey=body?.error?.details?.some?.(detail=>detail?.reason==='API_KEY_INVALID')===true;
-     const message=typeof body?.error?.message==='string'?body.error.message:'';
-     const reason=rejectedKey?'key rejected':/schema|response_format/i.test(message)?'schema rejected':'invalid request';
-     console.warn('Gemini request rejected',entry.model,reason);
-    }else await response.body?.cancel().catch(()=>{});
-    if(rejectedKey||[401,403,429].includes(response.status))continue;
-    break;
-   }
-   let size=0;const chunks=[];for await(const chunk of response.body){size+=chunk.length;if(size>256000)throw new Error('size');chunks.push(chunk);}
-   let json;try{json=JSON.parse(Buffer.concat(chunks).toString());}catch{attempt.outcome='invalid';lastStatus=502;break;}
-   let report;try{report=validate(json,entry);}catch{attempt.outcome='invalid';lastStatus=502;break;}
-   attempt.outcome='complete';return {report,model:entry.model,attempts,policy:MODEL_POLICY};
-  }catch{attempt.outcome='network';lastStatus=503;break;}
+  const {attempt,report}=await geminiAttempt({entry:{...entry,thinking:undefined,endpoint:'generateContent'},apiKey,body,deadline,clock,fetcher,
+   beforeInput:async()=>{await beforeAttempt(entry);return true;},validate:json=>validate(json,entry)});
+  attempts.push(attempt);
+  if(attempt.outcome==='complete')return {report,model:entry.model,attempts,policy:MODEL_POLICY};
+  lastStatus=attempt.httpStatus===429?429:attempt.outcome==='invalid'?502:503;
+  if(!['quota','key'].includes(attempt.outcome))break;
   }
  }
- const error=new CloudError(lastStatus===429?429:lastStatus===502?502:503,`Gemini could not finish this insight after its available free-model fallbacks${lastStatus&&lastStatus!==502&&lastStatus!==503?' (HTTP '+lastStatus+')':''}. Your goals, charts and saved records are intact. Try later.`);error.attempts=attempts;throw error;
+ const error=new CloudError(lastStatus===429?429:lastStatus===502?502:503,'Gemini could not finish this insight after its available model fallbacks. Your saved records are intact.');
+ error.attempts=attempts;
+ throw error;
 }

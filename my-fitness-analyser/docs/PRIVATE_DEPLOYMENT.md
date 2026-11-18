@@ -32,6 +32,10 @@ key. A second account must be invited to fitness_owners; then it receives its ow
 records, never the bootstrap owner's. RLS isolates rows/storage paths. UI assets can be public; health APIs and
 originals require verified authentication.
 
+## Gemini release migrations
+
+The production database uses a private release ledger for the November 19 Gemini update. Verify the live schema and `fitness_release.migrations` before retrying. Apply `20261118120000_analysis_model_fallbacks.sql` before `20261119120000_training_recovery_consent.sql`, then deploy the matching application and worker. [Gemini configuration and verification](GEMINI_DATA_SHARING.md).
+
 ## Production configuration
 
 Set these as **Production-only** Vercel environment variables, through the provider
