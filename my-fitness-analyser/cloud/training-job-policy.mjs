@@ -8,7 +8,7 @@ export const TRAINING_ROUTE=Object.freeze(ANALYSIS_ROUTE.map((entry,index)=>
 // The worker trusts only evidence built by the app server, even if a member
 // bypasses the app and calls the enqueue RPC with their own Supabase JWT.
 export function signTrainingJob(key,{owner,evidenceKey,consentRevision,pack}){
- return createHmac('sha256',key).update('training-job:v1:').update(JSON.stringify([owner,evidenceKey,String(consentRevision),pack.hash])).digest('hex');
+ return createHmac('sha256',key).update('training-job:v1:').update(JSON.stringify([owner,evidenceKey,String(consentRevision),pack.hash,...(pack.recentWorthKnowing?[pack.recentWorthKnowing]:[])])).digest('hex');
 }
 
 export function validJobSignature(keys,job){

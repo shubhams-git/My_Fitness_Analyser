@@ -6,6 +6,8 @@ import {coachingViews,evidenceHash} from '../analysis/coaching-evidence.mjs';
 import {RECORDED_COACH,recordedTrainingReport} from '../analysis/recorded-coaching.mjs';
 import {TRAINING_ROUTE,validJobSignature} from './training-job-policy.mjs';
 
+const noteKey=note=>note.toLowerCase().replace(/[^\p{L}]+/gu,' ').trim();
+
 const uuid=/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export async function runTrainingJob(api,{id,capability},{env=process.env,fetcher=fetch}={}){
@@ -32,7 +34,11 @@ export async function runTrainingJob(api,{id,capability},{env=process.env,fetche
  if(budget.retryAt)return true; // Database released the lease and scheduled the next eligible time.
  if(!Number.isInteger(budget.slot)||!keys[budget.slot-1])return finish({failure:'configuration'});
  const candidates=[...coachingViews(job.pack)].map((view,reduction)=>({
-  body:coachingGenerationRequest(view),validate:json=>extractCoaching(json,view,{compact:true}),reduction
+  body:coachingGenerationRequest(view),validate:json=>{
+   const report=extractCoaching(json,view,{compact:true});
+   if(report.worthKnowing&&job.pack.recentWorthKnowing?.some(note=>noteKey(note)===noteKey(report.worthKnowing)))delete report.worthKnowing;
+   return report;
+  },reduction
  })).slice(entry.evidenceTier||0);
  const result=await geminiAttempt({entry,apiKey:keys[budget.slot-1],candidates,fetcher,
   beforeInput:()=>rpc('training_generation_allowed',lease)});

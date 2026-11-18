@@ -57,7 +57,7 @@ export function coachingGenerationRequest(pack,{includeNote=true}={}){
   .replace('Use the exact schemaVersion and evidenceHash.','')+
   '\nReturn the required fields only. Each claim uses signalFactId for its main supporting fact. The app assembles citations from signalFactId and the exact {fact.id} placeholders in the prose. Cite at most six facts per claim. Put no numbers or zone labels outside placeholders.'+(includeNote?'\n\nFor a faster or slower headline, signalFactId must be the signed paceChange or splitChange fact for that comparison. Use paceDifference only as the magnitude in prose. If no signed comparison exists, use a non-comparative headline. Never append a unit after a placeholder.\n\n'+COACH_KNOWLEDGE:'');
  const recoveryRules=pack.content.recovery?'\n\nUse Garmin sleep and recovery only as potentially imperfect wearable estimates. Check days of coverage, freshness and missing fields before interpreting patterns. Today may be incomplete. Compare with the runner’s own recorded history and training context. Do not assume missing days are zero, infer illness or a medical condition, claim causation, prescribe treatment, or turn estimates into a readiness verdict. Label a recovery finding interpretation and cite its actual wearable facts.':'';
- return structuredGeminiRequest({instruction:systemInstruction+recoveryRules,input:pack.content,schema});
+ return structuredGeminiRequest({instruction:systemInstruction+recoveryRules,input:pack.recentWorthKnowing?.length?{...pack.content,recentWorthKnowing:pack.recentWorthKnowing}:pack.content,schema});
 }
 
 function assembleGeneratedReport(result,pack){
@@ -117,7 +117,7 @@ export class TrainingIntelligence {
  constructor(api,library,{env=process.env,fetcher=fetch,goals=new CloudGoals(api),zones=new CloudZones(api),wholeTraining=false,durable=false}={}){this.api=api;this.library=library;this.env=env;this.fetcher=fetcher;this.goals=goals;this.zones=zones;this.wholeTraining=wholeTraining;this.durable=durable;this.disclosure=wholeTraining?TRAINING_DISCLOSURE:DISCLOSURE;}
  preference(){return aiPreference(this.api,this.disclosure);}
  configured(){return geminiKeys(this.env).length===GEMINI_POOL_SIZE;}
- async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,includeRecovery:this.durable,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=(hash,prompt=COACH_PROMPT)=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,prompt,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash),previousPromptKey:fingerprint(pack.hash,PREVIOUS_COACH_PROMPT)};}
+ async context(){const [data,profiles,goals,zones]=await Promise.all([this.library.read(),this.api.json(`/rest/v1/fitness_profiles?owner_id=eq.${this.api.config.owner}&select=timezone`),this.goals.snapshot(),this.zones.snapshot()]);const anchor=localDay(profiles[0]?.timezone||'Australia/Sydney'),strengthEntries=this.wholeTraining?await recentStrength(this.api,anchor):null;const pack=coachingEvidence(data,{anchor,strengthEntries,includeRecovery:this.durable,zoneVersions:zones.versions,goalVersions:goals.versions}),model=(this.durable?TRAINING_ROUTE:modelRoute('run-coaching'))[0].model,policy=this.durable?TRAINING_JOB_POLICY:MODEL_POLICY,fingerprint=(hash,prompt=this.durable?COACH_PROMPT+'-fresh-knowledge':COACH_PROMPT)=>createHash('sha256').update(JSON.stringify([this.api.config.owner,hash,policy,model,prompt,COACH_SCHEMA])).digest('hex');return {pack,model,key:fingerprint(pack.hash),legacyKey:fingerprint(pack.legacyHash),previousPromptKey:fingerprint(pack.hash,PREVIOUS_COACH_PROMPT)};}
  async saved(context){
   const path=`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&order=created_at.desc`;
   const valid=rows=>rows.filter(r=>{try{
@@ -151,8 +151,11 @@ export class TrainingIntelligence {
   const cached=await this.saved(context);
   if(cached?.evidence_key===context.key&&cached.model_id===context.model)return {review:this.item(cached,context.key),job:null};
   const evidenceKey=context.key;
-  const signature=signTrainingJob(geminiKeys(this.env)[0],{owner:this.api.config.owner,evidenceKey,consentRevision:pref.revision,pack:context.pack});
-  const claim=await this.api.request('/rest/v1/rpc/enqueue_training_job',{method:'POST',body:{evidence_key:evidenceKey,evidence_pack:context.pack,consent_revision:pref.revision,job_signature:signature,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
+  const notes=await this.api.json(`/rest/v1/analysis_reports?owner_id=eq.${this.api.config.owner}&status=eq.complete&report->>worthKnowing=not.is.null&select=note:report->>worthKnowing&order=created_at.desc,id.desc&limit=8`);
+  const recentWorthKnowing=[...new Set(notes.map(row=>row.note).filter(note=>typeof note==='string'&&note.length<=280&&note.trim()&&!/[<>{}\r\n\d]|https?:|www\./i.test(note)))];
+  const pack={...context.pack,recentWorthKnowing};
+  const signature=signTrainingJob(geminiKeys(this.env)[0],{owner:this.api.config.owner,evidenceKey,consentRevision:pref.revision,pack});
+  const claim=await this.api.request('/rest/v1/rpc/enqueue_training_job',{method:'POST',body:{evidence_key:evidenceKey,evidence_pack:pack,consent_revision:pref.revision,job_signature:signature,prompt_version:COACH_PROMPT,schema_version:COACH_SCHEMA}});
   if(!claim.ok)throw new CloudError(claim.status===403?403:claim.status===429?429:503,claim.status===403?'Gemini permission changed. Check your AI settings.':claim.status===429?'Please wait a moment before requesting another analysis.':'The background analysis could not be queued. Try again shortly.');
   return {job:await claim.json()};
  }

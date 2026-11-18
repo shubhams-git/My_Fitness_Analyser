@@ -5,6 +5,8 @@ Completed increment: consented recovery evidence and counted Gemini requests (F2
 
 ## Implemented
 
+- Training gives Gemini more freedom over the Worth knowing topic, supplies recent educational notes for variety and omits repeated wording.
+
 - The next hosted release uses one five-key Gemini rotation pool for Training and Weight. Configure the five named Production keys before deploying. See [Gemini data sharing](docs/GEMINI_DATA_SHARING.md).
 
 - Hosted Garmin sync saves up to 28 days of allowlisted sleep, HRV and daily wellness summaries for the connected member. Training includes up to 24 detailed outdoor runs with recovery coverage and comparison windows, under the renewed v3 disclosure.
