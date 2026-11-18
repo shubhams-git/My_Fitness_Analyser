@@ -14,14 +14,16 @@
     "test:prototypes": "node --test tests/*.test.mjs",
     "dev": "node --watch prototypes/server.mjs",
     "vendor:motion": "node scripts/vendor-motion.mjs",
-    "vendor:maps": "node scripts/vendor-maps.mjs"
+    "vendor:maps": "node scripts/vendor-maps.mjs",
+    "vendor:video": "node scripts/vendor-video.mjs"
   },
   "displayName": "My Fitness Analyser",
   "dependencies": {
     "@garmin/fitsdk": "21.221.0",
     "ajv": "8.20.0",
     "gsap": "3.15.1",
-    "maplibre-gl": "6.16.0"
+    "maplibre-gl": "6.16.0",
+    "mediabunny": "1.66.0"
   },
   "devDependencies": {
     "@electric-sql/pglite": "0.5.15"

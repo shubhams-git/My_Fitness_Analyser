@@ -114,3 +114,27 @@ activity's imagery and physical iPhone Safari require the deployed browser key.
 - [Free plan pricing](https://www.maptiler.com/cloud/pricing/)
 - [Free plan attribution](https://docs.maptiler.com/guides/map-design/attribution/add-attribution/)
 - [Browser-key origin restrictions](https://docs.maptiler.com/guides/developer/credentials/api-key/)
+
+## Continuous flyover and Story export
+
+19 November 2026. Version satellite-replay-v6 replaces the speed-driven
+sway and turn banking with a precomputed camera path. The elevated opening
+rotates into a glide to the first fix. Follow holds a stable pitch and smooths
+position and bearing in playback time before a pullback and finish hold.
+The full route stays drawn across all phases. A fixed overview inset keeps
+it in view when the camera follows at close range. The runner and its
+crimson-to-gold wake are drawn together on each map render. Missing GPS
+still separates route runs and hides the moving marker until the next fix.
+
+**Download Story** generates a silent 1080 × 1920 MP4 on the device.
+The export composes a separate portrait map with the same camera model,
+lightning, activity title and recorded stats. It uses pitched EOxCloudless
+imagery with visible attribution and ShareAlike licence text. The video is
+intended for personal, non-commercial sharing. Mediabunny 1.66.0 is
+vendored unmodified under MPL-2.0 and loaded only on export. WebCodecs
+encodes fixed 30 fps output even if rendering takes longer than playback.
+
+- [Strava Flyover launch and aerial zoom reference](https://press.strava.com/en-gb/articles/strava-releases-flyover-transforming-how-athletes-look-back-at-adventures)
+- [Instagram Story video dimensions](https://www.facebook.com/business/ads-guide/video/instagram-story)
+- [EOxCloudless guidance for video exports](https://cloudless.eox.at/documentation/faq)
+- [Mediabunny MP4 writing reference](https://mediabunny.dev/guide/writing-media-files)

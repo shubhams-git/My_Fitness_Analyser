@@ -14,6 +14,8 @@
     { "source": "/satellite-replay.js", "destination": "/prototypes/satellite-replay.js" },
     { "source": "/satellite-replay.css", "destination": "/prototypes/satellite-replay.css" },
     { "source": "/replay-model.js", "destination": "/prototypes/replay-model.js" },
+    { "source": "/replay-lightning.js", "destination": "/prototypes/replay-lightning.js" },
+    { "source": "/replay-export.js", "destination": "/prototypes/replay-export.js" },
     { "source": "/index.html", "destination": "/prototypes/shell.html" },
     { "source": "/activity-analysis.js", "destination": "/prototypes/activity-analysis.js" },
     { "source": "/activity-visuals.js", "destination": "/prototypes/activity-visuals.js" },

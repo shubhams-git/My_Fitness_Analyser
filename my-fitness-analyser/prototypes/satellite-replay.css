@@ -17,7 +17,8 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
 .satellite-replay::backdrop{background:rgb(4 9 15 / .94)}
 .satellite-replay ::selection{background:var(--color-accent);color:var(--color-onAccent)}
 .satellite-stage{position:relative;grid-row:2;min-height:0;min-width:0;overflow:hidden;background:var(--color-surface)}
-.satellite-canvas,.satellite-shade{position:absolute;inset:0}
+.satellite-canvas,.satellite-shade,.satellite-lightning{position:absolute;inset:0}
+.satellite-lightning{display:block;width:100%;height:100%;pointer-events:none}
 .satellite-shade{pointer-events:none;background:linear-gradient(180deg,transparent 70%,rgb(5 12 20 / .8))}
 .satellite-hud{
   position:relative;z-index:3;grid-row:1;min-width:0;min-height:0;overflow:auto;
@@ -34,7 +35,7 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
 }
 .satellite-header p{font:500 .875rem/1.5 var(--font-display);margin:8px 0 0;color:var(--color-text)}
 .satellite-header p span{color:var(--color-muted)}
-.satellite-close,.satellite-controls button,.satellite-message button{
+.satellite-close,.satellite-controls :is(button,a),.satellite-message button{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   min-height:48px;min-width:48px;
   border:1px solid var(--color-border);border-radius:12px;
@@ -44,7 +45,7 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
 }
 .satellite-close{width:48px;flex-shrink:0;border-radius:50%}
 .satellite-replay svg{width:20px;height:20px;flex-shrink:0}
-.satellite-close:hover,.satellite-controls button:hover,.satellite-message button:hover{background:var(--color-raised)}
+.satellite-close:hover,.satellite-controls :is(button,a):hover,.satellite-message button:hover{background:var(--color-raised)}
 .satellite-close:active,.satellite-controls button:active,.satellite-message button:active{background:var(--color-raised);border-color:var(--color-text)}
 .satellite-replay :is(button,input,summary,a):focus-visible{outline:3px solid var(--color-focus);outline-offset:3px}
 .satellite-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin:0 32px;max-width:520px}
@@ -66,7 +67,10 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
 .satellite-position output{font-variant-numeric:tabular-nums;color:var(--color-text)}
 .satellite-footer input{display:block;width:100%;height:44px;margin:4px 0 8px;accent-color:var(--color-accent);cursor:pointer}
 .satellite-controls{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-.satellite-controls button{padding:10px 18px}
+.satellite-controls :is(button,a){padding:10px 14px;text-decoration:none}
+.satellite-controls [hidden],.satellite-export-status:empty{display:none}
+.satellite-export-status{margin:8px 0 0;font-size:.8125rem;color:var(--color-text)}
+.satellite-export-stage{position:fixed;top:0;left:-600px;width:540px;height:960px;pointer-events:none}
 .satellite-controls [data-replay-play]{background:var(--color-accent);color:var(--color-onAccent);border-color:var(--color-accent);min-width:120px}
 .satellite-controls [data-replay-play]:hover,.satellite-controls [data-replay-play]:active{background:var(--color-highlight);border-color:var(--color-highlight)}
 .satellite-controls button:disabled,.satellite-footer input:disabled{opacity:.55;cursor:default}
@@ -98,9 +102,13 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
   .satellite-metrics{margin:0 20px;gap:16px;max-width:none}
   .satellite-metrics dd{font-size:2.5rem}
   .satellite-footer{padding:12px max(20px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
-  .satellite-controls button{flex:1 1 auto;min-width:max-content;padding:10px 12px}
-  .satellite-controls button span{white-space:nowrap}
-  .satellite-controls [data-replay-play]{min-width:max-content}
+  .satellite-controls{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1.35fr);gap:8px}
+  .satellite-controls :is(button,a){min-width:0;padding:6px;font-size:.8125rem;line-height:1.2;text-align:center}
+  .satellite-controls [data-replay-play]{min-width:0}
+}
+@media(max-width:375px){
+  .satellite-controls svg{width:15px;height:15px}
+  .satellite-controls :is(button,a){gap:4px;font-size:.75rem}
 }
 
 @media(max-height:540px) and (orientation:landscape){
@@ -114,8 +122,8 @@ dialog.satellite-replay[open]{display:grid;grid-template-rows:minmax(0,auto) min
   .satellite-metrics dd{font-size:2rem;margin-top:4px}
   .satellite-footer{padding:8px max(20px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
   .satellite-footer input{margin:0;height:44px}
-  .satellite-controls{gap:12px;flex-wrap:nowrap}
-  .satellite-controls button{flex:0 0 auto;min-height:44px;padding:8px 16px}
+  .satellite-controls{display:flex;gap:12px;flex-wrap:wrap}
+  .satellite-controls :is(button,a){flex:0 0 auto;min-height:44px;padding:8px 16px}
   .satellite-controls [data-replay-play]{min-width:112px}
   .satellite-message{padding:12px 16px}
 }

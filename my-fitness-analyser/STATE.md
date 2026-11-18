@@ -1,7 +1,7 @@
 # Current state
 
 Updated: 19 November 2026 (Australia/Sydney)
-Completed increment: consented recovery evidence and counted Gemini requests (F22)
+Completed increment: continuous route flyover and Story export (F16)
 
 ## Implemented
 
@@ -15,13 +15,15 @@ Completed increment: consented recovery evidence and counted Gemini requests (F2
 - The worker counts the complete request using the selected model before every generation. Training uses a 120-second primary attempt, then 70/55/40-second fallbacks. Missing counts fail closed. The final fallback starts with a smaller evidence view.
 - Production Supabase records migrations 20261118120000 and 20261119120000 in the private release ledger. Personal provider calls require an approved project. Existing Free keys remain suitable for synthetic testing only. See [Gemini data sharing](docs/GEMINI_DATA_SHARING.md).
 
-- Satellite replay follows closer on MapTiler imagery, with subtle pace-driven
-  sway and turn banking. The orange trace shows the latest part of the route
-  during the chase and reveals the full route on pullback. Reduced motion
-  retains top-down manual inspection. Chromium checked live tiles with a
-  synthetic route, turn framing, playback controls and imagery fallback.
-  The runner dot and trail render in the same map update to keep them aligned
-  during fast playback. Production was inspected on the Melbourne run.
+- Satellite replay opens with an aerial orbit, glides to the start, follows
+  a smoothed camera path and pulls back to the full route. A lightning wake
+  tracks the runner and a full-route inset preserves context during the chase.
+  GPS gaps remain open. Reduced motion retains top-down manual inspection.
+  Download Story renders a portrait 1080 × 1920 silent H.264 MP4 at 30 fps
+  in the browser. Chromium exercises the synthetic route with live imagery
+  in phone and landscape layouts. FFprobe verified 678 frames across
+  22.6 seconds at 1080 × 1920 and 30 fps. All 152 prototype tests and the
+  foundation checks pass. See [F16](features/F16_SATELLITE_REPLAY.md).
 
 - Route replay can use higher-resolution MapTiler Cloud Free imagery with an
   origin-restricted `MAPTILER_BROWSER_KEY` on the deployment. EOxCloudless
@@ -349,4 +351,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Confirm an eligible Gemini project for personal training and weight evidence before enabling the hosted provider routes.
+Verify the hosted flyover and Story download on physical iPhone Safari.

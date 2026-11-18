@@ -1,5 +1,13 @@
 # Decision register
 
+D51 — Continuous lightning flyover and Story export, 19 November 2026.
+Use a camera path sampled in playback time so the orbit, entry, turns and
+pullback match when played or scrubbed. Render the complete GPS route as a
+static layer and keep the animated runner and wake in the same render pass.
+Show the whole course in an inset when the chase camera moves in. Export
+a portrait 1080 × 1920 H.264 MP4 in the browser at fixed 30 fps with
+attributed EOxCloudless imagery for personal sharing. See F16.
+
 D50 — Bounded Gemini recovery, 18 November 2026. Owner requests 3.6 retries
 with rotated keys, then 3 Flash Preview and finally 3.1 Flash-Lite. Use two
 70-second primary attempts, 55-second Preview and 40-second Lite, preserving
