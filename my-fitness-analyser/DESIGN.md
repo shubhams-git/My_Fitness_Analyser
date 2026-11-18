@@ -58,8 +58,9 @@ Use native scroll; sections remain reachable by links and keyboard. A deliberate
 Route-length-aware satellite replay takes 20–24.5 seconds and opens through
 Replay route. The camera orbits above the full route, descends to the start,
 follows at a steady pitch and pulls back to a complete-route view. A warm
-lightning wake draws attention to the moving runner. A small route overview shows
-the entire trace during close tracking. The traversal uses recorded elapsed
+lightning wake draws attention to the moving runner. The full route starts as a
+muted guide and lights up behind the runner, including in the small overview
+shown during close tracking. The traversal uses recorded elapsed
 timestamps, including GPS gaps. Pause, restart, timeline inspection and close
 remain explicit. Download Story exports a 1080 × 1920 silent MP4 with route
 statistics and imagery credits. Normal street-map and chart inspection keep a

@@ -1,4 +1,18 @@
 const MAX_WAKE_PIXELS=106;
+const COVERED_COLOR='#ff9c63';
+
+function tracePath(path,lines,project){
+  for(const line of lines){
+    let started=false;
+    for(const coordinate of line){
+      const [x,y]=project(coordinate);
+      if(!Number.isFinite(x)||!Number.isFinite(y)){started=false;continue;}
+      if(started)path.lineTo(x,y);
+      else path.moveTo(x,y);
+      started=true;
+    }
+  }
+}
 
 function visibleWake(points){
   const wake=[{...points.at(-1),distance:0}];
@@ -65,14 +79,8 @@ function routeOverview(route){
   const scale=Math.min((width-20)/Math.max((east-west)*aspect,1e-8),(height-20)/Math.max(north-south,1e-8));
   const project=([lon,lat])=>[width/2+(lon-(west+east)/2)*aspect*scale,height/2-(lat-(south+north)/2)*scale];
   const line=new Path2D();
-  for(const segment of route.segments){
-    segment.forEach((point,index)=>{
-      const [x,y]=project(point.coordinate);
-      if(index===0)line.moveTo(x,y);
-      else line.lineTo(x,y);
-    });
-  }
-  return (ctx,stageWidth,stageHeight,bottom,opacity,coordinate)=>{
+  tracePath(line,route.segments.map(segment=>segment.map(point=>point.coordinate)),project);
+  return (ctx,stageWidth,stageHeight,bottom,opacity,coordinate,covered)=>{
     if(stageHeight<height+bottom+38)return;
     ctx.save();
     ctx.translate(stageWidth-width-14,stageHeight-height-bottom);
@@ -84,11 +92,15 @@ function routeOverview(route){
     ctx.strokeStyle='#ffffff4d';
     ctx.lineWidth=1;
     ctx.stroke();
-    ctx.strokeStyle='#ffad7e';
+    ctx.strokeStyle='#9dafba';
     ctx.lineWidth=2;
     ctx.lineJoin='round';
     ctx.lineCap='round';
     ctx.stroke(line);
+    ctx.beginPath();
+    tracePath(ctx,covered,project);
+    ctx.strokeStyle=COVERED_COLOR;
+    ctx.stroke();
     if(coordinate){
       const [x,y]=project(coordinate);
       ctx.beginPath();
@@ -103,7 +115,7 @@ function routeOverview(route){
 export function replayLightning(canvas,route){
   const ctx=canvas.getContext('2d');
   const drawOverview=routeOverview(route);
-  return function paint(map,{points=[],coordinate,seconds=0,energy=0,overview=0}={},insetBottom=14){
+  return function paint(map,{points=[],covered=[],coordinate,seconds=0,energy=0,overview=0}={},insetBottom=14){
     if(!ctx)return;
     const width=canvas.clientWidth,height=canvas.clientHeight;
     const scale=Math.min(window.devicePixelRatio||1,1.5);
@@ -114,7 +126,20 @@ export function replayLightning(canvas,route){
     }
     ctx.setTransform(scale,0,0,scale,0,0);
     ctx.clearRect(0,0,width,height);
-    if(overview>0)drawOverview(ctx,width,height,insetBottom,overview,coordinate);
+    if(covered.length){
+      ctx.beginPath();
+      tracePath(ctx,covered,point=>{
+        const {x,y}=map.project(point);
+        // A point behind the camera is projected outside this guard band.
+        return Math.abs(x-width/2)>=width*1.49||Math.abs(y-height/2)>=height*1.49?[NaN,NaN]:[x,y];
+      });
+      ctx.lineCap='round';
+      ctx.lineJoin='round';
+      ctx.lineWidth=3.5;
+      ctx.strokeStyle=COVERED_COLOR;
+      ctx.stroke();
+    }
+    if(overview>0)drawOverview(ctx,width,height,insetBottom,overview,coordinate,covered);
     if(!coordinate)return;
 
     const head=map.project(coordinate);

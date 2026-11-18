@@ -1,7 +1,7 @@
 # Current state
 
 Updated: 19 November 2026 (Australia/Sydney)
-Completed increment: continuous route flyover and Story export (F16)
+Completed increment: progressive flyover trail and tighter chase framing (F16)
 
 ## Implemented
 
@@ -18,11 +18,13 @@ Completed increment: continuous route flyover and Story export (F16)
 - Satellite replay opens with an aerial orbit, glides to the start, follows
   a smoothed camera path and pulls back to the full route. A lightning wake
   tracks the runner and a full-route inset preserves context during the chase.
+  The route starts muted and lights up to the current GPS position in both
+  playback and Story export. The chase camera is 0.25 zoom levels closer.
   GPS gaps remain open. Reduced motion retains top-down manual inspection.
   Download Story renders a portrait 1080 × 1920 silent H.264 MP4 at 30 fps
   in the browser. Chromium exercises the synthetic route with live imagery
   in phone and landscape layouts. FFprobe verified 678 frames across
-  22.6 seconds at 1080 × 1920 and 30 fps. All 152 prototype tests and the
+  22.6 seconds at 1080 × 1920 and 30 fps. All 153 prototype tests and the
   foundation checks pass. See [F16](features/F16_SATELLITE_REPLAY.md).
 
 - Route replay can use higher-resolution MapTiler Cloud Free imagery with an

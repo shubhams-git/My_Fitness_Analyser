@@ -79,6 +79,8 @@ test('flight pans into the start, turns smoothly at a sharp corner, and settles 
  assert.equal(camera(0).pitch,12);
  assert.notEqual(camera(1).bearing,camera(0).bearing);
  assert.deepEqual(camera(3.8).center,model.route.points[0].coordinate);
+ assert.equal(camera(6).zoom,15.4);
+ assert.equal(flight.cameraAt(6,framing,{sharpImagery:false}).zoom,14.7);
  assert.ok(Math.abs(angleDelta(camera(6).bearing,camera(15).bearing))>30);
  for(let t=4;t<16;t+=.025){
   assert.ok(Math.abs(angleDelta(camera(t).bearing,camera(t+.025).bearing))<=.626);
@@ -109,4 +111,17 @@ test('lightning stays in the current GPS segment while the complete route is ava
  assert.equal(replayShot(model,0,false).effect.energy,0);
  assert.ok(replayShot(model,model.duration/2,false).effect.energy>0);
  assert.equal(replayShot(model,model.duration,false).effect.energy,0);
+});
+
+test('the trail lights up to the playhead and preserves earlier sections through GPS gaps and seeks',()=>{
+ const model=replayModel([fix(0),fix(5),fix(10),fix(11,null,{lat:null}),fix(14),fix(20)]);
+ const full=model.completeTrail.features.map(feature=>feature.geometry.coordinates);
+ assert.deepEqual(replayShot(model,2,false).effect.covered,[]);
+ assert.deepEqual(replayShot(model,3.8,false).effect.covered,[]);
+ assert.deepEqual(model.coveredTrail(7.5),[[...full[0].slice(0,2),model.sample(7.5).coordinate]]);
+ assert.deepEqual(model.coveredTrail(12),[full[0]]);
+ assert.deepEqual(model.coveredTrail(14),[full[0]]);
+ assert.deepEqual(model.coveredTrail(17),[full[0],[full[1][0],model.sample(17).coordinate]]);
+ assert.deepEqual(replayShot(model,model.duration,false).effect.covered,full);
+ assert.deepEqual(replayShot(model,model.duration/4,true).effect.covered,[full[0].slice(0,2)]);
 });

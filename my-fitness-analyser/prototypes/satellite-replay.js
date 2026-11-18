@@ -24,7 +24,7 @@ export function createReplayMap(Map,container,model,key,options={}){
 
 export function addReplayRoute(map,model){
   map.addSource('replay-route',{type:'geojson',data:model.completeTrail,tolerance:0});
-  for(const [id,color,width] of [['route-casing','#271b21',7],['route-ember','#ff9c63',3.5]]){
+  for(const [id,color,width] of [['route-casing','#17212b',6],['route-guide','#9dafba',2.5]]){
     map.addLayer({id,type:'line',source:'replay-route',layout:{'line-cap':'round','line-join':'round'},
       paint:{'line-color':color,'line-width':width}});
   }
@@ -50,7 +50,8 @@ export function replayShot(model,clock,reduced){
   const coordinate=following||phase.name==='finished'||reduced?sample.coordinate:model.route.points[0].coordinate;
   const energy=following?Math.min(1,phase.followSeconds*2)*(1-exit):0;
   const wake=energy>0?model.wake(phase.time,sample,model.end/model.duration*.75):[];
-  return {phase,sample,exit,effect:{coordinate,points:wake,seconds:clock,energy,overview:following?(1-exit)*Math.min(1,phase.followSeconds):0}};
+  const covered=model.coveredTrail(phase.time);
+  return {phase,sample,exit,effect:{coordinate,covered,points:wake,seconds:clock,energy,overview:following?(1-exit)*Math.min(1,phase.followSeconds):0}};
 }
 
 export function openSatelliteReplay({activity,mapTilerBrowserKey,opener,reduced=false,onClose}){

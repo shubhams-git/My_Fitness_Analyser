@@ -1,6 +1,6 @@
 import { geographicRoute,routeFeatures } from './route-geometry.js';
 
-export const REPLAY_VERSION='satellite-replay-v6';
+export const REPLAY_VERSION='satellite-replay-v7';
 export const REPLAY_SECONDS=22.7;
 const descentEnd=3.8, finishHold=1.6;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -63,6 +63,23 @@ export function replayModel(records){
     return {index,row,coordinate,segment,gap:!coordinate};
   }
   const lastFixAt=time=>route.points[Math.max(0,atOrBefore(route.points,time,pointTime))];
+  function coveredTrail(time){
+    const covered=[];
+    for(const [index,path] of route.segments.entries()){
+      if(time<=path[0].row.t)break;
+      const coordinates=completeTrail.features[index].geometry.coordinates;
+      if(time>=path.at(-1).row.t){
+        covered.push(coordinates);
+        continue;
+      }
+      const last=atOrBefore(path,time,pointTime);
+      const part=coordinates.slice(0,last+1);
+      if(time>path[last].row.t)part.push(interpolatePoint(path[last],path[last+1],time));
+      if(part.length>1)covered.push(part);
+      break;
+    }
+    return covered;
+  }
   function wake(time,fix,seconds){
     const path=route.segments[fix.segment];
     if(!path||!fix.coordinate)return [];
@@ -75,7 +92,7 @@ export function replayModel(records){
     points.push(fix.coordinate);
     return points;
   }
-  return {route,completeTrail,end,duration:replayDuration(records),sample,wake,lastFixAt,available:end>0&&route.segments.length>0&&records.every(r=>Number.isFinite(r.t))&&records.every((r,i)=>!i||r.t>=records[i-1].t)};
+  return {route,completeTrail,end,duration:replayDuration(records),sample,coveredTrail,wake,lastFixAt,available:end>0&&route.segments.length>0&&records.every(r=>Number.isFinite(r.t))&&records.every((r,i)=>!i||r.t>=records[i-1].t)};
 }
 export function replayPhase(seconds,end,duration=REPLAY_SECONDS){
   const t=clamp(seconds,0,duration),finish=duration-finishHold;
@@ -123,7 +140,7 @@ export function replayFlight(model){
     const a=frames[start],b=frames[Math.min(count,start+1)],exit=replayPullback(seconds,model.duration);
     const followCenter=mixPoint(a.center,b.center,u);
     const followBearing=mix(a.bearing,b.bearing,u);
-    const chaseZoom=Math.min(sharpImagery?15.6:14.45,fit.zoom+2.15);
+    const chaseZoom=Math.min(sharpImagery?15.85:14.7,fit.zoom+2.4);
     return {
       center:mixPoint(mixPoint(opening.center,followCenter,approach),closing.center,exit),
       bearing:mix(openingBearing,followBearing,turn)+angleDelta(followBearing,closingBearing)*exit,

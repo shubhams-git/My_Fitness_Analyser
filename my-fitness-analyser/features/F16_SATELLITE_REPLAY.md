@@ -138,3 +138,8 @@ encodes fixed 30 fps output even if rendering takes longer than playback.
 - [Instagram Story video dimensions](https://www.facebook.com/business/ads-guide/video/instagram-story)
 - [EOxCloudless guidance for video exports](https://cloudless.eox.at/documentation/faq)
 - [Mediabunny MP4 writing reference](https://mediabunny.dev/guide/writing-media-files)
+
+Version satellite-replay-v7 keeps the full route as a muted guide and lights
+the covered distance up to the current GPS position. The inset and Story MP4
+use the same playback progress, including when the timeline is scrubbed.
+Chase zoom increases by 0.25 levels.

@@ -7,6 +7,8 @@ static layer and keep the animated runner and wake in the same render pass.
 Show the whole course in an inset when the chase camera moves in. Export
 a portrait 1080 × 1920 H.264 MP4 in the browser at fixed 30 fps with
 attributed EOxCloudless imagery for personal sharing. See F16.
+The follow-up uses a muted guide and lights the covered route in the
+same frame as the runner. It raises chase zoom by 0.25 levels.
 
 D50 — Bounded Gemini recovery, 18 November 2026. Owner requests 3.6 retries
 with rotated keys, then 3 Flash Preview and finally 3.1 Flash-Lite. Use two
