@@ -43,8 +43,18 @@
 .zn-chart td.zn-duration{padding-right:8px;overflow-wrap:anywhere}
 
 .goal-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:24px 0}
-.goal-strip{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:8px 16px;padding:18px 0;border-top:1px solid var(--color-divider);min-width:0}
-.fn-app .goal-strip h2{font:700 1.45rem/1.15 var(--font-editorial);margin:0}.goal-strip a{min-height:44px;display:inline-flex;align-items:center;color:var(--color-accent);font-size:.875rem}.goal-strip strong{grid-column:1/-1;font:700 1.8rem/1.1 var(--font-editorial);font-variant-numeric:tabular-nums}.goal-strip p{grid-column:1/-1;color:var(--color-muted);font-size:.875rem;margin:4px 0}.goal-strip progress{grid-column:1/-1;width:100%;height:8px;accent-color:var(--color-accent)}.goal-tabs{flex-wrap:wrap}.zn-form [aria-invalid=true]{border-color:var(--color-danger)}
+.goal-strip{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px 16px;padding:14px 0 18px;border-top:1px solid var(--color-divider);min-width:0}
+.fn-app .goal-strip h2{font:650 1.125rem/1.4 var(--font-body);margin:0;overflow-wrap:anywhere}
+.goal-strip a{min-height:44px;display:inline-flex;align-items:center;color:var(--color-accent);font:550 .8125rem/1.4 var(--font-body)}
+.goal-strip a:focus-visible{outline:2px solid var(--color-focus);outline-offset:4px}
+.goal-strip strong{grid-column:1/-1;font:650 1.125rem/1.4 var(--font-body);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.goal-strip p{grid-column:1/-1;color:var(--color-muted);font:.875rem/1.5 var(--font-body);margin:2px 0 0}
+.goal-strip progress{grid-column:1/-1;appearance:none;display:block;width:100%;height:8px;border:0;border-radius:999px;overflow:hidden;background:var(--color-raised);accent-color:var(--color-accent)}
+.goal-strip progress::-webkit-progress-bar{background:var(--color-raised)}
+.goal-strip progress::-webkit-progress-value{background:var(--color-accent);border-radius:999px}
+.goal-strip progress::-moz-progress-bar{background:var(--color-accent);border-radius:999px}
+@media(max-width:650px){.fn-app .goal-strip h2{font-size:1rem}.goal-strip a{font-size:.75rem}}
+.goal-tabs{flex-wrap:wrap}.zn-form [aria-invalid=true]{border-color:var(--color-danger)}
 @media(max-width:640px){.goal-pair{grid-template-columns:1fr;gap:8px}}
 
 .goal-chart-line{stroke:var(--color-positive);stroke-width:1;stroke-dasharray:5 4;opacity:.7}.jr-chart-frame text.goal-chart-label{fill:var(--color-positive)}

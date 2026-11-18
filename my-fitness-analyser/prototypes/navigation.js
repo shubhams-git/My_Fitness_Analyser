@@ -2,7 +2,7 @@ import { logout,refreshView,viewSnapshot } from './session.js';
 
 const training=()=>import('./training.js').then(module=>module.mountTraining);
 const pages={
-  today:{title:'Training',styles:['coaching','training-focus'],load:training},
+  today:{title:'Training',styles:['coaching','training-focus','zones'],load:training},
   progress:{title:'Progress',styles:['training-focus','progress','activity-visuals','zones'],load:training},
   sessions:{title:'Sessions',styles:['training-focus'],load:training},
   journal:{title:'Journal',description:'Weight trends and gym sessions.',styles:['journal','journal-capture','zones'],load:()=>import('./journal.js').then(module=>module.mountJournal)},
