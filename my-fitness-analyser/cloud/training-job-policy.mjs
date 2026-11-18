@@ -1,11 +1,8 @@
 import {createHmac,timingSafeEqual} from 'node:crypto';
-import {PRIMARY_GEMINI_MODEL} from './gemini-router.mjs';
+import {ANALYSIS_ROUTE} from './gemini-router.mjs';
 
-export const TRAINING_JOB_POLICY='durable-coach-v3';
-export const TRAINING_ROUTE=Object.freeze([
- PRIMARY_GEMINI_MODEL,
- {model:'gemini-3.5-flash-lite',timeout:220000,endpoint:'generateContent'}
-]);
+export const TRAINING_JOB_POLICY='durable-coach-v4';
+export const TRAINING_ROUTE=ANALYSIS_ROUTE;
 
 // The worker trusts only evidence built by the app server, even if a member
 // bypasses the app and calls the enqueue RPC with their own Supabase JWT.

@@ -1,0 +1,2105 @@
+{
+  "goalContext": {
+    "weekly": null,
+    "time": null
+  },
+  "zoneContext": [],
+  "version": "coaching-evidence-v5",
+  "dataset": "personal",
+  "scope": "Outdoor Garmin runs for performance. Other recorded workouts provide context for the next run.",
+  "runsInHistory": 9,
+  "truncated": false,
+  "sessions": [
+    {
+      "personalZones": [],
+      "ref": "s01",
+      "daysAgo": 10,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s02",
+      "daysAgo": 13,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s03",
+      "daysAgo": 19,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s04",
+      "daysAgo": 22,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s05",
+      "daysAgo": 25,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [
+        "no_hr"
+      ],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s06",
+      "daysAgo": 28,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s07",
+      "daysAgo": 31,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s08",
+      "daysAgo": 34,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [
+        "no_hr"
+      ],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    },
+    {
+      "personalZones": [],
+      "ref": "s09",
+      "daysAgo": 37,
+      "source": "garmin",
+      "environment": "outdoor",
+      "durationBasis": "timer",
+      "paceBasis": "timer",
+      "limitations": [],
+      "fullKmSplitCount": 5,
+      "breathing": null,
+      "finish": null,
+      "discomfort": null
+    }
+  ],
+  "facts": [
+    {
+      "id": "history.runs",
+      "label": "Imported runs",
+      "value": 9,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "history.distance",
+      "label": "Imported running distance",
+      "value": 43198.48215273119,
+      "unit": "m",
+      "sessionIds": []
+    },
+    {
+      "id": "s01.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.durationS",
+      "label": "Recorded duration",
+      "value": 1245.6000000000001,
+      "unit": "s",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 259.50911794458113,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.hrBpm",
+      "label": "Average heart rate",
+      "value": 148.84783712110053,
+      "unit": "bpm",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 96.39834771920135,
+      "unit": "s",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 244.39777858291768,
+      "unit": "s",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 510.17283228381064,
+      "unit": "s",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 263.1992874023316,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 267.7878589801505,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 4.588571577818868,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 263.1992874023316,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 248.47727546263198,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 274.8399591308626,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 244.8983531612064,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s01.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 267.7878589801505,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01"
+      ]
+    },
+    {
+      "id": "s02.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.durationS",
+      "label": "Recorded duration",
+      "value": 1267.2,
+      "unit": "s",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 264.00927605922703,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.hrBpm",
+      "label": "Average heart rate",
+      "value": 149.04783712110054,
+      "unit": "bpm",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 98.06999536751124,
+      "unit": "s",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 248.63589035025151,
+      "unit": "s",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 519.0197600112755,
+      "unit": "s",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 267.7634368948576,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 272.43157907807193,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 4.668142183214343,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 267.7634368948576,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 252.78612995042332,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 279.6059699828429,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 249.14514541255676,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s02.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 272.43157907807193,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02"
+      ]
+    },
+    {
+      "id": "s03.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.durationS",
+      "label": "Recorded duration",
+      "value": 1310.4,
+      "unit": "s",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 273.0095922885189,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.hrBpm",
+      "label": "Average heart rate",
+      "value": 149.44783712110055,
+      "unit": "bpm",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 101.41329066413095,
+      "unit": "s",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 257.11211388491915,
+      "unit": "s",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 536.7136154662054,
+      "unit": "s",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 276.89173587990956,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 281.71901927391525,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 4.82728339400569,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 276.89173587990956,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 261.40383892600585,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 289.1379916868035,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 257.6387299152576,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s03.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 281.71901927391525,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03"
+      ]
+    },
+    {
+      "id": "s04.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.durationS",
+      "label": "Recorded duration",
+      "value": 1331.9999999999998,
+      "unit": "s",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 277.50975040316473,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.hrBpm",
+      "label": "Average heart rate",
+      "value": 149.64783712110054,
+      "unit": "bpm",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 103.08493831244073,
+      "unit": "s",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 261.35022565225296,
+      "unit": "s",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 545.5605431936702,
+      "unit": "s",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 281.4558853724355,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 286.36273937183677,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 4.906853999401278,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 281.4558853724355,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 265.7126934137971,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 293.9040025387837,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 261.8855221666081,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s04.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 286.36273937183677,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04"
+      ]
+    },
+    {
+      "id": "s05.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.durationS",
+      "label": "Recorded duration",
+      "value": 1353.6,
+      "unit": "s",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 282.0099085178107,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 104.75658596075061,
+      "unit": "s",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 265.5883374195868,
+      "unit": "s",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 554.4074709211351,
+      "unit": "s",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 286.0200348649615,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 291.00645946975857,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 4.986424604797094,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 286.0200348649615,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 270.02154790158846,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 298.6700133907639,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 266.13231441795847,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s05.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 291.00645946975857,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05"
+      ]
+    },
+    {
+      "id": "s06.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.durationS",
+      "label": "Recorded duration",
+      "value": 1375.1999999999998,
+      "unit": "s",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 286.5100666324566,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.hrBpm",
+      "label": "Average heart rate",
+      "value": 150.04783712110054,
+      "unit": "bpm",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 106.42823360906044,
+      "unit": "s",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 269.8264491869206,
+      "unit": "s",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 563.2543986486,
+      "unit": "s",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 290.58418435748746,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 295.65017956768025,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 5.065995210192796,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 290.58418435748746,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 274.3304023893797,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 303.43602424274417,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 270.3791066693088,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s06.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 295.65017956768025,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06"
+      ]
+    },
+    {
+      "id": "s07.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.durationS",
+      "label": "Recorded duration",
+      "value": 1396.8,
+      "unit": "s",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 291.01022474710254,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.hrBpm",
+      "label": "Average heart rate",
+      "value": 150.24783712110053,
+      "unit": "bpm",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 108.09988125737033,
+      "unit": "s",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 274.0645609542545,
+      "unit": "s",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 572.101326376065,
+      "unit": "s",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 295.14833385001344,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 300.29389966560205,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 5.145565815588611,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 295.14833385001344,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 278.6392568771711,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 308.20203509472447,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 274.6258989206592,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s07.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 300.29389966560205,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07"
+      ]
+    },
+    {
+      "id": "s08.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.durationS",
+      "label": "Recorded duration",
+      "value": 1418.3999999999999,
+      "unit": "s",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 295.5103828617484,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 109.77152890568016,
+      "unit": "s",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 278.30267272158835,
+      "unit": "s",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 580.94825410353,
+      "unit": "s",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 299.71248334253943,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 304.93761976352357,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 5.225136420984143,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 299.71248334253943,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 282.94811136496236,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 312.96804594670476,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 278.8726911720096,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s08.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 304.93761976352357,
+      "unit": "s/km",
+      "sessionIds": [
+        "s08"
+      ]
+    },
+    {
+      "id": "s09.distanceM",
+      "label": "Recorded distance",
+      "value": 4799.831350303465,
+      "unit": "m",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.durationS",
+      "label": "Recorded duration",
+      "value": 1440,
+      "unit": "s",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.paceSPerKm",
+      "label": "Recorded pace",
+      "value": 300.01054097639434,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.hrBpm",
+      "label": "Average heart rate",
+      "value": 150.64783712110054,
+      "unit": "bpm",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.cadence",
+      "label": "Average cadence",
+      "value": 168,
+      "unit": "spm",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.elevation",
+      "label": "Recorded elevation gain",
+      "value": 13.50085837842763,
+      "unit": "m",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.best400",
+      "label": "Fastest elapsed 400 metre segment",
+      "value": 111.44317655399004,
+      "unit": "s",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.best1000",
+      "label": "Fastest elapsed 1000 metre segment",
+      "value": 282.5407844889221,
+      "unit": "s",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.best2000",
+      "label": "Fastest elapsed 2000 metre segment",
+      "value": 589.7951818309948,
+      "unit": "s",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.openingSplit",
+      "label": "Opening full kilometre",
+      "value": 304.2766328350654,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.closingSplit",
+      "label": "Closing full kilometre",
+      "value": 309.5813398614454,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.splitChange",
+      "label": "Closing minus opening full-kilometre pace",
+      "value": 5.304707026379958,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.split1Pace",
+      "label": "Full kilometre 1 pace",
+      "value": 304.2766328350654,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.split2Pace",
+      "label": "Full kilometre 2 pace",
+      "value": 287.25696585275375,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.split3Pace",
+      "label": "Full kilometre 3 pace",
+      "value": 317.73405679868506,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.split4Pace",
+      "label": "Full kilometre 4 pace",
+      "value": 283.11948342336,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "s09.split5Pace",
+      "label": "Full kilometre 5 pace",
+      "value": 309.5813398614454,
+      "unit": "s/km",
+      "sessionIds": [
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s01.baselinePace",
+      "label": "Earlier similar-distance runs: median pace",
+      "value": 277.50975040316473,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06"
+      ]
+    },
+    {
+      "id": "comparison.s01.paceChange",
+      "label": "Recorded pace minus earlier median pace",
+      "value": -18.000632458583596,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01",
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06"
+      ]
+    },
+    {
+      "id": "comparison.s01.paceDifference",
+      "label": "Absolute pace difference from earlier median",
+      "value": 18.000632458583596,
+      "unit": "s/km",
+      "sessionIds": [
+        "s01",
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06"
+      ]
+    },
+    {
+      "id": "comparison.s01.count",
+      "label": "Earlier comparison runs",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": [
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06"
+      ]
+    },
+    {
+      "id": "comparison.s02.baselinePace",
+      "label": "Earlier similar-distance runs: median pace",
+      "value": 282.0099085178107,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07"
+      ]
+    },
+    {
+      "id": "comparison.s02.paceChange",
+      "label": "Recorded pace minus earlier median pace",
+      "value": -18.000632458583652,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07"
+      ]
+    },
+    {
+      "id": "comparison.s02.paceDifference",
+      "label": "Absolute pace difference from earlier median",
+      "value": 18.000632458583652,
+      "unit": "s/km",
+      "sessionIds": [
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07"
+      ]
+    },
+    {
+      "id": "comparison.s02.count",
+      "label": "Earlier comparison runs",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": [
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07"
+      ]
+    },
+    {
+      "id": "comparison.s03.baselinePace",
+      "label": "Earlier similar-distance runs: median pace",
+      "value": 286.5100666324566,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08"
+      ]
+    },
+    {
+      "id": "comparison.s03.paceChange",
+      "label": "Recorded pace minus earlier median pace",
+      "value": -13.500474343937697,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08"
+      ]
+    },
+    {
+      "id": "comparison.s03.paceDifference",
+      "label": "Absolute pace difference from earlier median",
+      "value": 13.500474343937697,
+      "unit": "s/km",
+      "sessionIds": [
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08"
+      ]
+    },
+    {
+      "id": "comparison.s03.count",
+      "label": "Earlier comparison runs",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": [
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08"
+      ]
+    },
+    {
+      "id": "comparison.s04.baselinePace",
+      "label": "Earlier similar-distance runs: median pace",
+      "value": 291.01022474710254,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s04.paceChange",
+      "label": "Recorded pace minus earlier median pace",
+      "value": -13.50047434393781,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s04.paceDifference",
+      "label": "Absolute pace difference from earlier median",
+      "value": 13.50047434393781,
+      "unit": "s/km",
+      "sessionIds": [
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s04.count",
+      "label": "Earlier comparison runs",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": [
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s05.baselinePace",
+      "label": "Earlier similar-distance runs: median pace",
+      "value": 293.26030380442546,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s05.paceChange",
+      "label": "Recorded pace minus earlier median pace",
+      "value": -11.250395286614776,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s05.paceDifference",
+      "label": "Absolute pace difference from earlier median",
+      "value": 11.250395286614776,
+      "unit": "s/km",
+      "sessionIds": [
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s05.count",
+      "label": "Earlier comparison runs",
+      "value": 4,
+      "unit": "count",
+      "sessionIds": [
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s06.baselinePace",
+      "label": "Earlier similar-distance runs: median pace",
+      "value": 295.5103828617484,
+      "unit": "s/km",
+      "sessionIds": [
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s06.paceChange",
+      "label": "Recorded pace minus earlier median pace",
+      "value": -9.000316229291798,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s06.paceDifference",
+      "label": "Absolute pace difference from earlier median",
+      "value": 9.000316229291798,
+      "unit": "s/km",
+      "sessionIds": [
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "comparison.s06.count",
+      "label": "Earlier comparison runs",
+      "value": 3,
+      "unit": "count",
+      "sessionIds": [
+        "s07",
+        "s08",
+        "s09"
+      ]
+    },
+    {
+      "id": "week.recent.runs",
+      "label": "recent 7-day recorded runs",
+      "value": 0,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "week.recent.activeDays",
+      "label": "recent 7-day days with recorded runs",
+      "value": 0,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "week.recent.distanceCoverage",
+      "label": "recent 7-day runs with distance",
+      "value": 0,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "week.recent.durationCoverage",
+      "label": "recent 7-day runs with time",
+      "value": 0,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "week.previous.runs",
+      "label": "previous 7-day recorded runs",
+      "value": 2,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "week.previous.activeDays",
+      "label": "previous 7-day days with recorded runs",
+      "value": 2,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "week.previous.distance",
+      "label": "previous 7-day recorded running distance",
+      "value": 9599.66270060693,
+      "unit": "m",
+      "sessionIds": []
+    },
+    {
+      "id": "week.previous.distanceCoverage",
+      "label": "previous 7-day runs with distance",
+      "value": 2,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "week.previous.duration",
+      "label": "previous 7-day recorded running time",
+      "value": 2512.8,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "week.previous.durationCoverage",
+      "label": "previous 7-day runs with time",
+      "value": 2,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.recent.runs",
+      "label": "recent 28-day recorded runs",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.recent.activeDays",
+      "label": "recent 28-day days with recorded runs",
+      "value": 5,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.recent.distance",
+      "label": "recent 28-day recorded running distance",
+      "value": 23999.156751517326,
+      "unit": "m",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.recent.distanceCoverage",
+      "label": "recent 28-day runs with distance",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.recent.duration",
+      "label": "recent 28-day recorded running time",
+      "value": 6508.799999999999,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.recent.durationCoverage",
+      "label": "recent 28-day runs with time",
+      "value": 5,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.previous.runs",
+      "label": "previous 28-day recorded runs",
+      "value": 4,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.previous.activeDays",
+      "label": "previous 28-day days with recorded runs",
+      "value": 4,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.previous.distance",
+      "label": "previous 28-day recorded running distance",
+      "value": 19199.32540121386,
+      "unit": "m",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.previous.distanceCoverage",
+      "label": "previous 28-day runs with distance",
+      "value": 4,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.previous.duration",
+      "label": "previous 28-day recorded running time",
+      "value": 5630.4,
+      "unit": "s",
+      "sessionIds": []
+    },
+    {
+      "id": "volume.28d.previous.durationCoverage",
+      "label": "previous 28-day runs with time",
+      "value": 4,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "history.activeDays",
+      "label": "Days with a run",
+      "value": 9,
+      "unit": "days",
+      "sessionIds": []
+    },
+    {
+      "id": "history.ratedRuns",
+      "label": "Runs with a reported effort",
+      "value": 0,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "workouts.strength.count",
+      "label": "Recent strength sessions",
+      "value": 1,
+      "unit": "count",
+      "sessionIds": []
+    },
+    {
+      "id": "workouts.strength.duration",
+      "label": "Recorded strength time in the last fourteen days",
+      "value": 2400,
+      "unit": "s",
+      "sessionIds": []
+    }
+  ],
+  "comparisons": [
+    {
+      "ref": "comparison.s01",
+      "sessionIds": [
+        "s01",
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06"
+      ],
+      "direction": "faster",
+      "rule": "Same source, run type, environment and time basis; distance within twenty percent. Effort, weather and terrain are not controlled."
+    },
+    {
+      "ref": "comparison.s02",
+      "sessionIds": [
+        "s02",
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07"
+      ],
+      "direction": "faster",
+      "rule": "Same source, run type, environment and time basis; distance within twenty percent. Effort, weather and terrain are not controlled."
+    },
+    {
+      "ref": "comparison.s03",
+      "sessionIds": [
+        "s03",
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08"
+      ],
+      "direction": "faster",
+      "rule": "Same source, run type, environment and time basis; distance within twenty percent. Effort, weather and terrain are not controlled."
+    },
+    {
+      "ref": "comparison.s04",
+      "sessionIds": [
+        "s04",
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ],
+      "direction": "faster",
+      "rule": "Same source, run type, environment and time basis; distance within twenty percent. Effort, weather and terrain are not controlled."
+    },
+    {
+      "ref": "comparison.s05",
+      "sessionIds": [
+        "s05",
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ],
+      "direction": "faster",
+      "rule": "Same source, run type, environment and time basis; distance within twenty percent. Effort, weather and terrain are not controlled."
+    },
+    {
+      "ref": "comparison.s06",
+      "sessionIds": [
+        "s06",
+        "s07",
+        "s08",
+        "s09"
+      ],
+      "direction": "faster",
+      "rule": "Same source, run type, environment and time basis; distance within twenty percent. Effort, weather and terrain are not controlled."
+    }
+  ],
+  "workouts": {
+    "windowDays": 14,
+    "overlappingStrengthDays": 0,
+    "days": [
+      {
+        "daysAgo": 2,
+        "kind": "strength",
+        "sessions": 1,
+        "durationS": 2400,
+        "focuses": [
+          "Legs"
+        ]
+      }
+    ]
+  }
+}

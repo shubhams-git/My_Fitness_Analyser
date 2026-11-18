@@ -1,5 +1,8 @@
 # Training intelligence: evidence before interpretation
 
+For the current hosted Training and weight prompts, all transmitted fields,
+synthetic request examples and fallback policy, see [Gemini data sharing](GEMINI_DATA_SHARING.md).
+
 Current update, 7 November: F08 adds owner-consented personal run briefings with a
 new evidence/schema/client, private reports and Account AI preferences. See
 [F08](../features/F08-coaching-intelligence.md). The synthetic-only pipeline below

@@ -1,5 +1,13 @@
 # F22 — Durable training analysis
 
+18 November local update: the current implementation uses two 3.6 Flash attempts
+(70s each), then 3 Flash Preview (55s), then 3.1 Flash-Lite (40s), with a key
+reservation for each request. Weight now uses the same route. Apply migration
+20261118120000_analysis_model_fallbacks.sql with the application. The older route
+descriptions below are release history. See [current data and prompts](../docs/GEMINI_DATA_SHARING.md).
+PostgreSQL tests exercise the fourth Training step, four bounded weight
+reservations and publishing Preview metadata. Production rollout is outstanding.
+
 ## What runs and when
 
 Training Today calls the private Vercel handler. Loading Training or Account

@@ -2,8 +2,15 @@ import {createHash} from 'node:crypto';
 import {CloudError} from './supabase.mjs';
 export const MODEL_POLICY='flash-routes-v2';
 export const PRIMARY_GEMINI_MODEL=Object.freeze({
- model:'gemini-3.6-flash',timeout:220000,endpoint:'generateContent'
+ model:'gemini-3.6-flash',timeout:70000,endpoint:'generateContent'
 });
+// Sequential requests only; reservation rotates credentials before every call.
+export const ANALYSIS_ROUTE=Object.freeze([
+ PRIMARY_GEMINI_MODEL,
+ PRIMARY_GEMINI_MODEL,
+ Object.freeze({model:'gemini-3-flash-preview',timeout:55000,endpoint:'generateContent'}),
+ Object.freeze({model:'gemini-3.1-flash-lite',timeout:40000,endpoint:'generateContent'})
+]);
 
 export function structuredGeminiRequest({instruction,input,schema}){
  return {

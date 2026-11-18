@@ -1,0 +1,192 @@
+{
+  "schemaVersion": "weight-review-v2",
+  "evidenceHash": "df06d5b59a2dcea0813fef4f0f517682b5c366a21921438ac97da2b9fe8be046",
+  "goalContext": null,
+  "version": "weight-evidence-v3",
+  "trendMethod": "calendar-ema7-v1",
+  "scope": "Daily scale observations, smoothed trend and recent changes and any explicit personal weight goal.",
+  "facts": [
+    {
+      "id": "history.days",
+      "label": "Recorded days in this period",
+      "value": 12,
+      "unit": "days"
+    },
+    {
+      "id": "history.readings",
+      "label": "Individual weigh-ins in this period",
+      "value": 12,
+      "unit": "readings"
+    },
+    {
+      "id": "period.span",
+      "label": "Recorded period length",
+      "value": 33,
+      "unit": "days"
+    },
+    {
+      "id": "latest.age",
+      "label": "Days since the last recorded weigh-in",
+      "value": 35,
+      "unit": "days"
+    },
+    {
+      "id": "latest.scale",
+      "label": "Latest daily scale value",
+      "value": 78.7,
+      "unit": "kg"
+    },
+    {
+      "id": "latest.trend",
+      "label": "Latest smoothed trend",
+      "value": 79.14,
+      "unit": "kg"
+    },
+    {
+      "id": "latest.vsTrend",
+      "label": "Latest scale reading minus smoothed trend",
+      "value": -0.44,
+      "unit": "kg"
+    },
+    {
+      "id": "latest.change",
+      "label": "Latest scale reading minus previous recorded day",
+      "value": -0.19,
+      "unit": "kg"
+    },
+    {
+      "id": "latest.gap",
+      "label": "Days between the two latest recorded days",
+      "value": 3,
+      "unit": "days"
+    },
+    {
+      "id": "period.trendChange",
+      "label": "Signed trend change across recorded period",
+      "value": -0.86,
+      "unit": "kg"
+    },
+    {
+      "id": "period.trendDifference",
+      "label": "Absolute trend change across recorded period",
+      "value": 0.86,
+      "unit": "kg"
+    },
+    {
+      "id": "recent.days",
+      "label": "Recorded days in last recorded 28-day period",
+      "value": 10,
+      "unit": "days"
+    },
+    {
+      "id": "recent.span",
+      "label": "Span covered by those readings",
+      "value": 27,
+      "unit": "days"
+    },
+    {
+      "id": "recent.weeklyRate",
+      "label": "Signed robust weekly scale trend",
+      "value": -0.25,
+      "unit": "kg/week"
+    },
+    {
+      "id": "recent.weeklyMagnitude",
+      "label": "Absolute robust weekly scale trend",
+      "value": 0.25,
+      "unit": "kg/week"
+    },
+    {
+      "id": "recent.deviation",
+      "label": "Median absolute scale-to-trend difference",
+      "value": 0.25,
+      "unit": "kg"
+    },
+    {
+      "id": "recent.range",
+      "label": "Observed daily scale range",
+      "value": 1.28,
+      "unit": "kg"
+    }
+  ],
+  "observations": [
+    {
+      "daysBeforeLatest": 33,
+      "scaleKg": 80,
+      "trendKg": 80,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 30,
+      "scaleKg": 80.07,
+      "trendKg": 80.02,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 27,
+      "scaleKg": 79.98,
+      "trendKg": 80.01,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 24,
+      "scaleKg": 79.73,
+      "trendKg": 79.94,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 21,
+      "scaleKg": 79.45,
+      "trendKg": 79.81,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 18,
+      "scaleKg": 79.31,
+      "trendKg": 79.68,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 15,
+      "scaleKg": 79.34,
+      "trendKg": 79.6,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 12,
+      "scaleKg": 79.43,
+      "trendKg": 79.55,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 9,
+      "scaleKg": 79.4,
+      "trendKg": 79.51,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 6,
+      "scaleKg": 79.18,
+      "trendKg": 79.43,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 3,
+      "scaleKg": 78.89,
+      "trendKg": 79.29,
+      "readings": 1
+    },
+    {
+      "daysBeforeLatest": 0,
+      "scaleKg": 78.7,
+      "trendKg": 79.14,
+      "readings": 1
+    }
+  ],
+  "rules": {
+    "interpolatedDaysAreNotObservations": true,
+    "weeklyRate": "Median of observed daily-value pair slopes at least seven days apart; requires four recorded days spanning fourteen days.",
+    "trendDirection": "falling",
+    "stale": true
+  }
+}

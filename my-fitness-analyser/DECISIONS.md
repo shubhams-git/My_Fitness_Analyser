@@ -1,5 +1,14 @@
 # Decision register
 
+D50 — Bounded Gemini recovery, 18 November 2026. Owner requests 3.6 retries
+with rotated keys, then 3 Flash Preview and finally 3.1 Flash-Lite. Use two
+70-second primary attempts, 55-second Preview and 40-second Lite, preserving
+Free configuration, consent, validation and shared model backoff. Extend the
+SQL reservation/result allowlists and four-step durable job route together.
+Weight remains synchronous with a 250-second attempt-loop budget; Training
+remains durable. Publish synthetic request examples and exact prompts in
+docs/GEMINI_DATA_SHARING.md. Production migration/deployment is outstanding.
+
 D49 — Higher-resolution route replay imagery, 14 November 2026. Use MapTiler
 Cloud Free satellite tiles for this private app when an origin-restricted browser
 key is configured. Retain EOxCloudless on imagery failure. Keep the existing

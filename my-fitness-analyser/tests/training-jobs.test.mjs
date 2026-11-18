@@ -15,7 +15,7 @@ const pack=coachingEvidence({activities:Object.fromEntries(syntheticHistory().ma
 const evidenceKey='a'.repeat(64);
 const worthKnowing='Elapsed pace includes stops, while moving pace omits them. Runs with different stop patterns can rank differently depending on which clock you compare.';
 const report={worthKnowing,schemaVersion:COACH_SCHEMA,evidenceHash:pack.hash,verdict:{text:'Your log contains {history.runs} recorded runs.',explanation:'Your log gives you a baseline for comparing familiar efforts.',nextAction:'Keep your next run at a familiar effort.',factIds:['history.runs'],signal:{factId:'history.runs',direction:'none'}},findings:[],charts:[]};
-const migrations=['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql','20261112_whole_training_disclosure.sql','20261112120000_gemini_key_rotation.sql','20261113190000_durable_training_jobs.sql','20261113190100_training_job_dispatch.sql','20261114120000_remove_weight_insight_caps.sql'];
+const migrations=['20261107_training_intelligence.sql','20261108_weight_intelligence.sql','20261110_goals_and_model_routes.sql','20261111_coaching_recovery.sql','20261112_whole_training_disclosure.sql','20261112120000_gemini_key_rotation.sql','20261113190000_durable_training_jobs.sql','20261113190100_training_job_dispatch.sql','20261114120000_remove_weight_insight_caps.sql','20261118120000_analysis_model_fallbacks.sql'];
 
 test('the worker classifies timeout, quota and incomplete output without leaking provider bodies',async()=>{
  const request={entry:TRAINING_ROUTE[0],apiKey:key,body:{},validate:()=>{throw new Error('should not validate');}};
@@ -35,8 +35,8 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
  const rpc={claim_training_job:['job_id','job_capability'],reserve_training_gemini:['job_id','job_capability','job_lease','key_ids','target_model'],finish_training_job:['job_id','job_capability','job_lease','attempt','result_report','retry_seconds','failure_code']};
  const api={json:async(path,{body})=>{const name=path.split('/').at(-1),args=rpc[name].map(field=>body[field]);return sql(`select ${name}(${args.map((_,i)=>'$'+(i+1)).join(',')})`,args);}};
  let calls=0;
- const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.ok(JSON.stringify(body).includes('teach one specific, non-obvious idea'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],calls===1?key:env.GEMINI_API_KEY_2);
-  if(calls===1)return Response.json({error:{message:'unavailable'}},{status:503});
+ const fetcher=async(url,options)=>{calls++;const body=JSON.parse(options.body);assert.match(url,new RegExp(TRAINING_ROUTE[calls-1].model+':generateContent$'));assert.ok(JSON.stringify(body).includes('teach one specific, non-obvious idea'));assert.equal(body.generationConfig.thinkingConfig,undefined);assert.equal(body.generationConfig.maxOutputTokens,undefined);assert.equal(options.headers['x-goog-api-key'],calls%2===1?key:env.GEMINI_API_KEY_2);
+  if(calls<4)return Response.json({error:{message:'unavailable'}},{status:503});
   const {factIds,signal,...prose}=report.verdict;
   return Response.json({usageMetadata:{promptTokenCount:600,thoughtsTokenCount:500,candidatesTokenCount:350},candidates:[{finishReason:'STOP',content:{parts:[{text:JSON.stringify({verdict:{...prose,signalFactId:signal.factId},findings:[],worthKnowing})}]}}]});};
  try{
@@ -64,7 +64,8 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
   await as('authenticated',owner);assert.ok((await sql('select training_job_status()')).retryAt);
   await admin();await db.exec("update training_analysis_jobs set available_at=now();update gemini_request_budget set next_request_at=now()");
   await as('anon');await runTrainingJob(api,delivery,{env,fetcher});assert.equal(calls,2);
-  await as('authenticated',owner);const complete=await sql('select training_job_status()');assert.equal(complete.state,'complete');assert.equal(complete.attempts[0].httpStatus,503);assert.equal(complete.attempts[1].thoughtTokens,500);
+  for(let i=0;i<2;i++){await admin();await db.exec("update training_analysis_jobs set available_at=now();update gemini_request_budget set next_request_at=now()");await as('anon');await runTrainingJob(api,delivery,{env,fetcher});}
+  await as('authenticated',owner);const complete=await sql('select training_job_status()');assert.equal(complete.state,'complete');assert.equal(complete.attempts[0].httpStatus,503);assert.equal(complete.attempts[3].thoughtTokens,500);
   assert.deepEqual(await sql('select report from analysis_reports where id=$1',[queued.id]),report);
   await assert.rejects(db.query("select finish_training_review($1,'failed',null,null)",[queued.id]),e=>e.code==='42501');
   await db.query("select set_weight_ai_preference(true,'gemini-weight-v1')");
@@ -79,16 +80,20 @@ test('Postgres dispatches a private job, recovers its lease, paces fallbacks and
   await admin();await db.exec("update gemini_request_budget set next_request_at=now()+interval '65 seconds',used=20");
   await as('authenticated',owner);
   assert.equal((await reserveWeight()).slot,1,'weight rotates away from the last Training key even at the app caps');
+  for(const model of ['gemini-3.6-flash','gemini-3-flash-preview','gemini-3.1-flash-lite'])assert.ok((await sql('select reserve_weight_gemini($1,$2,$3)',[weight,geminiKeyIds([key,env.GEMINI_API_KEY_2]),model])).slot);
+  await assert.rejects(reserveWeight(),e=>e.code==='42501');
+  const weightTrace=[{model:'gemini-3-flash-preview',thinking:'default',outcome:'complete',httpStatus:200}];
+  assert.equal(await sql("select finish_weight_review_v2($1,'complete','{}','{}','gemini-3-flash-preview',$2)",[weight,weightTrace]),true);
   await admin();assert.equal(await sql('select pack from training_analysis_jobs where id=$1',[queued.id]),null);
   await db.query("update analysis_reports set created_at=now()-interval '31 seconds'");
   await as('authenticated',owner);const second=await enqueue();await db.query("select set_ai_preference(false,'gemini-training-v2')");
   await admin();const cancelled=await sql('select body from net.requests where body->>\'id\'=$1',[second.id]);
   assert.equal(await sql('select pack from training_analysis_jobs where id=$1',[second.id]),null);
-  await as('anon');assert.equal(await runTrainingJob(api,cancelled,{env,fetcher}),false);assert.equal(calls,2);
+  await as('anon');assert.equal(await runTrainingJob(api,cancelled,{env,fetcher}),false);assert.equal(calls,4);
   await admin();await db.exec("update analysis_reports set created_at=now()-interval '31 seconds';update gemini_request_budget set used=20");
   await as('authenticated',owner);await db.query("select set_ai_preference(true,'gemini-training-v2')");const third=await enqueue(owner,3);
   await admin();const limited=await sql('select body from net.requests where body->>\'id\'=$1',[third.id]);
-  await as('anon');assert.equal(await runTrainingJob(api,limited,{env,fetcher}),true);assert.equal(calls,2);
+  await as('anon');assert.equal(await runTrainingJob(api,limited,{env,fetcher}),true);assert.equal(calls,4);
   await as('authenticated',owner);assert.equal((await sql('select training_job_status()')).state,'complete');
   assert.equal(await sql('select model_id from analysis_reports where id=$1',[third.id]),'recorded-training');
  }finally{await db.close();}

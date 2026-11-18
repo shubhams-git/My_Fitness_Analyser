@@ -1,9 +1,22 @@
 # Current state
 
 Updated: 18 November 2026 (Australia/Sydney)
-Completed local increment: task-first Field Notes (F23)
+Completed local increment: bounded Gemini analysis recovery (F22)
 
 ## Implemented
+
+- Local analysis recovery: two 3.6 Flash attempts (70s each), then 3 Flash
+  Preview (55s), then 3.1 Flash-Lite (40s), rotating keys at each reservation.
+  Weight now retries and SQL permits bounded reservations and Preview results;
+  Training SQL permits the fourth step. Migration 20261118120000 and matching
+  deployment are outstanding. Current prompts/data examples:
+  [Gemini sharing](docs/GEMINI_DATA_SHARING.md). This supersedes older route
+  descriptions below. Full serial suite: 148 passed; targeted recovery
+  rerun: 11 passed. Foundation/cloud config checks passed.
+  Parallel suite hit local PGlite initialization failures. No UI changed.
+  Live synthetic probes: 3.6 timed out then returned 503 on another key;
+  3 Flash Preview returned 503; 3.1 Flash-Lite returned a validated two-finding
+  report in 4.06s. No personal health library was used for the probes.
 
 - Satellite replay follows closer on MapTiler imagery, with subtle pace-driven
   sway and turn banking. The orange trace shows the latest part of the route
@@ -339,4 +352,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Review F23 on physical iPhone Safari, including first load and a timed run check-in.
+Apply the analysis fallback migration and matching deployment, then verify one signed-in analysis completes.

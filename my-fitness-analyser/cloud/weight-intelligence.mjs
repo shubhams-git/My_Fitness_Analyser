@@ -1,5 +1,5 @@
 import {CloudGoals} from './goals.mjs';
-import {PRIMARY_GEMINI_MODEL,structuredGeminiRequest,geminiAttempt,geminiKeyIds,geminiKeys,geminiConfigured} from './gemini-router.mjs';
+import {PRIMARY_GEMINI_MODEL,ANALYSIS_ROUTE,structuredGeminiRequest,geminiAttempt,geminiKeyIds,geminiKeys,geminiConfigured} from './gemini-router.mjs';
 import { createHash } from 'node:crypto';
 import { CloudError } from './supabase.mjs';
 import { CloudJournal } from './journal.mjs';
@@ -7,7 +7,7 @@ import { weightEvidence } from '../analysis/weight-evidence.mjs';
 import { evidenceHash } from '../analysis/coaching-evidence.mjs';
 import { WEIGHT_SCHEMA,WEIGHT_PROMPT,WEIGHT_DISCLOSURE,WEIGHT_SYSTEM,weightSchema,validateWeightReport } from '../analysis/weight-contract.mjs';
 import { providerSchema } from '../analysis/gemini-schema.mjs';
-const WEIGHT_MODEL_POLICY='weight-default-thinking-v1';
+const WEIGHT_MODEL_POLICY='weight-fallback-v2';
 
 export function weightRequest(pack){
  return structuredGeminiRequest({
@@ -53,23 +53,26 @@ export class WeightIntelligence {
    claim.status===403?'Your weight sharing choice changed. Check your AI settings.':
    claim.status===409?'A weight insight is already running. Try again shortly.':'Couldn’t start the weight insight. Try again shortly.');
   const id=await claim.json(),keys=geminiKeys(this.env);
+  const deadline=Date.now()+250000;
   let trace=[];try{
-   const entry=PRIMARY_GEMINI_MODEL;
-   const budget=await this.api.json('/rest/v1/rpc/reserve_weight_gemini',{method:'POST',body:{target_id:id,key_ids:geminiKeyIds(keys),target_model:entry.model}});
-   if(budget.retryAt){
-    const retry=new Date(budget.retryAt).toLocaleString('en-AU',{timeZone:'Australia/Sydney',weekday:'short',day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
-    throw new CloudError(429,'Gemini asked us to wait before retrying. Try again after '+retry+' Sydney time.');
+   for(const entry of ANALYSIS_ROUTE){
+    if(Date.now()>=deadline)break;
+    if((await this.context()).key!==context.key)throw new CloudError(409,'Your readings changed during analysis. Generate again for the updated history.');
+    const budget=await this.api.json('/rest/v1/rpc/reserve_weight_gemini',{method:'POST',body:{target_id:id,key_ids:geminiKeyIds(keys),target_model:entry.model}});
+    if(budget.retryAt)continue;
+    if(!keys[budget.slot-1])throw new CloudError(503,'The Gemini request could not start.');
+    const remaining=deadline-Date.now();if(remaining<=0)break;
+    const {attempt,report,retrySeconds}=await geminiAttempt({entry:{...entry,timeout:Math.min(entry.timeout,remaining)},apiKey:keys[budget.slot-1],body:weightRequest(context.pack),validate:json=>extractWeight(json,context.pack),fetcher:this.fetcher});
+    console.info('Weight Gemini attempt',JSON.stringify(attempt));
+    if(retrySeconds)await this.api.json('/rest/v1/rpc/backoff_weight_gemini',{method:'POST',body:{target_id:id,target_model:entry.model,retry_seconds:retrySeconds}});
+    trace.push({model:attempt.model,thinking:attempt.thinking,httpStatus:attempt.httpStatus,outcome:['complete','invalid','network'].includes(attempt.outcome)?attempt.outcome:attempt.httpStatus===null?'network':'http'});
+    if(!report)continue;
+    const latest=await this.context();if(latest.key!==context.key)throw new CloudError(409,'Your readings changed during analysis. Generate again for the updated history.');
+    const stored=await this.api.json('/rest/v1/rpc/finish_weight_review_v2',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack,result_model:entry.model,attempt_log:trace}});
+    if(!stored)throw new CloudError(409,'Your weight sharing choice changed. This insight was not published.');
+    return this.item({id,report,evidence:context.pack,finished_at:new Date().toISOString(),model_id:entry.model,model_policy:WEIGHT_MODEL_POLICY,provider_attempts:trace,evidence_key:context.key},context.key);
    }
-   if(!keys[budget.slot-1])throw new CloudError(503,'The Gemini request could not start.');
-   const {attempt,report,retrySeconds}=await geminiAttempt({entry,apiKey:keys[budget.slot-1],body:weightRequest(context.pack),validate:json=>extractWeight(json,context.pack),fetcher:this.fetcher});
-   console.info('Weight Gemini attempt',JSON.stringify(attempt));
-   if(retrySeconds)await this.api.json('/rest/v1/rpc/backoff_weight_gemini',{method:'POST',body:{target_id:id,target_model:entry.model,retry_seconds:retrySeconds}});
-   trace=[{model:attempt.model,thinking:attempt.thinking,httpStatus:attempt.httpStatus,outcome:['complete','invalid','network'].includes(attempt.outcome)?attempt.outcome:attempt.httpStatus===null?'network':'http'}];
-   if(!report)throw new CloudError(attempt.outcome==='quota'?429:503,attempt.outcome==='quota'?'Gemini reached its quota. Try again later.':'Gemini could not complete the weight insight. Your readings are unchanged.');
-   const latest=await this.context();if(latest.key!==context.key)throw new CloudError(409,'Your readings changed during analysis. Generate again for the updated history.');
-   const stored=await this.api.json('/rest/v1/rpc/finish_weight_review_v2',{method:'POST',body:{target_id:id,result_status:'complete',result_report:report,result_evidence:context.pack,result_model:entry.model,attempt_log:trace}});
-   if(!stored)throw new CloudError(409,'Your weight sharing choice changed. This insight was not published.');
-   return this.item({id,report,evidence:context.pack,finished_at:new Date().toISOString(),model_id:entry.model,model_policy:WEIGHT_MODEL_POLICY,provider_attempts:trace,evidence_key:context.key},context.key);
+   throw new CloudError(503,'Gemini could not complete the weight insight after its model fallbacks. Your readings are unchanged. Try again later.');
   }catch(e){await this.api.json('/rest/v1/rpc/finish_weight_review_v2',{method:'POST',body:{target_id:id,result_status:'failed',result_report:null,result_evidence:null,result_model:null,attempt_log:e.attempts||trace}}).catch(()=>{});throw e;}
  }
 }
