@@ -67,6 +67,8 @@ their email and code, choose a password in Account, and connect their own
 Garmin key. The code expires according to the Supabase Email OTP Expiration
 setting. Keep the output out of Git and send it only to the invited address.
 The invite list and activation status are stored in the production database.
+For an already claimed invitation, run the same command with `--recovery` to
+send a fresh password setup code for the existing account.
 [Supabase invitation expiry](https://supabase.com/docs/guides/auth/users).
 
 ### Other sign-in methods

@@ -7,7 +7,8 @@ const toggle=document.querySelector('#toggle-registration');
 const title=document.querySelector('#signin-title');
 const providerButtons=[...document.querySelectorAll('[data-provider]')];
 const params=new URLSearchParams(location.search);
-const redeeming=params.get('invite')==='1';
+const recovering=params.get('invite')==='recovery';
+const redeeming=recovering||params.get('invite')==='1';
 const allowedPaths=['/','/training','/training.html','/journal','/journal.html','/account','/account.html','/app.html','/index.html'];
 let next='/training',registering=false,availableProviders={};
 try{
@@ -77,7 +78,7 @@ form.addEventListener('submit',async event=>{
   notice('');
   try{
     if(redeeming){
-      await submit('accept-invite',{email:form.elements.email.value,code:form.elements.code.value});
+      await submit('accept-invite',{email:form.elements.email.value,code:form.elements.code.value,recovery:recovering});
       form.elements.code.value='';
       notifySessionChange();
       location.replace('/account#new-password');
@@ -91,7 +92,7 @@ form.addEventListener('submit',async event=>{
       if(!await openRecord())throw new Error('Your account could not load. Please try again.');
     }
   }catch(error){notice(error.message);}
-  finally{busy(false);button.textContent=redeeming?'Accept invitation':registering?'Create account':'Sign in';}
+  finally{busy(false);button.textContent=recovering?'Continue to password setup':redeeming?'Accept invitation':registering?'Create account':'Sign in';}
 });
 
 for(const control of providerButtons)control.addEventListener('click',async()=>{
@@ -105,7 +106,8 @@ for(const control of providerButtons)control.addEventListener('click',async()=>{
 
 const auth=params.get('auth');
 if(redeeming){
-  title.textContent=button.textContent='Accept invitation';
+  title.textContent=recovering?'Set your password':'Accept invitation';
+  button.textContent=recovering?'Continue to password setup':'Accept invitation';
   document.querySelector('#sign-in-description').textContent='Enter the code from your invitation email. You’ll set a password next.';
   document.querySelector('label[for="password"]').hidden=true;
   document.querySelector('.password-field').hidden=true;

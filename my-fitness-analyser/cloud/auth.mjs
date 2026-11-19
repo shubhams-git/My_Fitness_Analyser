@@ -64,7 +64,8 @@ export async function acceptInvitation(request,response,config,body,{fetcher=fet
   if(!/^[^\s@]+@[^\s@]+$/.test(email)||email.length>254||!/^\d{6,10}$/.test(token))
     throw new CloudError(400,'Enter the email address and numeric code from your invitation.');
   const api=new SupabaseApi(config,null,{fetcher});
-  const result=await api.request('/auth/v1/verify',{method:'POST',body:{type:'invite',email,token}});
+  const type=body.recovery===true?'recovery':'invite';
+  const result=await api.request('/auth/v1/verify',{method:'POST',body:{type,email,token}});
   if(!result.ok){
     if(result.status===429)throw new CloudError(429,'Too many attempts. Wait a minute and try again.');
     if(result.status>=500)throw new CloudError(503,'The invitation could not be checked. Try again shortly.');
