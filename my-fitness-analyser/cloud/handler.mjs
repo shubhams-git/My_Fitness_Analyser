@@ -2,7 +2,7 @@ import {CloudGoals} from './goals.mjs';
 import { CloudZones } from './zones.mjs';
 import { randomUUID,createHash } from 'node:crypto';
 import { CloudLibrary,CloudError,cloudConfig } from './supabase.mjs';
-import { authOptions,authorize,finishAuth,register,requireOrigin,signIn,signOut,startOAuth } from './auth.mjs';
+import { acceptInvitation,authOptions,authorize,finishAuth,register,requireOrigin,signIn,signOut,startOAuth } from './auth.mjs';
 import { GarminCredentials } from './garmin-credentials.mjs';
 import { GarminSync } from '../prototypes/garmin.mjs';
 import { trainingDataset } from '../prototypes/training-data.mjs';
@@ -25,6 +25,10 @@ export async function privateHandler(request,response,route,{configReader=cloudC
     const config=configReader(env);
     if(route==='auth-options'&&request.method==='GET'){send(200,await authOptions(config));return;}
     if(config.memberAccounts){
+      if(route==='accept-invite'&&request.method==='POST'){
+        await acceptInvitation(request,response,config,JSON.parse((await readBody(request,4096)).toString()));
+        send(200,{signedIn:true});return;
+      }
       if(route==='register'&&request.method==='POST'){
         await register(request,response,config,JSON.parse((await readBody(request,16384)).toString()));
         send(200,{confirmationRequired:true});return;

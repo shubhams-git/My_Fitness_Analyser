@@ -20,7 +20,7 @@
     </header>
     <section class="sign-in-panel" aria-labelledby="signin-title">
       <h1 id="signin-title">Sign in</h1>
-      <p>Use the email address on your invitation.</p>
+      <p id="sign-in-description">Use the email address on your invitation.</p>
       <form id="sign-in-form" method="post" tabindex="-1">
         <label for="email">Email address</label>
         <input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required>
@@ -29,11 +29,15 @@
           <input id="password" name="password" type="password" autocomplete="current-password" required>
           <button id="show-password" class="password-visibility" type="button" aria-controls="password" aria-pressed="false" aria-label="Show password"><span aria-hidden="true">Show</span></button>
         </div>
+        <label for="invite-code" hidden>Invitation code</label>
+        <input id="invite-code" name="code" type="text" autocomplete="one-time-code" inputmode="numeric" pattern="[0-9]{6,10}" maxlength="10" hidden disabled required>
         <p id="sign-in-status" role="alert"></p>
         <button class="primary-button sign-in-submit" type="submit">Sign in</button>
       </form>
+      <a id="back-to-sign-in" class="sign-in-link" href="/sign-in" hidden>Back to sign in</a>
       <div id="member-auth" hidden>
         <button id="toggle-registration" class="password-visibility sign-in-toggle" type="button">Create an account</button>
+        <a class="sign-in-link" href="/sign-in?invite=1">Use an invitation code</a>
         <div class="sign-in-providers" role="group" aria-label="Continue with a social account">
           <button class="secondary-button" type="button" data-provider="google" disabled>Google</button>
           <button class="secondary-button" type="button" data-provider="facebook" disabled>Facebook</button>

@@ -19,6 +19,8 @@
 #sign-in-status:empty{display:none}
 #sign-in-status[data-success]{color:var(--color-text)}
 .sign-in-toggle.password-visibility{position:static;margin-block:6px 10px;padding-inline:8px;text-decoration:underline;text-underline-offset:3px}
+.sign-in-link:not([hidden]){display:inline-flex;align-items:center;min-height:44px;padding-inline:8px;color:var(--color-text);text-decoration:underline;text-underline-offset:3px;font-size:.875rem}
+.sign-in-link:focus-visible{outline:2px solid var(--color-focus);outline-offset:3px}
 .sign-in-providers{display:flex;flex-wrap:wrap;gap:8px}
 .sign-in-providers button{flex:1;justify-content:center;min-height:44px}
 .sign-in-providers button:disabled{opacity:.55;cursor:default}

@@ -7,6 +7,7 @@ const toggle=document.querySelector('#toggle-registration');
 const title=document.querySelector('#signin-title');
 const providerButtons=[...document.querySelectorAll('[data-provider]')];
 const params=new URLSearchParams(location.search);
+const redeeming=params.get('invite')==='1';
 const allowedPaths=['/','/training','/training.html','/journal','/journal.html','/account','/account.html','/app.html','/index.html'];
 let next='/training',registering=false,availableProviders={};
 try{
@@ -72,9 +73,16 @@ form.addEventListener('submit',async event=>{
   event.preventDefault();
   if(button.disabled||!form.reportValidity())return;
   busy(true);
-  button.textContent=registering?'Creating account…':'Signing in…';
+  button.textContent=redeeming?'Checking code…':registering?'Creating account…':'Signing in…';
   notice('');
   try{
+    if(redeeming){
+      await submit('accept-invite',{email:form.elements.email.value,code:form.elements.code.value});
+      form.elements.code.value='';
+      notifySessionChange();
+      location.replace('/account#new-password');
+      return;
+    }
     await submit(registering?'register':'login',{email:form.elements.email.value,password:form.elements.password.value});
     form.elements.password.value='';
     if(registering)notice('Check your email and open the confirmation link in this browser.',true);
@@ -83,7 +91,7 @@ form.addEventListener('submit',async event=>{
       if(!await openRecord())throw new Error('Your account could not load. Please try again.');
     }
   }catch(error){notice(error.message);}
-  finally{busy(false);button.textContent=registering?'Create account':'Sign in';}
+  finally{busy(false);button.textContent=redeeming?'Accept invitation':registering?'Create account':'Sign in';}
 });
 
 for(const control of providerButtons)control.addEventListener('click',async()=>{
@@ -96,11 +104,21 @@ for(const control of providerButtons)control.addEventListener('click',async()=>{
 });
 
 const auth=params.get('auth');
+if(redeeming){
+  title.textContent=button.textContent='Accept invitation';
+  document.querySelector('#sign-in-description').textContent='Enter the code from your invitation email. You’ll set a password next.';
+  document.querySelector('label[for="password"]').hidden=true;
+  document.querySelector('.password-field').hidden=true;
+  form.elements.password.disabled=true;
+  document.querySelector('label[for="invite-code"]').hidden=false;
+  form.elements.code.hidden=form.elements.code.disabled=false;
+  document.querySelector('#back-to-sign-in').hidden=false;
+}
 if(auth==='complete')notifySessionChange();
 if(auth==='retry')notice('Sign-in could not finish. Open the confirmation link in the browser you used to register, or try signing in again.');
 if(auth==='invite')notice('Use the verified email address on your invitation.');
-if(!auth||auth==='complete')openRecord().catch(()=>{});
-fetch('/api/private?route=auth-options',{cache:'no-store'}).then(async response=>{
+if(!redeeming&&(!auth||auth==='complete'))openRecord().catch(()=>{});
+if(!redeeming)fetch('/api/private?route=auth-options',{cache:'no-store'}).then(async response=>{
   if(!response.ok)return;
   const options=await response.json();
   if(!options.memberAccounts)return;

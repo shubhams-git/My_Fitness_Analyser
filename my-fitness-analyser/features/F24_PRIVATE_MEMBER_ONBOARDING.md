@@ -38,16 +38,34 @@ is `APP_ORIGIN/api/auth/callback`. Email confirmation stays required. The
 Before User Created Postgres hook uses `public.check_fitness_member_invite`.
 Live Supabase Auth rejected an uninvited signup with HTTP 403.
 
-To add a member, insert the exact email they will verify through their mailbox
-or chosen OAuth provider. They can then open the app and choose Create an account
-or an enabled provider. Open password confirmation links in the same browser
-used to register.
+### Invite another friend manually
+
+In the Supabase project, open **SQL Editor → New query**. Replace the example
+with the email address your friend will use, then run this query.
 
 ```sql
 insert into public.fitness_member_invites(email)
 values (lower(btrim('friend@example.com')))
 on conflict (email) do nothing;
 ```
+
+From the `my-fitness-analyser` directory, run the following in PowerShell with
+the Supabase CLI signed in and linked to the project. The local `.env` supplies
+the app origin and Supabase project URL.
+
+```powershell
+npx --yes supabase projects api-keys --reveal --output json |
+  node --env-file=.env scripts/create-member-invite.mjs friend@example.com
+```
+
+Email the resulting sign-in URL and one-time code to that friend. They enter
+their email and code, choose a password in Account, and connect their own
+Garmin key. The code expires according to the Supabase Email OTP Expiration
+setting. Keep the output out of Git and send it only to the invited address.
+The invite list and activation status are stored in the production database.
+[Supabase invitation expiry](https://supabase.com/docs/guides/auth/users).
+
+### Other sign-in methods
 
 Configure an OAuth app with each provider, then enter its client ID and secret
 under Supabase Authentication → Sign In / Providers. Each provider uses the
@@ -68,6 +86,6 @@ to project-team addresses. Keep email confirmation on.
 The tests exercise provider redirects and the PKCE cookie, verified invitation
 claims, database-level credential isolation, encryption ownership binding,
 invalid Garmin key handling, the onboarding requirement and owner-specific sync.
-Production OAuth and email signup for invited friends await provider credentials
-or custom SMTP. An end-to-end second-member sync awaits an invited member with
-their own Garmin key.
+Production OAuth and automated email signup await provider credentials or
+custom SMTP. Operators can email an invitation code directly. An end-to-end
+second-member sync awaits an invited member with their own Garmin key.

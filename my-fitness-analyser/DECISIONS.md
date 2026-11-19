@@ -1,5 +1,11 @@
 # Decision register
 
+D54 — Manual member invitations, 20 November 2026. Let an operator generate a
+Supabase invitation code for an allowlisted email and send it directly. Verify
+the code through Supabase and claim membership before issuing a session.
+Keep privileged credentials in the local operator command and let members set
+their own password in Account. See [F24](features/F24_PRIVATE_MEMBER_ONBOARDING.md).
+
 D53 — Match Story rendering to the live flyover, 20 November 2026.
 Capture the replay's active imagery, terrain and chase zoom when rendering
 an attributed portrait video. Render map and effects at native output

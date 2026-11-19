@@ -57,6 +57,26 @@ export async function register(request,response,config,body,{fetcher=fetch}={}){
   response.setHeader('Set-Cookie',verifierCookie(verifier));
 }
 
+export async function acceptInvitation(request,response,config,body,{fetcher=fetch}={}){
+  requireOrigin(request,config);
+  const email=typeof body?.email==='string'?body.email.trim().toLowerCase():'';
+  const token=typeof body?.code==='string'?body.code.trim():'';
+  if(!/^[^\s@]+@[^\s@]+$/.test(email)||email.length>254||!/^\d{6,10}$/.test(token))
+    throw new CloudError(400,'Enter the email address and numeric code from your invitation.');
+  const api=new SupabaseApi(config,null,{fetcher});
+  const result=await api.request('/auth/v1/verify',{method:'POST',body:{type:'invite',email,token}});
+  if(!result.ok){
+    if(result.status===429)throw new CloudError(429,'Too many attempts. Wait a minute and try again.');
+    if(result.status>=500)throw new CloudError(503,'The invitation could not be checked. Try again shortly.');
+    throw new CloudError(400,'That invitation code is invalid or expired. Ask for a new code.');
+  }
+  const session=await result.json();
+  if(!session.access_token||!session.refresh_token)throw new CloudError(503,'Sign-in could not be completed.');
+  api.token=session.access_token;
+  if(!await ownerSession(api,{claimInvite:true}))throw new CloudError(401,'Sign-in could not be verified.');
+  setSession(response,session);
+}
+
 export function startOAuth(request,response,config,provider){
   requireOrigin(request,config);
   if(!providers.has(provider))throw new CloudError(400,'Choose Google, Facebook or GitHub.');

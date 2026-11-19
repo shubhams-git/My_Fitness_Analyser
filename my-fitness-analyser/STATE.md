@@ -1,9 +1,13 @@
 # Current state
 
 Updated: 20 November 2026 (Australia/Sydney)
-Completed increment: full-resolution Story flyover export (F16)
+Completed increment: manually emailed member activation (F24)
 
 ## Implemented
+
+- A one-time Supabase invitation code lets allowlisted friends activate their
+  account from an email sent by the operator. The app opens Account for password
+  setup. [Manual invitation steps](features/F24_PRIVATE_MEMBER_ONBOARDING.md#invite-another-friend-manually).
 
 - Member onboarding uses invited email registration and configurable Google,
   Facebook and GitHub OAuth. New members connect Garmin on Account before
@@ -361,4 +365,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Verify a hosted Story download on physical iPhone Safari.
+Verify the first invited member's Garmin sync after they connect their own key.

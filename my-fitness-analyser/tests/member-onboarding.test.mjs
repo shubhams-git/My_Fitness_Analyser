@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { PGlite } from '@electric-sql/pglite';
-import { finishAuth,register,startOAuth } from '../cloud/auth.mjs';
+import { acceptInvitation,finishAuth,register,startOAuth } from '../cloud/auth.mjs';
 import { GarminCredentials,openGarminKey,sealGarminKey } from '../cloud/garmin-credentials.mjs';
 import { privateHandler } from '../cloud/handler.mjs';
 
@@ -14,6 +14,31 @@ const goodOrigin={headers:{origin:config.origin}};
 const response=()=>({headers:{},setHeader(key,value){this.headers[key]=value;},end(value){this.body=value;}});
 const cookiePair=out=>out.headers['Set-Cookie'].split(';')[0];
 const migration=new URL('../supabase/migrations/20261119130000_private_member_onboarding.sql',import.meta.url);
+
+test('emailed invite codes must verify and claim membership before setting a session',async()=>{
+  const body={email:' Second@example.test ',code:'01234567'};
+  const verified=async(url,options)=>{
+    if(url.endsWith('/verify')){
+      assert.deepEqual(JSON.parse(options.body),{type:'invite',email:'second@example.test',token:'01234567'});
+      return Response.json({access_token:'access',refresh_token:'refresh'});
+    }
+    assert.equal(options.headers.Authorization,'Bearer access');
+    if(url.endsWith('/user'))return Response.json({id:second,email:'second@example.test'});
+    if(url.endsWith('claim_fitness_member_invite'))return Response.json(true);
+    return Response.json([]);
+  };
+  const out=response();
+  await acceptInvitation(goodOrigin,out,config,body,{fetcher:verified});
+  assert.match(out.headers['Set-Cookie'][0],/^fitness_access=access;.*HttpOnly; Secure/);
+  const rejected=response();
+  const noInvite=async(url,options)=>url.endsWith('claim_fitness_member_invite')?Response.json(false):verified(url,options);
+  await assert.rejects(acceptInvitation(goodOrigin,rejected,config,body,{fetcher:noInvite}),{status:403});
+  assert.equal(rejected.headers['Set-Cookie'],undefined);
+  for(const [status,expected] of [[403,400],[429,429],[503,503]]){
+    await assert.rejects(acceptInvitation(goodOrigin,rejected,config,body,{fetcher:async()=>new Response(null,{status})}),{status:expected});
+  }
+  await assert.rejects(acceptInvitation({headers:{origin:'https://other.test'}},rejected,config,body,{fetcher:verified}),{status:403});
+});
 
 test('OAuth uses same-origin POST and a browser-bound PKCE callback for all three providers',async()=>{
   assert.throws(()=>startOAuth({headers:{origin:'https://other.test'}},response(),config,'google'),{status:403});
