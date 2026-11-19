@@ -2,7 +2,7 @@ import {activityKind} from './activity-kind.js';
 import { distributionMarkup } from './effort-distribution.js';
 import { seriesChart,metricValue,metricHeadline,MEASURES } from './activity-analysis.js';
 import { activityChartPanel,metricSvg,metricText } from './activity-visuals.js';
-import { logout,privateResponse as apiFetch,refreshView } from './session.js';
+import { privateResponse as apiFetch,refreshView } from './session.js';
 import { fieldNotesView } from './field-notes.js';
 import { mountPremiumMotion } from './premium-motion.js';
 import { routeView } from './route-view.js';
@@ -16,7 +16,7 @@ const paceText = seconds => seconds == null || !Number.isFinite(seconds) || seco
 const distance = metres => metres == null ? '—' : (metres/1000).toFixed(2);
 const dateText = date => date ? new Date(date+'T12:00:00Z').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric',timeZone:'UTC'}) : 'Date to confirm';
 const round = value => value == null ? '—' : String(Math.round(value));
-export function mountActivity({root,data,signal,navigate,toggleMotion}){
+export function mountActivity({root,data,signal,navigate,toggleMotion,requestSignOut}){
 root.innerHTML='<div id="app"></div><div id="dialogs"></div><div id="announcer" class="sr-only" role="status" aria-live="polite"></div>';
 const $=(selector,scope=root)=>scope.querySelector(selector);
 const $$=(selector,scope=root)=>[...scope.querySelectorAll(selector)];
@@ -200,7 +200,7 @@ root.addEventListener('click',async event=>{
   if(action==='checkin'){openCheckin();}
   if(action==='sync-garmin')void syncGarmin();
   if(action==='import-file')$('#fit-import')?.click();
-  if(action==='sign-out'){void logout().catch(error=>openDetail('Sign out',`<p>${escape(error.message)}</p>`));return;}
+  if(action==='sign-out'){$('#detail-dialog').close();requestSignOut();return;}
   if(action==='route-replay'&&routeGeometry()){
     target.disabled=true;
     try{

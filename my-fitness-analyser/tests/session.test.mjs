@@ -52,7 +52,7 @@ test('sign-out cancels pending reads and clears member data before another accou
   const cancelled=assert.rejects(refreshView('/api/journal','journal'),{name:'AbortError'});
   await logout();
   await cancelled;
-  assert.deepEqual(redirects,['/sign-in.html']);
+  assert.deepEqual(redirects,['/sign-in.html?signed-out=1']);
   assert.ok(cleared);
   assert.equal(localStorage.getItem('mfa-private:first'),null);
   assert.equal(viewSnapshot(training,'training'),undefined);

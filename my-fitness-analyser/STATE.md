@@ -1,9 +1,15 @@
 # Current state
 
 Updated: 20 November 2026 (Australia/Sydney)
-Completed increment: manually emailed member activation (F24)
+Completed increment: mobile account and sign-out review (F23/F24)
 
 ## Implemented
+
+- Account now has a compact profile, section shortcuts, a Garmin-first task
+  order and on-demand import, backup and password forms. The shared sign-out
+  dialog keeps pending and retry feedback visible and confirms success on
+  Sign in. Progress month filters fit narrow screens. See the
+  [mobile review](.impeccable/critique/2026-11-19T19-01-33Z__prototypes-account-js.md) for verification.
 
 - The main header exposes sign-out on signed-in pages. Switching accounts
   clears cached member views and drafts and cancels pending private requests.

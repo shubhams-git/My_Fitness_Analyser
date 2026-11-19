@@ -4,11 +4,41 @@ html:has(.mfa-shell) { scroll-padding-top: var(--shell-clearance, 112px); }
 .mfa-shell nav a { border-bottom: 2px solid transparent; }
 .mfa-shell nav [aria-current] { color: var(--color-text); }
 .mfa-shell nav [aria-current="location"] { border-bottom-style: dashed; }
-.mfa-shell .mfa-actions { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
-.mfa-shell #logout { min-height: 44px; padding-inline: 8px; font-size: .75rem; white-space: nowrap; flex-shrink: 0; }
-.mfa-shell #logout:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
-#sign-out-status { color: var(--color-danger); }
-.mfa-shell :is(#logout, #motion)[hidden] { display: none; }
+.session-exit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: .875rem;
+  font-weight: 650;
+}
+.session-exit:is(:hover, :active) { background: var(--color-raised); }
+.session-exit svg { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; }
+.mfa-shell #logout { flex-shrink: 0; }
+.fn-app .session-dialog {
+  width: min(27rem, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 24px;
+  box-shadow: 0 16px 54px color-mix(in srgb, var(--color-canvas) 70%, transparent);
+}
+.session-dialog::backdrop { background: color-mix(in srgb, var(--color-canvas) 78%, transparent); backdrop-filter: none; }
+.session-dialog h2 { font: 700 2rem/1.1 var(--font-editorial); margin-bottom: 10px; }
+.session-dialog p { font-size: .9375rem; }
+.session-dialog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+.session-dialog-actions button { flex: 1 1 auto; }
+#confirm-sign-out[aria-disabled="true"] { opacity: .7; cursor: wait; }
+#sign-out-status { color: var(--color-danger); margin-top: 12px; overflow-wrap: anywhere; }
+#sign-out-status:empty { display: none; }
 .mfa-shell .tr-brand { flex-shrink: 0; }
 .mfa-shell .tr-brand span { white-space: nowrap; }
 #route-outlet { min-width: 0; }
@@ -52,11 +82,11 @@ html:has(.mfa-shell) { scroll-padding-top: var(--shell-clearance, 112px); }
   .mfa-shell.tr-header { column-gap: 10px; row-gap: 0; padding-block: max(2px, env(safe-area-inset-top)) 0; }
   .mfa-shell nav { flex-wrap: wrap; justify-content: space-between; gap: 0 4px; }
   .mfa-shell nav a { padding-inline: 1px; min-width: 44px; justify-content: center; }
-  .mfa-shell .mfa-actions { gap: 12px; }
   .route-preview-grid { grid-template-columns: 1fr; gap: 22px; }
   .route-placeholder + .route-placeholder { display: none; }
 }
-.large-text .mfa-shell.tr-header { position: static; }
+.large-text .mfa-shell.tr-header { position: static; flex-wrap: wrap; }
+.large-text .mfa-shell nav { order: 3; width: 100%; flex-wrap: wrap; gap: 0 20px; }
 .large-text:has(.mfa-shell) { scroll-padding-top: 12px; }
 @media(max-height:480px) and (orientation:landscape) {
  .mfa-shell.tr-header { position: static; }
@@ -64,7 +94,19 @@ html:has(.mfa-shell) { scroll-padding-top: var(--shell-clearance, 112px); }
 }
 @media (prefers-reduced-motion: no-preference) {
   html:not(.reduce-motion) #route-outlet > .route-arrival > main { animation: route-arrival 160ms cubic-bezier(.2,.75,.25,1) both; }
+  html:not(.reduce-motion) .mfa-shell .nav-arrival[aria-current="page"] { position: relative; border-bottom-color: transparent; }
+  html:not(.reduce-motion) .mfa-shell .nav-arrival[aria-current="page"]::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -2px;
+    height: 2px;
+    background: var(--color-accent);
+    transform-origin: left center;
+    animation: nav-trace 220ms var(--motion-ease) both;
+  }
 }
+@keyframes nav-trace { from { transform: scaleX(.2); } to { transform: scaleX(1); } }
+html.reduce-motion .session-dialog[open] { animation: none; }
 @keyframes route-arrival {
   from { opacity: .86; transform: translateY(3px); }
   to { opacity: 1; transform: translateY(0); }

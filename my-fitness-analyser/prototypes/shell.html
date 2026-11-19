@@ -29,9 +29,20 @@
       <a href="/journal" data-page="journal">Journal</a>
       <a href="/account" data-page="account">Account</a>
     </nav>
-    <button class="text-button" id="logout" type="button" hidden>Sign out</button>
+    <button class="session-exit" id="logout" type="button" aria-haspopup="dialog" hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 4H5v16h8M10 12h10m-4-4 4 4-4 4"/></svg>
+      Sign out
+    </button>
   </header>
-  <p id="sign-out-status" class="route-sync" role="alert"></p>
+  <dialog id="sign-out-dialog" class="session-dialog" aria-labelledby="sign-out-title" aria-describedby="sign-out-description">
+    <h2 id="sign-out-title">Sign out?</h2>
+    <p id="sign-out-description">Saved records stay in your account. Drafts on this browser will be cleared.</p>
+    <p id="sign-out-status" role="alert"></p>
+    <div class="session-dialog-actions">
+      <button class="secondary-button" id="cancel-sign-out" type="button" autofocus>Stay signed in</button>
+      <button class="primary-button" id="confirm-sign-out" type="button">Sign out</button>
+    </div>
+  </dialog>
   <div id="route-outlet" tabindex="-1">
     <main class="td-main route-preview">
       <div class="td-page-heading"><div><h1>My Fitness Analyser</h1></div></div>

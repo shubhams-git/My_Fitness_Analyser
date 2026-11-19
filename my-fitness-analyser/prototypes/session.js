@@ -153,7 +153,7 @@ export async function logout(){
     localStorage.setItem(endedKey,String(Date.now()));
   }catch{}
   document.body.replaceChildren();
-  location.replace('/sign-in.html');
+  location.replace('/sign-in.html?signed-out=1');
 }
 
 addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
@@ -163,6 +163,6 @@ addEventListener('storage',event=>{
   sessionRequests.abort();
   clearSnapshots();
   document.body.replaceChildren();
-  if(event.key===endedKey)location.replace('/sign-in.html');
+  if(event.key===endedKey)location.replace('/sign-in.html?signed-out=1');
   else location.reload();
 });

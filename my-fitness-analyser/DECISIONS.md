@@ -401,3 +401,13 @@ The hosted Training worker now receives an expanded allowlisted evidence pack, r
 ## 19 November 2026 · One hosted Gemini key pool
 
 Training and Weight rotate five distinct credentials from the same production settings. Member consent still governs sharing. Production uses the base key and suffixes 2, 3, 4 and 5.
+
+## 20 November 2026 · Mobile account and browser session
+
+Sign-out stays visible in the shared header and is available from Account.
+Both actions open the same confirmation because signing out clears local drafts.
+Pending and retry feedback stays in that dialog, and Cancel restores focus.
+Account keeps Garmin sync in view and uses disclosures for occasional tasks.
+Invitation and recovery links open password setup directly. Motion is limited
+to the selected navigation indicator, section accent rules and disclosure
+feedback. See [the mobile review](.impeccable/critique/2026-11-19T19-01-33Z__prototypes-account-js.md).

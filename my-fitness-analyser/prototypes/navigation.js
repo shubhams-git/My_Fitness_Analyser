@@ -13,11 +13,15 @@ const shell=document.querySelector('.mfa-shell');
 const outlet=document.querySelector('#route-outlet');
 const status=document.querySelector('#route-announcement');
 const signOut=document.querySelector('#logout');
+const signOutDialog=document.querySelector('#sign-out-dialog');
+const cancelSignOut=document.querySelector('#cancel-sign-out');
+const confirmSignOut=document.querySelector('#confirm-sign-out');
 const signOutStatus=document.querySelector('#sign-out-status');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const assets=new Map();
 const scrollPositions=new Map();
 let active,visit=0,prefetchTimer;
+let signOutTrigger;
 let motionEnabled=true;
 try{motionEnabled=localStorage.getItem('mfa-visual-motion')!=='off';}catch{}
 history.scrollRestoration='manual';
@@ -77,10 +81,11 @@ function setPage(view){
   const title=pages[view].title;
   document.title=title+' — My Fitness Analyser';
   const current=view==='activity'?'sessions':view;
-  for(const link of shell.querySelectorAll('[data-page]')){
-    if(link.dataset.page===current)link.setAttribute('aria-current',view==='activity'?'location':'page');
-    else link.removeAttribute('aria-current');
-  }
+  const previous=shell.querySelector('[aria-current]');
+  const selected=shell.querySelector('[data-page="'+current+'"]');
+  if(previous!==selected)previous?.removeAttribute('aria-current');
+  selected.setAttribute('aria-current',view==='activity'?'location':'page');
+  selected.classList.toggle('nav-arrival',Boolean(previous&&previous!==selected));
   document.body.className='fn-app training-app'+(view==='journal'?' journal-app':view==='activity'?' field-notes':'');
   delete document.body.dataset.hasJournal;
   const text=new URL(location.href).searchParams.get('text');
@@ -106,6 +111,9 @@ function position({hash,x=0,y=0,focus=false,href}){
     try{id=decodeURIComponent(hash.slice(1));}catch{}
     const anchor=id&&document.getElementById(id);
     if(anchor){
+      for(let node=anchor.parentElement;node;node=node.parentElement){
+        if(node instanceof HTMLDetailsElement)node.open=true;
+      }
       anchor.scrollIntoView({block:'start',behavior:'instant'});
       if(focus){if(!anchor.hasAttribute('tabindex'))anchor.tabIndex=-1;anchor.focus({preventScroll:true});}
       return;
@@ -187,7 +195,7 @@ async function show(url,{key,restore,focus=false,force=false}={}){
     current.content=content;
     signal.addEventListener('abort',()=>content.abort(),{once:true});
     outlet.replaceChildren(sync,root);
-    mount({root,route,data,signal:content.signal,navigate:open,toggleMotion});
+    mount({root,route,data,signal:content.signal,navigate:open,toggleMotion,requestSignOut:()=>showSignOut(signOut)});
     if(route.view==='account'){
       root.querySelector('.ac-controls')?.append(document.querySelector('#account-controls').content.cloneNode(true));
       updateMotion();
@@ -240,7 +248,7 @@ async function show(url,{key,restore,focus=false,force=false}={}){
       retry(sync,'Showing saved data.',reconnect);
     }
   }catch(error){
-    if(signal.aborted||signOut.disabled)return;
+    if(signal.aborted||confirmSignOut.getAttribute('aria-disabled')==='true')return;
     if(error.status===428){location.replace('/account#garmin-connection');return;}
     if(error.name==='AbortError'){
       // A write completed while this read was in flight. Read the new version.
@@ -302,15 +310,40 @@ function toggleMotion(){
 outlet.addEventListener('click',event=>{
  if(event.target.closest('#motion'))toggleMotion();
 });
-signOut.addEventListener('click',async ()=>{
-  signOut.disabled=true;
-  signOut.textContent='Signing out…';
+function showSignOut(trigger){
+  if(signOutDialog.open)return;
+  signOutTrigger=trigger;
+  confirmSignOut.textContent='Sign out';
+  signOutStatus.textContent='';
+  signOutDialog.showModal();
+}
+signOut.addEventListener('click',()=>showSignOut(signOut));
+outlet.addEventListener('click',event=>{
+  const trigger=event.target.closest('[data-session-exit]');
+  if(trigger)showSignOut(trigger);
+});
+cancelSignOut.addEventListener('click',()=>signOutDialog.close());
+signOutDialog.addEventListener('close',()=>{
+  const trigger=signOutTrigger?.isConnected?signOutTrigger:signOut;
+  trigger.focus({preventScroll:true});
+  signOutTrigger=null;
+});
+signOutDialog.addEventListener('cancel',event=>{
+  if(confirmSignOut.getAttribute('aria-disabled')==='true')event.preventDefault();
+});
+confirmSignOut.addEventListener('click',async ()=>{
+  if(confirmSignOut.getAttribute('aria-disabled')==='true')return;
+  confirmSignOut.setAttribute('aria-disabled','true');
+  cancelSignOut.disabled=true;
+  confirmSignOut.textContent='Signing out…';
   signOutStatus.textContent='';
   try{await logout();}
   catch(error){
     signOutStatus.textContent=error.message||'Couldn’t sign out. Try again.';
-    signOut.textContent='Sign out';
-    signOut.disabled=false;
+    confirmSignOut.textContent='Try again';
+    confirmSignOut.removeAttribute('aria-disabled');
+    cancelSignOut.disabled=false;
+    if(active&&!active.ready)void show(new URL(location.href),{key:active.key,force:true});
   }
 });
 reduced.addEventListener('change',updateMotion);

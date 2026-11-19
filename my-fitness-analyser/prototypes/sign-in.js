@@ -9,6 +9,7 @@ const providerButtons=[...document.querySelectorAll('[data-provider]')];
 const params=new URLSearchParams(location.search);
 const recovering=params.get('invite')==='recovery';
 const redeeming=recovering||params.get('invite')==='1';
+document.querySelector('#signed-out').hidden=redeeming||params.get('signed-out')!=='1';
 const allowedPaths=['/','/training','/training.html','/journal','/journal.html','/account','/account.html','/app.html','/index.html'];
 let next='/training',registering=false,availableProviders={};
 try{
@@ -125,7 +126,10 @@ if(!redeeming)fetch('/api/private?route=auth-options',{cache:'no-store'}).then(a
   const options=await response.json();
   if(!options.memberAccounts)return;
   availableProviders=options.providers||{};
-  for(const control of providerButtons)control.disabled=button.disabled||!availableProviders[control.dataset.provider];
-  document.querySelector('#provider-status').hidden=Object.values(availableProviders).some(Boolean);
+  for(const control of providerButtons){
+    control.hidden=!availableProviders[control.dataset.provider];
+    control.disabled=button.disabled||control.hidden;
+  }
+  document.querySelector('.sign-in-providers').hidden=providerButtons.every(control=>control.hidden);
   document.querySelector('#member-auth').hidden=false;
 }).catch(()=>{});

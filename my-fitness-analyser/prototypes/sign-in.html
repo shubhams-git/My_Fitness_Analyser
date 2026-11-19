@@ -21,6 +21,7 @@
     <section class="sign-in-panel" aria-labelledby="signin-title">
       <h1 id="signin-title">Sign in</h1>
       <p id="sign-in-description">Use the email address on your invitation.</p>
+      <p id="signed-out" role="status" hidden>You’re signed out of this browser.</p>
       <form id="sign-in-form" method="post" tabindex="-1">
         <label for="email">Email address</label>
         <input id="email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" required>
@@ -38,12 +39,11 @@
       <div id="member-auth" hidden>
         <button id="toggle-registration" class="password-visibility sign-in-toggle" type="button">Create an account</button>
         <a class="sign-in-link" href="/sign-in?invite=1">Use an invitation code</a>
-        <div class="sign-in-providers" role="group" aria-label="Continue with a social account">
+        <div class="sign-in-providers" role="group" aria-label="Continue with a social account" hidden>
           <button class="secondary-button" type="button" data-provider="google" disabled>Google</button>
           <button class="secondary-button" type="button" data-provider="facebook" disabled>Facebook</button>
           <button class="secondary-button" type="button" data-provider="github" disabled>GitHub</button>
         </div>
-        <p id="provider-status" class="sign-in-help" hidden>Social sign-in is awaiting provider setup.</p>
       </div>
       <p class="sign-in-help">This browser stays signed in. Sign out on a shared device.</p>
     </section>
