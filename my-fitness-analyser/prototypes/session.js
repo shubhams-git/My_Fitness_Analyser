@@ -1,11 +1,14 @@
 const prefix='mfa-view-v2:';
 const sessionKey='mfa-view-session-changed';
 const endedKey='mfa-session-ended';
+const logoutUrl='/api/private?route=logout';
 const maxAge=30*60*1000;
 const freshFor=45*1000;
 const maxEntries=12;
 const snapshots=new Map(),requests=new Map(),mutations=new Map();
 let generation=0,identity;
+let sessionRequests=new AbortController();
+let signingOut=false;
 
 function sessionVersion(){
   try{return [localStorage.getItem(sessionKey),localStorage.getItem(endedKey)].join(':');}catch{return null;}
@@ -105,10 +108,12 @@ export function signInPath(){
 }
 
 export async function privateResponse(url,options={}){
+  if(signingOut&&url!==logoutUrl)throw new DOMException('Sign-out is in progress.','AbortError');
   const write=options.method&&options.method!=='GET';
   if(write)invalidateFor(url);
   const session=sessionVersion(),epoch=generation;
-  const response=await fetch(url,{cache:'no-store',...options});
+  const signal=options.signal?AbortSignal.any([options.signal,sessionRequests.signal]):sessionRequests.signal;
+  const response=await fetch(url,{cache:'no-store',...options,signal});
   if(epoch!==generation||session!==sessionVersion())throw new DOMException('The session changed.','AbortError');
   if(response.ok&&write)invalidateFor(url);
   if(response.status===401||response.status===403&&!write){
@@ -135,7 +140,12 @@ export async function privateJson(url,options){
 }
 
 export async function logout(){
-  await privateJson('/api/private?route=logout',{method:'POST'});
+  // Stop outstanding refreshes before revoking the browser's current session.
+  signingOut=true;
+  sessionRequests.abort();
+  sessionRequests=new AbortController();
+  try{await privateJson(logoutUrl,{method:'POST'});}
+  finally{signingOut=false;}
   try{
     for(const key of Object.keys(localStorage)){
       if(key.startsWith('mfa-private:')||key.startsWith('mfa-prototype:'))localStorage.removeItem(key);
@@ -150,6 +160,7 @@ addEventListener('pageshow',event=>{if(event.persisted)location.reload();});
 addEventListener('pagehide',()=>document.querySelector('#route-outlet')?.replaceChildren());
 addEventListener('storage',event=>{
   if(event.key!==sessionKey&&event.key!==endedKey&&event.key!==null)return;
+  sessionRequests.abort();
   clearSnapshots();
   document.body.replaceChildren();
   if(event.key===endedKey)location.replace('/sign-in.html');

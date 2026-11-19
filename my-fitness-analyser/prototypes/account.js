@@ -49,7 +49,7 @@ const coach=document.createElement('section');
 coach.id='ai-settings';coach.setAttribute('aria-label','Training analysis preferences');
 const controls=document.createElement('div');controls.className='ac-controls';
 const display=document.createElement('div');display.className='ac-display';
-display.innerHTML='<h3>Display &amp; session</h3><p>Reduce animations and route replay motion.</p>';
+display.innerHTML='<h3>Visual motion</h3><p>Reduce animations and route replay motion.</p>';
 display.append(controls);
 const weight=document.createElement('div');weight.className='ac-display';
 weight.innerHTML='<h3>Weight analysis</h3><p>Weight and training have separate sharing choices.</p><a class="text-button" href="/journal#weight-insight">Manage weight analysis in Journal</a>';

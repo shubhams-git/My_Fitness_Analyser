@@ -12,6 +12,8 @@ const pages={
 const shell=document.querySelector('.mfa-shell');
 const outlet=document.querySelector('#route-outlet');
 const status=document.querySelector('#route-announcement');
+const signOut=document.querySelector('#logout');
+const signOutStatus=document.querySelector('#sign-out-status');
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 const assets=new Map();
 const scrollPositions=new Map();
@@ -171,6 +173,7 @@ async function show(url,{key,restore,focus=false,force=false}={}){
   },1200);
   const update=(data,mount,{animate=false,reposition=true}={})=>{
     if(signal.aborted)return;
+    signOut.hidden=!(data.viewer?.id||data.user?.id);
     const before=outlet.querySelector('h1');
     const restoreHeading=document.activeElement===before;
     const root=document.createElement('div');
@@ -237,7 +240,7 @@ async function show(url,{key,restore,focus=false,force=false}={}){
       retry(sync,'Showing saved data.',reconnect);
     }
   }catch(error){
-    if(signal.aborted)return;
+    if(signal.aborted||signOut.disabled)return;
     if(error.status===428){location.replace('/account#garmin-connection');return;}
     if(error.name==='AbortError'){
       // A write completed while this read was in flight. Read the new version.
@@ -296,13 +299,19 @@ function toggleMotion(){
   updateMotion();
   dispatchEvent(new Event('mfa-motion'));
 }
-outlet.addEventListener('click',async event=>{
+outlet.addEventListener('click',event=>{
  if(event.target.closest('#motion'))toggleMotion();
- const signOut=event.target.closest('#logout');
- if(signOut){
+});
+signOut.addEventListener('click',async ()=>{
   signOut.disabled=true;
-  try{await logout();}catch(error){const message=outlet.querySelector('#account-status');if(message)message.textContent=error.message;signOut.disabled=false;}
- }
+  signOut.textContent='Signing out…';
+  signOutStatus.textContent='';
+  try{await logout();}
+  catch(error){
+    signOutStatus.textContent=error.message||'Couldn’t sign out. Try again.';
+    signOut.textContent='Sign out';
+    signOut.disabled=false;
+  }
 });
 reduced.addEventListener('change',updateMotion);
 new ResizeObserver(()=>{

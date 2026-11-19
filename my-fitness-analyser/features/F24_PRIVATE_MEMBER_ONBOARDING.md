@@ -7,6 +7,10 @@ A transactional claim binds the invitation to the verified Auth UUID.
 Existing members keep their UUID, records and password. Use the same verified
 email across login methods so Supabase can link identities to the existing account.
 
+On a shared browser, use **Sign out** in the main header before signing in with
+another account. The app clears the signed-in member's cached views and drafts
+and returns to sign-in. Repeat the same steps to switch back.
+
 New members land in Account to connect Garmin. Training, Sessions and Journal
 open once their key is saved. Account verifies the key with Garmin before
 saving or replacing it. Sync uses the authenticated owner's stored credential,

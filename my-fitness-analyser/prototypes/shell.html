@@ -29,7 +29,9 @@
       <a href="/journal" data-page="journal">Journal</a>
       <a href="/account" data-page="account">Account</a>
     </nav>
+    <button class="text-button" id="logout" type="button" hidden>Sign out</button>
   </header>
+  <p id="sign-out-status" class="route-sync" role="alert"></p>
   <div id="route-outlet" tabindex="-1">
     <main class="td-main route-preview">
       <div class="td-page-heading"><div><h1>My Fitness Analyser</h1></div></div>
@@ -41,7 +43,6 @@
   </div>
   <template id="account-controls">
     <button class="secondary-button" id="motion" type="button" aria-pressed="true">Visual motion <span>on</span></button>
-    <button class="text-button" id="logout" type="button">Sign out</button>
   </template>
   <p id="route-announcement" class="sr-only" role="status"></p>
   <script type="module" src="/navigation.js"></script>

@@ -5,6 +5,9 @@ Completed increment: manually emailed member activation (F24)
 
 ## Implemented
 
+- The main header exposes sign-out on signed-in pages. Switching accounts
+  clears cached member views and drafts and cancels pending private requests.
+
 - A one-time Supabase invitation code lets allowlisted friends activate their
   account from an email sent by the operator. The app opens Account for password
   setup. [Manual invitation steps](features/F24_PRIVATE_MEMBER_ONBOARDING.md#invite-another-friend-manually).

@@ -5,7 +5,9 @@ html:has(.mfa-shell) { scroll-padding-top: var(--shell-clearance, 112px); }
 .mfa-shell nav [aria-current] { color: var(--color-text); }
 .mfa-shell nav [aria-current="location"] { border-bottom-style: dashed; }
 .mfa-shell .mfa-actions { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
-.mfa-shell #logout { min-height: 44px; font-size: .75rem; white-space: nowrap; }
+.mfa-shell #logout { min-height: 44px; padding-inline: 8px; font-size: .75rem; white-space: nowrap; flex-shrink: 0; }
+.mfa-shell #logout:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+#sign-out-status { color: var(--color-danger); }
 .mfa-shell :is(#logout, #motion)[hidden] { display: none; }
 .mfa-shell .tr-brand { flex-shrink: 0; }
 .mfa-shell .tr-brand span { white-space: nowrap; }
