@@ -1,4 +1,4 @@
-import { replayModel,replayPhase,replayFlight,replayMetrics,replayFraming,replayPullback } from './replay-model.js';
+import { REPLAY_VERSION,replayModel,replayPhase,replayFlight,replayMetrics,replayFraming,replayPullback } from './replay-model.js';
 import { replayLightning } from './replay-lightning.js';
 import { loadMapLibrary } from './route-maps.js';
 
@@ -11,7 +11,8 @@ export function satelliteStyle(mapTilerBrowserKey){return {version:8,name:'Field
 },layers:[{id:'earth',type:'raster',source:'satellite',paint:{'raster-fade-duration':250,'raster-saturation':-.08}}],sky:{'sky-color':'#477ba5','horizon-color':'#c7d9df','fog-color':'#c7d9df','sky-horizon-blend':.65,'horizon-fog-blend':.65,'fog-ground-blend':.12}};}
 
 const eoxCredit='<a href="https://cloudless.eox.at" target="_blank" rel="noopener noreferrer">EOxCloudless</a> by EOX IT Services GmbH · Contains modified Copernicus Sentinel data 2024 · <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener noreferrer">CC BY-NC-SA 4.0</a>';
-const mapTilerCredit='<a class="satellite-provider-logo" href="https://www.maptiler.com/" target="_blank" rel="noopener noreferrer"><img src="https://api.maptiler.com/resources/logo.svg" alt="MapTiler"></a><a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener noreferrer">© MapTiler</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>';
+const MAPTILER_LOGO='https://api.maptiler.com/resources/logo.svg';
+const mapTilerCredit=`<a class="satellite-provider-logo" href="https://www.maptiler.com/" target="_blank" rel="noopener noreferrer"><img src="${MAPTILER_LOGO}" alt="MapTiler"></a><a href="https://www.maptiler.com/copyright/" target="_blank" rel="noopener noreferrer">© MapTiler</a> · <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>`;
 
 export function createReplayMap(Map,container,model,key,options={}){
   return new Map({
@@ -86,22 +87,29 @@ export function openSatelliteReplay({activity,mapTilerBrowserKey,opener,reduced=
   exportButton.addEventListener('click',async()=>{
     if(exportJob||!ready||dead)return;
     pause();
+    const scene={
+      mapTilerBrowserKey:useMapTiler?mapTilerBrowserKey:null,
+      logoUrl:MAPTILER_LOGO,
+      terrain:map.getTerrain(),
+      chaseFitZoom:framing.fit.zoom
+    };
     exportJob=new AbortController();
     exportButton.disabled=true;
     storyLink.hidden=true;
     if(storyUrl){URL.revokeObjectURL(storyUrl);storyUrl=null;}
     exportStatus.textContent='Preparing the 9:16 Story…';
     try{
-      const {recordReplayStory}=await import('./replay-export.js');
+      const {recordReplayStory}=await import(`./replay-export.js?v=${REPLAY_VERSION}`);
       exportJob.signal.throwIfAborted();
-      const blob=await recordReplayStory({activity,model,flight,container:dialog,signal:exportJob.signal,onProgress:percent=>{
+      const blob=await recordReplayStory({activity,model,flight,scene,container:dialog,signal:exportJob.signal,onProgress:percent=>{
         exportStatus.textContent=percent===100?'Finishing your MP4…':`Rendering your Story… ${percent}%`;
       }});
       if(dead)return;
       const title=activity.title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
       storyUrl=URL.createObjectURL(blob);
       storyLink.href=storyUrl;
-      storyLink.download=`${title||'route'}-story.mp4`;
+      const renderedAt=new Date().toISOString().replace(/[-:]/g,'').slice(0,15);
+      storyLink.download=`${title||'route'}-story-${renderedAt}.mp4`;
       storyLink.hidden=false;
       exportButton.hidden=true;
       exportStatus.textContent='Story ready · 1080 × 1920 MP4';

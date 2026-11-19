@@ -1,7 +1,7 @@
 # Current state
 
-Updated: 19 November 2026 (Australia/Sydney)
-Completed increment: private member onboarding and encrypted Garmin sync (F24)
+Updated: 20 November 2026 (Australia/Sydney)
+Completed increment: full-resolution Story flyover export (F16)
 
 ## Implemented
 
@@ -28,10 +28,13 @@ Completed increment: private member onboarding and encrypted Garmin sync (F24)
   playback and Story export. The chase camera is 0.25 zoom levels closer.
   GPS gaps remain open. Reduced motion retains top-down manual inspection.
   Download Story renders a portrait 1080 × 1920 silent H.264 MP4 at 30 fps
-  in the browser. Chromium exercises the synthetic route with live imagery
-  in phone and landscape layouts. FFprobe verified 678 frames across
-  22.6 seconds at 1080 × 1920 and 30 fps. All 153 prototype tests and the
-  foundation checks pass. See [F16](features/F16_SATELLITE_REPLAY.md).
+  in the browser. It uses the active replay's imagery provider, terrain and
+  chase zoom. The map and effects render at native output resolution, and
+  failed tiles interrupt export before a file is saved. Each render has a
+  timestamped filename. A Chromium phone-viewport check exported an H.264 MP4
+  at 1080 × 1920 and 30 fps with MapTiler tile fixtures and live terrain.
+  All 158 prototype tests and the foundation checks pass.
+  See [F16](features/F16_SATELLITE_REPLAY.md).
 
 - Route replay can use higher-resolution MapTiler Cloud Free imagery with an
   origin-restricted `MAPTILER_BROWSER_KEY` on the deployment. EOxCloudless
@@ -358,5 +361,4 @@ Work stays on master; no new branch for this increment.
 
 ## Next action
 
-Configure the sign-in method for the first invited member and verify onboarding
-and sync with their own Garmin account.
+Verify a hosted Story download on physical iPhone Safari.

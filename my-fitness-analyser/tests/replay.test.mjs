@@ -81,6 +81,9 @@ test('flight pans into the start, turns smoothly at a sharp corner, and settles 
  assert.deepEqual(camera(3.8).center,model.route.points[0].coordinate);
  assert.equal(camera(6).zoom,15.4);
  assert.equal(flight.cameraAt(6,framing,{sharpImagery:false}).zoom,14.7);
+ const portraitExport={...framing,fit:{...fit,zoom:12},chaseFitZoom:fit.zoom};
+ assert.equal(flight.cameraAt(6,portraitExport).zoom,camera(6).zoom);
+ assert.equal(flight.cameraAt(6,portraitExport,{sharpImagery:false}).zoom,14.7);
  assert.ok(Math.abs(angleDelta(camera(6).bearing,camera(15).bearing))>30);
  for(let t=4;t<16;t+=.025){
   assert.ok(Math.abs(angleDelta(camera(t).bearing,camera(t+.025).bearing))<=.626);

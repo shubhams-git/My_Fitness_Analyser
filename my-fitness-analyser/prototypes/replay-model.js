@@ -1,6 +1,6 @@
 import { geographicRoute,routeFeatures } from './route-geometry.js';
 
-export const REPLAY_VERSION='satellite-replay-v7';
+export const REPLAY_VERSION='satellite-replay-v8';
 export const REPLAY_SECONDS=22.7;
 const descentEnd=3.8, finishHold=1.6;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -140,7 +140,7 @@ export function replayFlight(model){
     const a=frames[start],b=frames[Math.min(count,start+1)],exit=replayPullback(seconds,model.duration);
     const followCenter=mixPoint(a.center,b.center,u);
     const followBearing=mix(a.bearing,b.bearing,u);
-    const chaseZoom=Math.min(sharpImagery?15.85:14.7,fit.zoom+2.4);
+    const chaseZoom=Math.min(sharpImagery?15.85:14.7,(framing.chaseFitZoom??fit.zoom)+2.4);
     return {
       center:mixPoint(mixPoint(opening.center,followCenter,approach),closing.center,exit),
       bearing:mix(openingBearing,followBearing,turn)+angleDelta(followBearing,closingBearing)*exit,

@@ -143,3 +143,15 @@ Version satellite-replay-v7 keeps the full route as a muted guide and lights
 the covered distance up to the current GPS position. The inset and Story MP4
 use the same playback progress, including when the timeline is scrubbed.
 Chase zoom increases by 0.25 levels.
+
+Version satellite-replay-v8 uses the replay's active satellite provider,
+terrain and chase zoom in the Story MP4. The opening and finish still fit the
+portrait canvas. Both the map and the route effects render at 1080 × 1920, and
+the encoder targets 9 Mbps at 30 fps. It waits for visible map tiles before
+encoding and reports a tile failure instead of saving a partial video.
+Each render has a timestamped filename. The live flyover's presentation stays
+the same. MapTiler's Cloud terms allow attributed videos within their limited
+video provision. EOxCloudless and terrain retain their own credits when used.
+
+- [MapTiler Cloud terms and limited video provision](https://www.maptiler.com/terms/cloud/)
+- [MapTiler attribution guidance for videos](https://docs.maptiler.com/guides/map-design/attribution/add-attribution/)

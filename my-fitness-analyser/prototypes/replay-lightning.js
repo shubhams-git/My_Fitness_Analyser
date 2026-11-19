@@ -112,13 +112,12 @@ function routeOverview(route){
   };
 }
 
-export function replayLightning(canvas,route){
+export function replayLightning(canvas,route,scale=Math.min(window.devicePixelRatio||1,1.5)){
   const ctx=canvas.getContext('2d');
   const drawOverview=routeOverview(route);
   return function paint(map,{points=[],covered=[],coordinate,seconds=0,energy=0,overview=0}={},insetBottom=14){
     if(!ctx)return;
     const width=canvas.clientWidth,height=canvas.clientHeight;
-    const scale=Math.min(window.devicePixelRatio||1,1.5);
     const pixelsWide=Math.round(width*scale),pixelsHigh=Math.round(height*scale);
     if(canvas.width!==pixelsWide||canvas.height!==pixelsHigh){
       canvas.width=pixelsWide;

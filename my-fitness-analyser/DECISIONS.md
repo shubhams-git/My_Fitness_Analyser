@@ -1,5 +1,11 @@
 # Decision register
 
+D53 — Match Story rendering to the live flyover, 20 November 2026.
+Capture the replay's active imagery, terrain and chase zoom when rendering
+an attributed portrait video. Render map and effects at native output
+resolution, wait for the displayed tiles before encoding, and give each
+download a timestamped filename. See F16.
+
 D52 — Private member onboarding, 19 November 2026. Keep one Supabase project
 and its owner-scoped policies. Admit verified invited email addresses through
 Supabase's managed password and Google, Facebook and GitHub OAuth flows. Bind
